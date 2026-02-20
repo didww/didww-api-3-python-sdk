@@ -1,0 +1,70 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10', '3.11', '3.12', '3.13']
+    name: Tests with Python ${{ matrix.python-version }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: pip install -e ".[dev]"
+
+      - name: Run tests with coverage
+        run: pytest --cov=didww --cov-report=xml --cov-report=term-missing -v
+
+      - name: Upload coverage artifact
+        if: matrix.python-version == '3.13'
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage.xml
+
+      - name: Publish coverage summary
+        if: always() && matrix.python-version == '3.13'
+        run: |
+          if [ ! -f coverage.xml ]; then
+            echo "## Test Coverage" >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "Coverage report was not generated." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+
+          LINE_RATE=$(python3 -c "
+          import xml.etree.ElementTree as ET
+          tree = ET.parse('coverage.xml')
+          root = tree.getroot()
+          print(root.attrib.get('line-rate', '0'))
+          ")
+          BRANCH_RATE=$(python3 -c "
+          import xml.etree.ElementTree as ET
+          tree = ET.parse('coverage.xml')
+          root = tree.getroot()
+          print(root.attrib.get('branch-rate', '0'))
+          ")
+          LINE_PERCENT=$(python3 -c "print(f'{float(\"$LINE_RATE\") * 100:.2f}')")
+          BRANCH_PERCENT=$(python3 -c "print(f'{float(\"$BRANCH_RATE\") * 100:.2f}')")
+
+          {
+            echo "## Test Coverage"
+            echo ""
+            echo "| Metric | Coverage |"
+            echo "|---|---:|"
+            echo "| Line | ${LINE_PERCENT}% |"
+            echo "| Branch | ${BRANCH_PERCENT}% |"
+          } >> "$GITHUB_STEP_SUMMARY"

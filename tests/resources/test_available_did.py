@@ -1,0 +1,15 @@
+from tests.conftest import my_vcr
+
+
+class TestAvailableDid:
+    @my_vcr.use_cassette("available_dids/list.yaml")
+    def test_list_available_dids(self, client):
+        response = client.available_dids().list()
+        assert len(response.data) > 0
+
+    @my_vcr.use_cassette("available_dids/show.yaml")
+    def test_find_available_did(self, client):
+        response = client.available_dids().find("0b76223b-9625-412f-b0f3-330551473e7e")
+        ad = response.data
+        assert ad.id == "0b76223b-9625-412f-b0f3-330551473e7e"
+        assert ad.number == "16169886810"
