@@ -126,24 +126,7 @@ class Repository(ReadOnlyRepository):
         self.client.delete(f"{self._path}/{resource_id}")
 
 
-class CreateOnlyRepository:
-    _resource_class = None
-    _path = None
-
-    def __init__(self, client):
-        self.client = client
-
-    def list(self, params=None):
-        query = params.to_dict() if params else None
-        body = self.client.get(self._path, params=query)
-        data_list = body.get("data", [])
-        resources = [self._resource_class.from_jsonapi(d) for d in data_list]
-        return ApiResponse(
-            data=resources,
-            meta=body.get("meta", {}),
-            included=body.get("included", []),
-        )
-
+class CreateOnlyRepository(ReadOnlyRepository):
     def create(self, resource):
         doc = {"data": resource.to_jsonapi()}
         body = self.client.post(self._path, doc)

@@ -8,6 +8,15 @@ class TestAddressVerification:
         response = client.address_verifications().list()
         assert len(response.data) > 0
 
+    @my_vcr.use_cassette("address_verifications/show.yaml")
+    def test_find_address_verification(self, client):
+        response = client.address_verifications().find("c8e004b0-87ec-4987-b4fb-ee89db099f0e")
+        av = response.data
+        assert av.id == "c8e004b0-87ec-4987-b4fb-ee89db099f0e"
+        assert av.status == "Approved"
+        assert av.reference == "SHB-485120"
+        assert av.created_at == "2020-09-15T06:38:12.650Z"
+
     @my_vcr.use_cassette("address_verifications/create.yaml")
     def test_create_address_verification(self, client):
         av = AddressVerification()
