@@ -79,6 +79,12 @@ client = DidwwClient(api_key="YOUR_API_KEY", environment=Environment.PRODUCTION)
 ### Read-Only Resources
 
 ```python
+from didww.client import DidwwClient
+from didww.configuration import Environment
+from didww.query_params import QueryParams
+
+client = DidwwClient(api_key="YOUR_API_KEY", environment=Environment.SANDBOX)
+
 # Countries
 countries = client.countries().list().data
 country = client.countries().find("uuid").data
@@ -101,11 +107,13 @@ pops = client.pops().list().data
 # DID Group Types
 types = client.did_group_types().list().data
 
-# DID Groups
-groups = client.did_groups().list().data
+# DID Groups (with stock keeping units)
+params = QueryParams().include("stock_keeping_units")
+groups = client.did_groups().list(params).data
 
-# Available DIDs
-available = client.available_dids().list().data
+# Available DIDs (with DID group and stock keeping units)
+params = QueryParams().include("did_group.stock_keeping_units")
+available = client.available_dids().list(params).data
 
 # Proof Types
 proof_types = client.proof_types().list().data

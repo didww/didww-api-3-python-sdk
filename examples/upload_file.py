@@ -1,15 +1,14 @@
 import os
-import sys
 
 from client_factory import create_client
 from didww.encrypt import Encrypt
 
 client = create_client()
 
+# Use FILE_PATH env var or default to sample.pdf in the same directory
 file_path = os.environ.get("FILE_PATH")
 if not file_path:
-    print("FILE_PATH environment variable is required", file=sys.stderr)
-    sys.exit(1)
+    file_path = os.path.join(os.path.dirname(__file__), "sample.pdf")
 
 with open(file_path, "rb") as f:
     file_content = f.read()
