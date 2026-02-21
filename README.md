@@ -266,11 +266,14 @@ created = client.shared_capacity_groups().create(scg).data
 
 ```python
 from didww.resources.identity import Identity
+from didww.resources.country import Country
 
 identity = Identity()
 identity.first_name = "John"
 identity.last_name = "Doe"
+identity.phone_number = "12125551234"
 identity.identity_type = "Personal"
+identity.country = Country.build("country-uuid")
 created = client.identities().create(identity).data
 ```
 
@@ -278,11 +281,15 @@ created = client.identities().create(identity).data
 
 ```python
 from didww.resources.address import Address
+from didww.resources.identity import Identity
+from didww.resources.country import Country
 
 address = Address()
 address.city_name = "New York"
 address.postal_code = "10001"
 address.address = "123 Main St"
+address.identity = Identity.build("identity-uuid")
+address.country = Country.build("country-uuid")
 created = client.addresses().create(address).data
 ```
 
@@ -293,6 +300,7 @@ from didww.resources.export import Export
 
 export = Export()
 export.export_type = "cdr_in"
+export.filters = {"year": 2025, "month": 1}
 created = client.exports().create(export).data
 
 # Download the export when completed
@@ -309,7 +317,7 @@ params = (
     .filter("country.id", "uuid")
     .filter("name", "Arizona")
     .include("country")
-    .sort("-created_at")
+    .sort("name")
     .page(1, 25)
 )
 
