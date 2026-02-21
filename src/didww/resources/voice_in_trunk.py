@@ -67,6 +67,9 @@ class VoiceInTrunk(BaseResource):
         else:
             self._set_attr("configuration", config)
 
+    def set_pop(self, pop_id):
+        self._set_relationship("pop", "pops", pop_id)
+
 
 class VoiceInTrunkRepository(Repository):
     _resource_class = VoiceInTrunk
