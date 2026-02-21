@@ -74,6 +74,18 @@ class SafeAttributeField(AttributeField):
         return instance.attributes.get(self.source)
 
 
+class ExclusiveRelationField(RelationField):
+    """RelationField that nullifies another relationship when set."""
+
+    def __init__(self, source, excludes):
+        super().__init__(source)
+        self.excludes = excludes
+
+    def __set__(self, instance, value):
+        super().__set__(instance, value)
+        instance._null_relationship(self.excludes)
+
+
 class DidwwApiModel(ApiModel):
     """Base class for all DIDWW resources."""
 

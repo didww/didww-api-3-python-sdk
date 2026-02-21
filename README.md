@@ -135,7 +135,7 @@ dids = client.dids().list().data
 did = client.dids().find("uuid").data
 did.description = "Updated"
 did.capacity_limit = 20
-did.set_voice_in_trunk(VoiceInTrunk.build("trunk-uuid"))
+did.voice_in_trunk = VoiceInTrunk.build("trunk-uuid")
 client.dids().update(did)
 ```
 
