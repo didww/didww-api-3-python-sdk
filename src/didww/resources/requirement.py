@@ -33,12 +33,47 @@ class Requirement(BaseResource):
         return self._attr("address_proof_qty")
 
     @property
+    def personal_mandatory_fields(self):
+        return self._attr("personal_mandatory_fields")
+
+    @property
+    def business_mandatory_fields(self):
+        return self._attr("business_mandatory_fields")
+
+    @property
     def service_description_required(self):
         return self._attr("service_description_required")
 
     @property
     def restriction_message(self):
         return self._attr("restriction_message")
+
+    def country_id(self):
+        return self._relationship_id("country")
+
+    def did_group_type_id(self):
+        return self._relationship_id("did_group_type")
+
+    def personal_permanent_document_id(self):
+        return self._relationship_id("personal_permanent_document")
+
+    def business_permanent_document_id(self):
+        return self._relationship_id("business_permanent_document")
+
+    def personal_onetime_document_id(self):
+        return self._relationship_id("personal_onetime_document")
+
+    def business_onetime_document_id(self):
+        return self._relationship_id("business_onetime_document")
+
+    def personal_proof_type_ids(self):
+        return self._relationship_ids("personal_proof_types")
+
+    def business_proof_type_ids(self):
+        return self._relationship_ids("business_proof_types")
+
+    def address_proof_type_ids(self):
+        return self._relationship_ids("address_proof_types")
 
 
 class RequirementRepository(ReadOnlyRepository):

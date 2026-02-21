@@ -21,6 +21,13 @@ class BaseResource:
             return data.get("id")
         return None
 
+    def _relationship_ids(self, key):
+        rel = self._relationships.get(key, {})
+        data = rel.get("data") if isinstance(rel, dict) else None
+        if data and isinstance(data, list):
+            return [item.get("id") for item in data]
+        return []
+
     def _set_relationship(self, key, resource_type, resource_id):
         self._relationships[key] = {
             "data": {"type": resource_type, "id": resource_id}
