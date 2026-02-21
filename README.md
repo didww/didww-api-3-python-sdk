@@ -234,7 +234,7 @@ from didww.resources.available_did import AvailableDid
 
 reservation = DidReservation()
 reservation.description = "Reserved for client"
-reservation.set_available_did(AvailableDid.build("available-did-uuid"))
+reservation.available_did = AvailableDid.build("available-did-uuid")
 created = client.did_reservations().create(reservation).data
 
 # Delete reservation
@@ -250,7 +250,7 @@ from didww.resources.capacity_pool import CapacityPool
 scg = SharedCapacityGroup()
 scg.name = "Shared Group"
 scg.shared_channels_count = 20
-scg.set_capacity_pool(CapacityPool.build("pool-uuid"))
+scg.capacity_pool = CapacityPool.build("pool-uuid")
 created = client.shared_capacity_groups().create(scg).data
 ```
 

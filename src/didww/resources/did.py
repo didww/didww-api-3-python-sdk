@@ -1,92 +1,40 @@
-from didww.resources.base import BaseResource, Repository
+from didww.resources.base import DidwwApiModel, SafeAttributeField, RelationField, Repository
 
+class Did(DidwwApiModel):
+    _writable_attrs = {
+        "billing_cycles_count", "capacity_limit", "description",
+        "terminated", "dedicated_channels_count",
+    }
 
-class Did(BaseResource):
-    _type = "dids"
-    _writable_attrs = {"billing_cycles_count", "capacity_limit", "description", "terminated", "dedicated_channels_count", "pending_removal"}
+    number = SafeAttributeField("number")
+    blocked = SafeAttributeField("blocked")
+    capacity_limit = SafeAttributeField("capacity_limit")
+    description = SafeAttributeField("description")
+    terminated = SafeAttributeField("terminated")
+    awaiting_registration = SafeAttributeField("awaiting_registration")
+    created_at = SafeAttributeField("created_at")
+    expires_at = SafeAttributeField("expires_at")
+    channels_included_count = SafeAttributeField("channels_included_count")
+    billing_cycles_count = SafeAttributeField("billing_cycles_count")
+    dedicated_channels_count = SafeAttributeField("dedicated_channels_count")
+    order = RelationField("order")
+    did_group = RelationField("did_group")
+    voice_in_trunk = RelationField("voice_in_trunk")
+    voice_in_trunk_group = RelationField("voice_in_trunk_group")
+    capacity_pool = RelationField("capacity_pool")
+    shared_capacity_group = RelationField("shared_capacity_group")
+    address_verification = RelationField("address_verification")
 
-    @property
-    def number(self):
-        return self._attr("number")
-
-    @property
-    def blocked(self):
-        return self._attr("blocked")
-
-    @property
-    def capacity_limit(self):
-        return self._attr("capacity_limit")
-
-    @capacity_limit.setter
-    def capacity_limit(self, value):
-        self._set_attr("capacity_limit", value)
-
-    @property
-    def description(self):
-        return self._attr("description")
-
-    @description.setter
-    def description(self, value):
-        self._set_attr("description", value)
-
-    @property
-    def terminated(self):
-        return self._attr("terminated")
-
-    @property
-    def awaiting_registration(self):
-        return self._attr("awaiting_registration")
-
-    @property
-    def created_at(self):
-        return self._attr("created_at")
-
-    @property
-    def expires_at(self):
-        return self._attr("expires_at")
-
-    @property
-    def channels_included_count(self):
-        return self._attr("channels_included_count")
-
-    @property
-    def billing_cycles_count(self):
-        return self._attr("billing_cycles_count")
-
-    @billing_cycles_count.setter
-    def billing_cycles_count(self, value):
-        self._set_attr("billing_cycles_count", value)
-
-    @property
-    def pending_removal(self):
-        return self._attr("pending_removal")
-
-    @property
-    def dedicated_channels_count(self):
-        return self._attr("dedicated_channels_count")
+    class Meta:
+        type = "dids"
 
     def set_voice_in_trunk(self, trunk):
-        self._set_relationship("voice_in_trunk", trunk)
-        self._relationships["voice_in_trunk_group"] = {"data": None}
+        self.voice_in_trunk = trunk
+        self._null_relationship("voice_in_trunk_group")
 
     def set_voice_in_trunk_group(self, group):
-        self._set_relationship("voice_in_trunk_group", group)
-        self._relationships["voice_in_trunk"] = {"data": None}
-
-    def set_capacity_pool(self, pool):
-        self._set_relationship("capacity_pool", pool)
-
-    def set_shared_capacity_group(self, group):
-        self._set_relationship("shared_capacity_group", group)
-
-    def set_address_verification(self, av):
-        self._set_relationship("address_verification", av)
-
-    def order(self):
-        return self._get_relationship("order")
-
-    def did_group(self):
-        return self._get_relationship("did_group")
+        self.voice_in_trunk_group = group
+        self._null_relationship("voice_in_trunk")
 
 
 class DidRepository(Repository):

@@ -1,20 +1,13 @@
-from didww.resources.base import BaseResource, ReadOnlyRepository
+from didww.resources.base import DidwwApiModel, SafeAttributeField, ReadOnlyRepository
 
 
-class StockKeepingUnit(BaseResource):
-    _type = "stock_keeping_units"
+class StockKeepingUnit(DidwwApiModel):
+    setup_price = SafeAttributeField("setup_price")
+    monthly_price = SafeAttributeField("monthly_price")
+    channels_included_count = SafeAttributeField("channels_included_count")
 
-    @property
-    def setup_price(self):
-        return self._attr("setup_price")
-
-    @property
-    def monthly_price(self):
-        return self._attr("monthly_price")
-
-    @property
-    def channels_included_count(self):
-        return self._attr("channels_included_count")
+    class Meta:
+        type = "stock_keeping_units"
 
 
 class StockKeepingUnitRepository(ReadOnlyRepository):

@@ -15,7 +15,7 @@ class TestAvailableDid:
         ad = response.data
         assert ad.id == "0b76223b-9625-412f-b0f3-330551473e7e"
         assert ad.number == "16169886810"
-        dg = ad.did_group()
+        dg = ad.did_group
         assert dg is not None
         assert dg.prefix == "616"
-        assert len(dg.stock_keeping_units()) == 2
+        assert len(dg.stock_keeping_units) == 2

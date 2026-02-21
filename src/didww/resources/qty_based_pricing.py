@@ -1,20 +1,13 @@
-from didww.resources.base import BaseResource, ReadOnlyRepository
+from didww.resources.base import DidwwApiModel, SafeAttributeField, ReadOnlyRepository
 
 
-class QtyBasedPricing(BaseResource):
-    _type = "qty_based_pricings"
+class QtyBasedPricing(DidwwApiModel):
+    qty = SafeAttributeField("qty")
+    setup_price = SafeAttributeField("setup_price")
+    monthly_price = SafeAttributeField("monthly_price")
 
-    @property
-    def qty(self):
-        return self._attr("qty")
-
-    @property
-    def setup_price(self):
-        return self._attr("setup_price")
-
-    @property
-    def monthly_price(self):
-        return self._attr("monthly_price")
+    class Meta:
+        type = "qty_based_pricings"
 
 
 class QtyBasedPricingRepository(ReadOnlyRepository):

@@ -1,58 +1,25 @@
-from didww.resources.base import BaseResource, Repository
+from didww.resources.base import DidwwApiModel, SafeAttributeField, RelationField, Repository
 
 
-class CapacityPool(BaseResource):
-    _type = "capacity_pools"
+class CapacityPool(DidwwApiModel):
     _writable_attrs = {"total_channels_count"}
 
-    @property
-    def name(self):
-        return self._attr("name")
+    name = SafeAttributeField("name")
+    renew_date = SafeAttributeField("renew_date")
+    total_channels_count = SafeAttributeField("total_channels_count")
+    assigned_channels_count = SafeAttributeField("assigned_channels_count")
+    minimum_limit = SafeAttributeField("minimum_limit")
+    minimum_qty_per_order = SafeAttributeField("minimum_qty_per_order")
+    setup_price = SafeAttributeField("setup_price")
+    monthly_price = SafeAttributeField("monthly_price")
+    metered_rate = SafeAttributeField("metered_rate")
 
-    @property
-    def renew_date(self):
-        return self._attr("renew_date")
+    countries = RelationField("countries")
+    shared_capacity_groups = RelationField("shared_capacity_groups")
+    qty_based_pricings = RelationField("qty_based_pricings")
 
-    @property
-    def total_channels_count(self):
-        return self._attr("total_channels_count")
-
-    @total_channels_count.setter
-    def total_channels_count(self, value):
-        self._set_attr("total_channels_count", value)
-
-    @property
-    def assigned_channels_count(self):
-        return self._attr("assigned_channels_count")
-
-    @property
-    def minimum_limit(self):
-        return self._attr("minimum_limit")
-
-    @property
-    def minimum_qty_per_order(self):
-        return self._attr("minimum_qty_per_order")
-
-    @property
-    def setup_price(self):
-        return self._attr("setup_price")
-
-    @property
-    def monthly_price(self):
-        return self._attr("monthly_price")
-
-    @property
-    def metered_rate(self):
-        return self._attr("metered_rate")
-
-    def countries(self):
-        return self._get_relationships("countries")
-
-    def shared_capacity_groups(self):
-        return self._get_relationships("shared_capacity_groups")
-
-    def qty_based_pricings(self):
-        return self._get_relationships("qty_based_pricings")
+    class Meta:
+        type = "capacity_pools"
 
 
 class CapacityPoolRepository(Repository):

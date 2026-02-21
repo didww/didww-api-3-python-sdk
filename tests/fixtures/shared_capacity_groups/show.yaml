@@ -74,7 +74,7 @@ interactions:
         ,\n        \"terminated\": false,\n        \"awaiting_registration\": false,\n\
         \        \"created_at\": \"2018-12-27T16:44:05.634Z\",\n        \"number\"\
         : \"18082068798\",\n        \"expires_at\": \"2019-01-27T16:44:06.207Z\",\n\
-        \        \"channels_included_count\": 2,\n        \"pending_removal\": false,\n\
+        \        \"channels_included_count\": 2,\n        \"billing_cycles_count\": null,\n\
         \        \"dedicated_channels_count\": 0\n      },\n      \"relationships\"\
         : {\n        \"did_group\": {\n          \"links\": {\n            \"self\"\
         : \"https://sandbox-api.didww.com/v3/dids/0e63926a-a9cc-4597-b58b-620c3b05cd7f/relationships/did_group\"\
@@ -100,7 +100,7 @@ interactions:
         ,\n        \"terminated\": false,\n        \"awaiting_registration\": false,\n\
         \        \"created_at\": \"2018-12-27T16:45:15.997Z\",\n        \"number\"\
         : \"18082068794\",\n        \"expires_at\": \"2019-01-27T16:45:15.957Z\",\n\
-        \        \"channels_included_count\": 2,\n        \"pending_removal\": false,\n\
+        \        \"channels_included_count\": 2,\n        \"billing_cycles_count\": null,\n\
         \        \"dedicated_channels_count\": 0\n      },\n      \"relationships\"\
         : {\n        \"did_group\": {\n          \"links\": {\n            \"self\"\
         : \"https://sandbox-api.didww.com/v3/dids/ac6b3d66-3b45-423b-b378-52e236f18399/relationships/did_group\"\
@@ -126,7 +126,7 @@ interactions:
         ,\n        \"terminated\": false,\n        \"awaiting_registration\": false,\n\
         \        \"created_at\": \"2018-12-27T16:42:07.700Z\",\n        \"number\"\
         : \"542323629641\",\n        \"expires_at\": \"2019-01-27T16:43:05.192Z\"\
-        ,\n        \"channels_included_count\": 0,\n        \"pending_removal\": false,\n\
+        ,\n        \"channels_included_count\": 0,\n        \"billing_cycles_count\": null,\n\
         \        \"dedicated_channels_count\": 0\n      },\n      \"relationships\"\
         : {\n        \"did_group\": {\n          \"links\": {\n            \"self\"\
         : \"https://sandbox-api.didww.com/v3/dids/619a9f6a-78f8-4f87-9d18-ecbff657f014/relationships/did_group\"\
@@ -152,7 +152,7 @@ interactions:
         ,\n        \"terminated\": false,\n        \"awaiting_registration\": false,\n\
         \        \"created_at\": \"2018-12-27T16:42:07.725Z\",\n        \"number\"\
         : \"542323629643\",\n        \"expires_at\": \"2019-01-27T16:43:05.159Z\"\
-        ,\n        \"channels_included_count\": 0,\n        \"pending_removal\": false,\n\
+        ,\n        \"channels_included_count\": 0,\n        \"billing_cycles_count\": null,\n\
         \        \"dedicated_channels_count\": 0\n      },\n      \"relationships\"\
         : {\n        \"did_group\": {\n          \"links\": {\n            \"self\"\
         : \"https://sandbox-api.didww.com/v3/dids/78771845-2f29-46bc-8151-53732926d3ed/relationships/did_group\"\
@@ -178,7 +178,7 @@ interactions:
         ,\n        \"terminated\": false,\n        \"awaiting_registration\": false,\n\
         \        \"created_at\": \"2018-12-27T16:45:16.033Z\",\n        \"number\"\
         : \"18082068799\",\n        \"expires_at\": \"2019-01-27T16:45:15.958Z\",\n\
-        \        \"channels_included_count\": 2,\n        \"pending_removal\": false,\n\
+        \        \"channels_included_count\": 2,\n        \"billing_cycles_count\": null,\n\
         \        \"dedicated_channels_count\": 0\n      },\n      \"relationships\"\
         : {\n        \"did_group\": {\n          \"links\": {\n            \"self\"\
         : \"https://sandbox-api.didww.com/v3/dids/98798cf5-80ee-4736-aff9-4d3ce60ae29a/relationships/did_group\"\
@@ -204,7 +204,7 @@ interactions:
         ,\n        \"terminated\": false,\n        \"awaiting_registration\": false,\n\
         \        \"created_at\": \"2018-12-28T10:40:48.488Z\",\n        \"number\"\
         : \"14057782140\",\n        \"expires_at\": \"2019-01-28T10:41:04.529Z\",\n\
-        \        \"channels_included_count\": 2,\n        \"pending_removal\": false,\n\
+        \        \"channels_included_count\": 2,\n        \"billing_cycles_count\": null,\n\
         \        \"dedicated_channels_count\": 0\n      },\n      \"relationships\"\
         : {\n        \"did_group\": {\n          \"links\": {\n            \"self\"\
         : \"https://sandbox-api.didww.com/v3/dids/7a8a797d-b0e8-4e90-ac32-0a251ca3d612/relationships/did_group\"\
@@ -230,7 +230,7 @@ interactions:
         ,\n        \"terminated\": false,\n        \"awaiting_registration\": false,\n\
         \        \"created_at\": \"2018-12-27T09:59:55.175Z\",\n        \"number\"\
         : \"16091609123456799\",\n        \"expires_at\": \"2019-01-27T10:00:04.659Z\"\
-        ,\n        \"channels_included_count\": 2,\n        \"pending_removal\": false,\n\
+        ,\n        \"channels_included_count\": 2,\n        \"billing_cycles_count\": null,\n\
         \        \"dedicated_channels_count\": 0\n      },\n      \"relationships\"\
         : {\n        \"did_group\": {\n          \"links\": {\n            \"self\"\
         : \"https://sandbox-api.didww.com/v3/dids/a79c8633-60d6-4640-9a72-680d59cb44ee/relationships/did_group\"\
@@ -256,7 +256,7 @@ interactions:
         ,\n        \"terminated\": false,\n        \"awaiting_registration\": false,\n\
         \        \"created_at\": \"2018-12-27T09:59:55.053Z\",\n        \"number\"\
         : \"16091609123456798\",\n        \"expires_at\": \"2019-01-27T10:00:04.715Z\"\
-        ,\n        \"channels_included_count\": 0,\n        \"pending_removal\": false,\n\
+        ,\n        \"channels_included_count\": 0,\n        \"billing_cycles_count\": null,\n\
         \        \"dedicated_channels_count\": 0\n      },\n      \"relationships\"\
         : {\n        \"did_group\": {\n          \"links\": {\n            \"self\"\
         : \"https://sandbox-api.didww.com/v3/dids/9467643f-8fbc-4e25-9818-59f8ccfb915a/relationships/did_group\"\
@@ -282,7 +282,7 @@ interactions:
         ,\n        \"terminated\": false,\n        \"awaiting_registration\": false,\n\
         \        \"created_at\": \"2018-12-27T09:56:40.275Z\",\n        \"number\"\
         : \"16091609123456795\",\n        \"expires_at\": \"2019-01-27T09:57:02.119Z\"\
-        ,\n        \"channels_included_count\": 0,\n        \"pending_removal\": false,\n\
+        ,\n        \"channels_included_count\": 0,\n        \"billing_cycles_count\": null,\n\
         \        \"dedicated_channels_count\": 0\n      },\n      \"relationships\"\
         : {\n        \"did_group\": {\n          \"links\": {\n            \"self\"\
         : \"https://sandbox-api.didww.com/v3/dids/06e783b2-860c-4c6d-911d-989c081e1f46/relationships/did_group\"\
@@ -308,7 +308,7 @@ interactions:
         ,\n        \"terminated\": false,\n        \"awaiting_registration\": false,\n\
         \        \"created_at\": \"2018-12-27T09:56:40.237Z\",\n        \"number\"\
         : \"16091609123456794\",\n        \"expires_at\": \"2019-01-27T09:57:02.150Z\"\
-        ,\n        \"channels_included_count\": 0,\n        \"pending_removal\": false,\n\
+        ,\n        \"channels_included_count\": 0,\n        \"billing_cycles_count\": null,\n\
         \        \"dedicated_channels_count\": 0\n      },\n      \"relationships\"\
         : {\n        \"did_group\": {\n          \"links\": {\n            \"self\"\
         : \"https://sandbox-api.didww.com/v3/dids/a0366c97-a34f-4b09-a615-4e41bdec9abd/relationships/did_group\"\
@@ -334,7 +334,7 @@ interactions:
         ,\n        \"terminated\": false,\n        \"awaiting_registration\": false,\n\
         \        \"created_at\": \"2018-12-27T09:55:12.536Z\",\n        \"number\"\
         : \"16091234567\",\n        \"expires_at\": \"2019-01-27T09:56:02.662Z\",\n\
-        \        \"channels_included_count\": 0,\n        \"pending_removal\": false,\n\
+        \        \"channels_included_count\": 0,\n        \"billing_cycles_count\": null,\n\
         \        \"dedicated_channels_count\": 0\n      },\n      \"relationships\"\
         : {\n        \"did_group\": {\n          \"links\": {\n            \"self\"\
         : \"https://sandbox-api.didww.com/v3/dids/d526e2d6-9015-49f8-b474-74ab2aad33ab/relationships/did_group\"\
@@ -360,7 +360,7 @@ interactions:
         ,\n        \"terminated\": false,\n        \"awaiting_registration\": false,\n\
         \        \"created_at\": \"2018-12-27T09:55:12.575Z\",\n        \"number\"\
         : \"16091609123456789\",\n        \"expires_at\": \"2019-01-27T09:56:02.627Z\"\
-        ,\n        \"channels_included_count\": 0,\n        \"pending_removal\": false,\n\
+        ,\n        \"channels_included_count\": 0,\n        \"billing_cycles_count\": null,\n\
         \        \"dedicated_channels_count\": 0\n      },\n      \"relationships\"\
         : {\n        \"did_group\": {\n          \"links\": {\n            \"self\"\
         : \"https://sandbox-api.didww.com/v3/dids/5e78f52d-2328-4ecd-9f85-bcb28737e47f/relationships/did_group\"\
@@ -386,7 +386,7 @@ interactions:
         ,\n        \"terminated\": false,\n        \"awaiting_registration\": false,\n\
         \        \"created_at\": \"2018-12-27T09:55:12.699Z\",\n        \"number\"\
         : \"16091609123456790\",\n        \"expires_at\": \"2019-01-27T09:56:02.559Z\"\
-        ,\n        \"channels_included_count\": 2,\n        \"pending_removal\": false,\n\
+        ,\n        \"channels_included_count\": 2,\n        \"billing_cycles_count\": null,\n\
         \        \"dedicated_channels_count\": 0\n      },\n      \"relationships\"\
         : {\n        \"did_group\": {\n          \"links\": {\n            \"self\"\
         : \"https://sandbox-api.didww.com/v3/dids/683a7cbb-0859-438e-9540-105f3411c98f/relationships/did_group\"\
@@ -412,7 +412,7 @@ interactions:
         ,\n        \"terminated\": false,\n        \"awaiting_registration\": false,\n\
         \        \"created_at\": \"2018-12-27T09:56:01.638Z\",\n        \"number\"\
         : \"16091609123456791\",\n        \"expires_at\": \"2019-01-27T09:56:02.821Z\"\
-        ,\n        \"channels_included_count\": 0,\n        \"pending_removal\": false,\n\
+        ,\n        \"channels_included_count\": 0,\n        \"billing_cycles_count\": null,\n\
         \        \"dedicated_channels_count\": 0\n      },\n      \"relationships\"\
         : {\n        \"did_group\": {\n          \"links\": {\n            \"self\"\
         : \"https://sandbox-api.didww.com/v3/dids/db9de004-95e2-4f14-8867-bd43183d9c2c/relationships/did_group\"\
@@ -438,7 +438,7 @@ interactions:
         ,\n        \"terminated\": false,\n        \"awaiting_registration\": false,\n\
         \        \"created_at\": \"2018-12-27T09:56:01.679Z\",\n        \"number\"\
         : \"16091609123456792\",\n        \"expires_at\": \"2019-01-27T09:56:02.792Z\"\
-        ,\n        \"channels_included_count\": 0,\n        \"pending_removal\": false,\n\
+        ,\n        \"channels_included_count\": 0,\n        \"billing_cycles_count\": null,\n\
         \        \"dedicated_channels_count\": 0\n      },\n      \"relationships\"\
         : {\n        \"did_group\": {\n          \"links\": {\n            \"self\"\
         : \"https://sandbox-api.didww.com/v3/dids/d962f2b1-a34d-45dc-9964-2a0ad83ffbd2/relationships/did_group\"\
@@ -464,7 +464,7 @@ interactions:
         ,\n        \"terminated\": false,\n        \"awaiting_registration\": false,\n\
         \        \"created_at\": \"2018-12-27T09:56:01.799Z\",\n        \"number\"\
         : \"16091609123456793\",\n        \"expires_at\": \"2019-01-27T09:56:02.759Z\"\
-        ,\n        \"channels_included_count\": 2,\n        \"pending_removal\": false,\n\
+        ,\n        \"channels_included_count\": 2,\n        \"billing_cycles_count\": null,\n\
         \        \"dedicated_channels_count\": 0\n      },\n      \"relationships\"\
         : {\n        \"did_group\": {\n          \"links\": {\n            \"self\"\
         : \"https://sandbox-api.didww.com/v3/dids/be060f8b-00f3-4ee3-983a-abefaba7c6fa/relationships/did_group\"\
@@ -490,7 +490,7 @@ interactions:
         ,\n        \"terminated\": false,\n        \"awaiting_registration\": false,\n\
         \        \"created_at\": \"2018-12-27T09:56:40.396Z\",\n        \"number\"\
         : \"16091609123456796\",\n        \"expires_at\": \"2019-01-27T09:57:02.026Z\"\
-        ,\n        \"channels_included_count\": 2,\n        \"pending_removal\": false,\n\
+        ,\n        \"channels_included_count\": 2,\n        \"billing_cycles_count\": null,\n\
         \        \"dedicated_channels_count\": 0\n      },\n      \"relationships\"\
         : {\n        \"did_group\": {\n          \"links\": {\n            \"self\"\
         : \"https://sandbox-api.didww.com/v3/dids/1f07c315-8921-4c74-ab80-1a23fea87623/relationships/did_group\"\
@@ -516,7 +516,7 @@ interactions:
         \        \"terminated\": false,\n        \"awaiting_registration\": true,\n\
         \        \"created_at\": \"2017-05-24T08:04:41.572Z\",\n        \"number\"\
         : \"380442213578\",\n        \"expires_at\": \"2017-06-24T08:04:41.603Z\"\
-        ,\n        \"channels_included_count\": 0,\n        \"pending_removal\": false,\n\
+        ,\n        \"channels_included_count\": 0,\n        \"billing_cycles_count\": null,\n\
         \        \"dedicated_channels_count\": 0\n      },\n      \"relationships\"\
         : {\n        \"did_group\": {\n          \"links\": {\n            \"self\"\
         : \"https://sandbox-api.didww.com/v3/dids/d6235d1e-092b-48a1-a295-e1b13dafcda2/relationships/did_group\"\

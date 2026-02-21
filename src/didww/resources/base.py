@@ -1,171 +1,148 @@
-_type_registry = {}
+import importlib
 
-_all_types_registered = False
+from jsonapi_requests.orm.api import OrmApi
+from jsonapi_requests.orm.api_model import ApiModel
+from jsonapi_requests.orm.fields import AttributeField, RelationField
+from jsonapi_requests.data import JsonApiResponse
 
+# Map of JSON:API types to module:class for lazy loading
+_TYPE_MAP = {
+    "areas": "didww.resources.area:Area",
+    "available_dids": "didww.resources.available_did:AvailableDid",
+    "capacity_pools": "didww.resources.capacity_pool:CapacityPool",
+    "cities": "didww.resources.city:City",
+    "countries": "didww.resources.country:Country",
+    "dids": "didww.resources.did:Did",
+    "did_groups": "didww.resources.did_group:DidGroup",
+    "did_group_types": "didww.resources.did_group_type:DidGroupType",
+    "did_reservations": "didww.resources.did_reservation:DidReservation",
+    "identities": "didww.resources.identity:Identity",
+    "nanpa_prefixes": "didww.resources.nanpa_prefix:NanpaPrefix",
+    "orders": "didww.resources.order:Order",
+    "pops": "didww.resources.pop:Pop",
+    "proofs": "didww.resources.proof:Proof",
+    "proof_types": "didww.resources.proof_type:ProofType",
+    "regions": "didww.resources.region:Region",
+    "requirements": "didww.resources.requirement:Requirement",
+    "shared_capacity_groups": "didww.resources.shared_capacity_group:SharedCapacityGroup",
+    "supporting_document_templates": "didww.resources.supporting_document_template:SupportingDocumentTemplate",
+    "voice_in_trunks": "didww.resources.voice_in_trunk:VoiceInTrunk",
+    "voice_in_trunk_groups": "didww.resources.voice_in_trunk_group:VoiceInTrunkGroup",
+    "voice_out_trunks": "didww.resources.voice_out_trunk:VoiceOutTrunk",
+    "addresses": "didww.resources.address:Address",
+    "address_verifications": "didww.resources.address_verification:AddressVerification",
+    "permanent_supporting_documents": "didww.resources.permanent_supporting_document:PermanentSupportingDocument",
+    "stock_keeping_units": "didww.resources.stock_keeping_unit:StockKeepingUnit",
+    "qty_based_pricings": "didww.resources.qty_based_pricing:QtyBasedPricing",
+    "balances": "didww.resources.balance:Balance",
+    "encrypted_files": "didww.resources.encrypted_file:EncryptedFile",
+    "exports": "didww.resources.export:Export",
+    "public_keys": "didww.resources.public_key:PublicKey",
+    "requirement_validations": "didww.resources.requirement_validation:RequirementValidation",
+    "voice_out_trunk_regenerate_credentials": "didww.resources.voice_out_trunk_regenerate_credential:VoiceOutTrunkRegenerateCredential",
+}
 
-def _ensure_all_types_registered():
-    global _all_types_registered
-    if _all_types_registered:
-        return
-    _all_types_registered = True
-    import didww.resources.area  # noqa: F401
-    import didww.resources.available_did  # noqa: F401
-    import didww.resources.capacity_pool  # noqa: F401
-    import didww.resources.city  # noqa: F401
-    import didww.resources.country  # noqa: F401
-    import didww.resources.did  # noqa: F401
-    import didww.resources.did_group  # noqa: F401
-    import didww.resources.did_group_type  # noqa: F401
-    import didww.resources.did_reservation  # noqa: F401
-    import didww.resources.identity  # noqa: F401
-    import didww.resources.nanpa_prefix  # noqa: F401
-    import didww.resources.order  # noqa: F401
-    import didww.resources.pop  # noqa: F401
-    import didww.resources.proof  # noqa: F401
-    import didww.resources.proof_type  # noqa: F401
-    import didww.resources.region  # noqa: F401
-    import didww.resources.requirement  # noqa: F401
-    import didww.resources.shared_capacity_group  # noqa: F401
-    import didww.resources.supporting_document_template  # noqa: F401
-    import didww.resources.voice_in_trunk  # noqa: F401
-    import didww.resources.voice_in_trunk_group  # noqa: F401
-    import didww.resources.voice_out_trunk  # noqa: F401
-    import didww.resources.address  # noqa: F401
-    import didww.resources.address_verification  # noqa: F401
-    import didww.resources.permanent_supporting_document  # noqa: F401
-    import didww.resources.stock_keeping_unit  # noqa: F401
-    import didww.resources.qty_based_pricing  # noqa: F401
-    import didww.resources.balance  # noqa: F401
-    import didww.resources.encrypted_file  # noqa: F401
-    import didww.resources.export  # noqa: F401
-    import didww.resources.public_key  # noqa: F401
-    import didww.resources.requirement_validation  # noqa: F401
-    import didww.resources.voice_out_trunk_regenerate_credential  # noqa: F401
+# Shared ORM API instance (no HTTP — we handle that in client.py)
+api = OrmApi(api=None)
 
-
-def _build_included_map(included_list):
-    _ensure_all_types_registered()
-    included_map = {}
-    objects = []
-    for item in included_list:
-        item_type = item.get("type")
-        item_id = item.get("id")
-        cls = _type_registry.get(item_type)
-        if cls is not None:
-            obj = cls.from_jsonapi(item)
-            included_map[f"{item_type}:{item_id}"] = obj
-            objects.append(obj)
-    for obj in objects:
-        obj._resolve_includes(included_map)
-    return included_map
+# Patch the TypeRegistry to lazy-load resource modules for unknown types.
+_original_get_model = api.type_registry.get_model.__func__
 
 
-def _resolve_response(resources, included_list):
-    if not included_list:
-        return
-    included_map = _build_included_map(included_list)
-    if isinstance(resources, list):
-        for r in resources:
-            r._resolve_includes(included_map)
-    else:
-        resources._resolve_includes(included_map)
+def _lazy_get_model(self, type):
+    try:
+        return _original_get_model(self, type)
+    except KeyError:
+        entry = _TYPE_MAP.get(type)
+        if entry is None:
+            raise
+        module_path, class_name = entry.rsplit(":", 1)
+        importlib.import_module(module_path)
+        return _original_get_model(self, type)
 
 
-class BaseResource:
-    _type = None
+import types
+api.type_registry.get_model = types.MethodType(_lazy_get_model, api.type_registry)
+
+
+class SafeAttributeField(AttributeField):
+    """Returns None for missing keys instead of KeyError."""
+
+    def __get__(self, instance, type=None):
+        if instance is None:
+            return self
+        return instance.attributes.get(self.source)
+
+
+class DidwwApiModel(ApiModel):
+    """Base class for all DIDWW resources."""
+
     _writable_attrs = None
 
-    def __init_subclass__(cls, **kwargs):
-        super().__init_subclass__(**kwargs)
-        if cls._type is not None:
-            _type_registry[cls._type] = cls
-
-    def __init__(self, id=None, attributes=None, relationships=None, meta=None):
-        self.id = id
-        self._attributes = attributes or {}
-        self._relationships = relationships or {}
-        self._meta = meta or {}
-        self._included_cache = {}
-
-    def _attr(self, key):
-        return self._attributes.get(key)
-
-    def _set_attr(self, key, value):
-        self._attributes[key] = value
-
-    def _relationship_id(self, key):
-        rel = self._relationships.get(key, {})
-        data = rel.get("data") if isinstance(rel, dict) else None
-        if data and isinstance(data, dict):
-            return data.get("id")
-        return None
-
-    def _relationship_ids(self, key):
-        rel = self._relationships.get(key, {})
-        data = rel.get("data") if isinstance(rel, dict) else None
-        if data and isinstance(data, list):
-            return [item.get("id") for item in data]
-        return []
-
-    def _set_relationship(self, key, resource):
-        self._relationships[key] = {
-            "data": {"type": resource._type, "id": resource.id}
-        }
-
-    def _set_relationships(self, key, resources):
-        self._relationships[key] = {
-            "data": [{"type": r._type, "id": r.id} for r in resources]
-        }
-
-    def _resolve_includes(self, included_map):
-        for key, rel in self._relationships.items():
-            data = rel.get("data") if isinstance(rel, dict) else None
-            if data is None:
-                continue
-            if isinstance(data, dict):
-                self._included_cache[key] = included_map.get(f"{data['type']}:{data['id']}")
-            elif isinstance(data, list):
-                self._included_cache[key] = [
-                    included_map[f"{item['type']}:{item['id']}"]
-                    for item in data if f"{item['type']}:{item['id']}" in included_map
-                ]
-
-    def _get_relationship(self, key):
-        return self._included_cache.get(key)
-
-    def _get_relationships(self, key):
-        return self._included_cache.get(key, [])
-
-    def to_jsonapi(self, include_id=False):
-        attrs = {k: v for k, v in self._attributes.items() if v is not None}
-        if self._writable_attrs is not None:
-            attrs = {k: v for k, v in attrs.items() if k in self._writable_attrs}
-        doc = {"type": self._type, "attributes": attrs}
-        if include_id and self.id:
-            doc["id"] = self.id
-        if self._relationships:
-            doc["relationships"] = dict(self._relationships)
-        return doc
+    class Meta:
+        api = api
 
     @classmethod
     def build(cls, id, **attributes):
-        return cls(id=id, attributes=attributes if attributes else {})
+        obj = cls()
+        obj.id = id
+        for k, v in attributes.items():
+            obj.attributes[k] = v
+        return obj
 
     @classmethod
     def from_jsonapi(cls, data):
-        return cls(
-            id=data.get("id"),
-            attributes=data.get("attributes", {}),
-            relationships=data.get("relationships", {}),
-            meta=data.get("meta", {}),
-        )
+        """Backward-compatible factory from a JSON:API resource dict."""
+        response = JsonApiResponse.from_data({"data": data})
+        return cls.from_response_content(response)
+
+    def to_jsonapi(self, include_id=False):
+        """Serialize for create/update, respecting _writable_attrs."""
+        attrs = dict(self.attributes)
+        attrs = {k: v for k, v in attrs.items() if v is not None}
+        if self._writable_attrs is not None:
+            attrs = {k: v for k, v in attrs.items() if k in self._writable_attrs}
+        doc = {"type": self.type, "attributes": attrs}
+        if include_id and self.id:
+            doc["id"] = self.id
+        rels = self.raw_object.relationships.as_data()
+        null_rels = getattr(self, "_null_rels", None)
+        if null_rels:
+            for key in null_rels:
+                rels[key] = {"data": None}
+        if rels:
+            doc["relationships"] = rels
+        return doc
+
+    def _null_relationship(self, key):
+        """Mark a relationship as explicitly null for serialization."""
+        if not hasattr(self, "_null_rels"):
+            self._null_rels = set()
+        self._null_rels.add(key)
+
+    def _relationship_id(self, key):
+        """Get the ID from a to-one relationship without resolving it."""
+        try:
+            rel = self.relationships[key]
+            if rel.data and rel.data.id is not None:
+                return rel.data.id
+        except (KeyError, AttributeError):
+            pass
+        return None
+
+    def _relationship_ids(self, key):
+        """Get IDs from a to-many relationship without resolving them."""
+        try:
+            rel = self.relationships[key]
+            return [item.id for item in rel.data if item.id is not None]
+        except (KeyError, AttributeError, TypeError):
+            return []
 
 
 class ApiResponse:
-    def __init__(self, data, meta=None, included=None):
+    def __init__(self, data, meta=None):
         self.data = data
         self.meta = meta or {}
-        self.included = included or []
 
 
 class ReadOnlyRepository:
@@ -178,27 +155,18 @@ class ReadOnlyRepository:
     def list(self, params=None):
         query = params.to_dict() if params else None
         body = self.client.get(self._path, params=query)
-        data_list = body.get("data", [])
-        resources = [self._resource_class.from_jsonapi(d) for d in data_list]
-        included = body.get("included", [])
-        _resolve_response(resources, included)
-        return ApiResponse(
-            data=resources,
-            meta=body.get("meta", {}),
-            included=included,
-        )
+        response = JsonApiResponse.from_data(body)
+        resources = self._resource_class.from_response_content(response)
+        if not isinstance(resources, list):
+            resources = [resources]
+        return ApiResponse(data=resources, meta=body.get("meta", {}))
 
     def find(self, resource_id, params=None):
         query = params.to_dict() if params else None
         body = self.client.get(f"{self._path}/{resource_id}", params=query)
-        resource = self._resource_class.from_jsonapi(body["data"])
-        included = body.get("included", [])
-        _resolve_response(resource, included)
-        return ApiResponse(
-            data=resource,
-            meta=body.get("meta", {}),
-            included=included,
-        )
+        response = JsonApiResponse.from_data(body)
+        resource = self._resource_class.from_response_content(response)
+        return ApiResponse(data=resource, meta=body.get("meta", {}))
 
 
 class SingletonRepository:
@@ -211,14 +179,9 @@ class SingletonRepository:
     def find(self, params=None):
         query = params.to_dict() if params else None
         body = self.client.get(self._path, params=query)
-        resource = self._resource_class.from_jsonapi(body["data"])
-        included = body.get("included", [])
-        _resolve_response(resource, included)
-        return ApiResponse(
-            data=resource,
-            meta=body.get("meta", {}),
-            included=included,
-        )
+        response = JsonApiResponse.from_data(body)
+        resource = self._resource_class.from_response_content(response)
+        return ApiResponse(data=resource, meta=body.get("meta", {}))
 
 
 class Repository(ReadOnlyRepository):
@@ -226,27 +189,17 @@ class Repository(ReadOnlyRepository):
         doc = {"data": resource.to_jsonapi()}
         query = params.to_dict() if params else None
         body = self.client.post(self._path, doc, params=query)
-        created = self._resource_class.from_jsonapi(body["data"])
-        included = body.get("included", [])
-        _resolve_response(created, included)
-        return ApiResponse(
-            data=created,
-            meta=body.get("meta", {}),
-            included=included,
-        )
+        response = JsonApiResponse.from_data(body)
+        created = self._resource_class.from_response_content(response)
+        return ApiResponse(data=created, meta=body.get("meta", {}))
 
     def update(self, resource, params=None):
         doc = {"data": resource.to_jsonapi(include_id=True)}
         query = params.to_dict() if params else None
         body = self.client.patch(f"{self._path}/{resource.id}", doc, params=query)
-        updated = self._resource_class.from_jsonapi(body["data"])
-        included = body.get("included", [])
-        _resolve_response(updated, included)
-        return ApiResponse(
-            data=updated,
-            meta=body.get("meta", {}),
-            included=included,
-        )
+        response = JsonApiResponse.from_data(body)
+        updated = self._resource_class.from_response_content(response)
+        return ApiResponse(data=updated, meta=body.get("meta", {}))
 
     def delete(self, resource_id):
         self.client.delete(f"{self._path}/{resource_id}")
@@ -257,14 +210,9 @@ class CreateOnlyRepository(ReadOnlyRepository):
         doc = {"data": resource.to_jsonapi()}
         query = params.to_dict() if params else None
         body = self.client.post(self._path, doc, params=query)
-        created = self._resource_class.from_jsonapi(body["data"])
-        included = body.get("included", [])
-        _resolve_response(created, included)
-        return ApiResponse(
-            data=created,
-            meta=body.get("meta", {}),
-            included=included,
-        )
+        response = JsonApiResponse.from_data(body)
+        created = self._resource_class.from_response_content(response)
+        return ApiResponse(data=created, meta=body.get("meta", {}))
 
     def delete(self, resource_id):
         self.client.delete(f"{self._path}/{resource_id}")

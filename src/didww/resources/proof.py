@@ -1,32 +1,18 @@
-from didww.resources.base import BaseResource, CreateOnlyRepository
+from didww.resources.base import DidwwApiModel, SafeAttributeField, RelationField, CreateOnlyRepository
 
 
-class Proof(BaseResource):
-    _type = "proofs"
+class Proof(DidwwApiModel):
     _writable_attrs = set()
 
-    @property
-    def created_at(self):
-        return self._attr("created_at")
+    created_at = SafeAttributeField("created_at")
+    expires_at = SafeAttributeField("expires_at")
 
-    @property
-    def expires_at(self):
-        return self._attr("expires_at")
+    proof_type = RelationField("proof_type")
+    entity = RelationField("entity")
+    files = RelationField("files")
 
-    def set_proof_type(self, proof_type):
-        self._set_relationship("proof_type", proof_type)
-
-    def set_entity(self, entity):
-        self._set_relationship("entity", entity)
-
-    def set_files(self, files):
-        self._set_relationships("files", files)
-
-    def proof_type(self):
-        return self._get_relationship("proof_type")
-
-    def entity(self):
-        return self._get_relationship("entity")
+    class Meta:
+        type = "proofs"
 
 
 class ProofRepository(CreateOnlyRepository):

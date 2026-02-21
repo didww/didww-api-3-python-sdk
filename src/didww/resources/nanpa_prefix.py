@@ -1,19 +1,14 @@
-from didww.resources.base import BaseResource, ReadOnlyRepository
+from didww.resources.base import DidwwApiModel, SafeAttributeField, RelationField, ReadOnlyRepository
 
 
-class NanpaPrefix(BaseResource):
-    _type = "nanpa_prefixes"
+class NanpaPrefix(DidwwApiModel):
+    npa = SafeAttributeField("npa")
+    nxx = SafeAttributeField("nxx")
 
-    @property
-    def npa(self):
-        return self._attr("npa")
+    country = RelationField("country")
 
-    @property
-    def nxx(self):
-        return self._attr("nxx")
-
-    def country(self):
-        return self._get_relationship("country")
+    class Meta:
+        type = "nanpa_prefixes"
 
 
 class NanpaPrefixRepository(ReadOnlyRepository):

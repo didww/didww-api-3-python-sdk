@@ -17,7 +17,7 @@ class TestDidReservation:
         dr = response.data
         assert dr.id == "fd38d3ff-80cf-4e67-a605-609a2884a5c4"
         assert dr.description == "DIDWW"
-        ad = dr.available_did()
+        ad = dr.available_did
         assert ad is not None
         assert ad.number == "19492033398"
 
@@ -25,7 +25,7 @@ class TestDidReservation:
     def test_create_did_reservation(self, client):
         dr = DidReservation()
         dr.description = "DIDWW"
-        dr.set_available_did(AvailableDid.build("857d1462-5f43-4238-b007-ff05f282e41b"))
+        dr.available_did = AvailableDid.build("857d1462-5f43-4238-b007-ff05f282e41b")
         response = client.did_reservations().create(dr)
         created = response.data
         assert created.id == "fd38d3ff-80cf-4e67-a605-609a2884a5c4"

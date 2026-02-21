@@ -1,18 +1,16 @@
-from didww.resources.base import BaseResource, ReadOnlyRepository
+from didww.resources.base import DidwwApiModel, SafeAttributeField, RelationField, ReadOnlyRepository
 
 
-class AvailableDid(BaseResource):
-    _type = "available_dids"
+class AvailableDid(DidwwApiModel):
+    number = SafeAttributeField("number")
 
-    @property
-    def number(self):
-        return self._attr("number")
+    did_group = RelationField("did_group")
+
+    class Meta:
+        type = "available_dids"
 
     def nanpa_prefix_id(self):
         return self._relationship_id("nanpa_prefix")
-
-    def did_group(self):
-        return self._get_relationship("did_group")
 
 
 class AvailableDidRepository(ReadOnlyRepository):

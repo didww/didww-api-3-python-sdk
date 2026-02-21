@@ -1,12 +1,11 @@
-from didww.resources.base import BaseResource, ReadOnlyRepository
+from didww.resources.base import DidwwApiModel, SafeAttributeField, ReadOnlyRepository
 
 
-class DidGroupType(BaseResource):
-    _type = "did_group_types"
+class DidGroupType(DidwwApiModel):
+    name = SafeAttributeField("name")
 
-    @property
-    def name(self):
-        return self._attr("name")
+    class Meta:
+        type = "did_group_types"
 
 
 class DidGroupTypeRepository(ReadOnlyRepository):

@@ -1,35 +1,17 @@
-from didww.resources.base import BaseResource, Repository
+from didww.resources.base import DidwwApiModel, SafeAttributeField, RelationField, Repository
 
 
-class VoiceInTrunkGroup(BaseResource):
-    _type = "voice_in_trunk_groups"
+class VoiceInTrunkGroup(DidwwApiModel):
     _writable_attrs = {"capacity_limit", "name"}
 
-    @property
-    def name(self):
-        return self._attr("name")
+    name = SafeAttributeField("name")
+    capacity_limit = SafeAttributeField("capacity_limit")
+    created_at = SafeAttributeField("created_at")
 
-    @name.setter
-    def name(self, value):
-        self._set_attr("name", value)
+    voice_in_trunks = RelationField("voice_in_trunks")
 
-    @property
-    def capacity_limit(self):
-        return self._attr("capacity_limit")
-
-    @capacity_limit.setter
-    def capacity_limit(self, value):
-        self._set_attr("capacity_limit", value)
-
-    @property
-    def created_at(self):
-        return self._attr("created_at")
-
-    def set_voice_in_trunks(self, trunks):
-        self._set_relationships("voice_in_trunks", trunks)
-
-    def voice_in_trunks(self):
-        return self._get_relationships("voice_in_trunks")
+    class Meta:
+        type = "voice_in_trunk_groups"
 
 
 class VoiceInTrunkGroupRepository(Repository):

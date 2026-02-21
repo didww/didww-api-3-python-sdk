@@ -1,46 +1,24 @@
-from didww.resources.base import BaseResource, ReadOnlyRepository
+from didww.resources.base import DidwwApiModel, SafeAttributeField, RelationField, ReadOnlyRepository
 
 
-class DidGroup(BaseResource):
-    _type = "did_groups"
+class DidGroup(DidwwApiModel):
+    prefix = SafeAttributeField("prefix")
+    features = SafeAttributeField("features")
+    is_metered = SafeAttributeField("is_metered")
+    area_name = SafeAttributeField("area_name")
+    allow_additional_channels = SafeAttributeField("allow_additional_channels")
 
-    @property
-    def prefix(self):
-        return self._attr("prefix")
+    country = RelationField("country")
+    region = RelationField("region")
+    city = RelationField("city")
+    did_group_type = RelationField("did_group_type")
+    stock_keeping_units = RelationField("stock_keeping_units")
 
-    @property
-    def features(self):
-        return self._attr("features")
-
-    @property
-    def is_metered(self):
-        return self._attr("is_metered")
-
-    @property
-    def area_name(self):
-        return self._attr("area_name")
-
-    @property
-    def allow_additional_channels(self):
-        return self._attr("allow_additional_channels")
+    class Meta:
+        type = "did_groups"
 
     def requirement_id(self):
         return self._relationship_id("requirement")
-
-    def country(self):
-        return self._get_relationship("country")
-
-    def region(self):
-        return self._get_relationship("region")
-
-    def city(self):
-        return self._get_relationship("city")
-
-    def did_group_type(self):
-        return self._get_relationship("did_group_type")
-
-    def stock_keeping_units(self):
-        return self._get_relationships("stock_keeping_units")
 
 
 class DidGroupRepository(ReadOnlyRepository):

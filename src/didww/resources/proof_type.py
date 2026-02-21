@@ -1,16 +1,12 @@
-from didww.resources.base import BaseResource, ReadOnlyRepository
+from didww.resources.base import DidwwApiModel, SafeAttributeField, ReadOnlyRepository
 
 
-class ProofType(BaseResource):
-    _type = "proof_types"
+class ProofType(DidwwApiModel):
+    name = SafeAttributeField("name")
+    entity_type = SafeAttributeField("entity_type")
 
-    @property
-    def name(self):
-        return self._attr("name")
-
-    @property
-    def entity_type(self):
-        return self._attr("entity_type")
+    class Meta:
+        type = "proof_types"
 
 
 class ProofTypeRepository(ReadOnlyRepository):

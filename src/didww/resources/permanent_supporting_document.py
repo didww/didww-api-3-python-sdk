@@ -1,28 +1,17 @@
-from didww.resources.base import BaseResource, CreateOnlyRepository
+from didww.resources.base import DidwwApiModel, SafeAttributeField, RelationField, CreateOnlyRepository
 
 
-class PermanentSupportingDocument(BaseResource):
-    _type = "permanent_supporting_documents"
+class PermanentSupportingDocument(DidwwApiModel):
     _writable_attrs = set()
 
-    @property
-    def created_at(self):
-        return self._attr("created_at")
+    created_at = SafeAttributeField("created_at")
 
-    def set_identity(self, identity):
-        self._set_relationship("identity", identity)
+    identity = RelationField("identity")
+    template = RelationField("template")
+    files = RelationField("files")
 
-    def set_template(self, template):
-        self._set_relationship("template", template)
-
-    def set_files(self, files):
-        self._set_relationships("files", files)
-
-    def template(self):
-        return self._get_relationship("template")
-
-    def identity(self):
-        return self._get_relationship("identity")
+    class Meta:
+        type = "permanent_supporting_documents"
 
 
 class PermanentSupportingDocumentRepository(CreateOnlyRepository):

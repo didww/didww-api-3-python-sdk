@@ -19,14 +19,14 @@ class TestDidGroup:
         assert dg.is_metered is False
         assert dg.area_name == "Aachen"
         assert dg.allow_additional_channels is True
-        country = dg.country()
+        country = dg.country
         assert country is not None
         assert country.name == "Germany"
-        city = dg.city()
+        city = dg.city
         assert city is not None
         assert city.name == "Aachen"
-        dgt = dg.did_group_type()
+        dgt = dg.did_group_type
         assert dgt is not None
         assert dgt.name == "Local"
-        assert dg.region() is None
-        assert len(dg.stock_keeping_units()) == 2
+        assert dg.region is None
+        assert len(dg.stock_keeping_units) == 2

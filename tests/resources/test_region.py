@@ -15,6 +15,6 @@ class TestRegion:
         region = response.data
         assert region.id == "c11b1f34-16cf-4ba6-8497-f305b53d5b01"
         assert region.name == "California"
-        country = region.country()
+        country = region.country
         assert country is not None
         assert country.name == "United States"

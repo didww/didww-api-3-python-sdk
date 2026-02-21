@@ -1,4 +1,4 @@
-from didww.resources.base import BaseResource, Repository
+from didww.resources.base import DidwwApiModel, SafeAttributeField, RelationField, Repository
 from didww.resources.configuration.base import TrunkConfiguration
 
 # Import to register types
@@ -8,54 +8,31 @@ import didww.resources.configuration.iax2  # noqa: F401
 import didww.resources.configuration.pstn  # noqa: F401
 
 
-class VoiceInTrunk(BaseResource):
-    _type = "voice_in_trunks"
-    _writable_attrs = {"priority", "capacity_limit", "weight", "name", "cli_format",
-                       "cli_prefix", "description", "ringing_timeout", "configuration"}
+class VoiceInTrunk(DidwwApiModel):
+    _writable_attrs = {
+        "priority", "capacity_limit", "weight", "name", "cli_format",
+        "cli_prefix", "description", "ringing_timeout", "configuration",
+    }
 
-    @property
-    def name(self):
-        return self._attr("name")
+    name = SafeAttributeField("name")
+    priority = SafeAttributeField("priority")
+    weight = SafeAttributeField("weight")
+    capacity_limit = SafeAttributeField("capacity_limit")
+    cli_format = SafeAttributeField("cli_format")
+    cli_prefix = SafeAttributeField("cli_prefix")
+    description = SafeAttributeField("description")
+    ringing_timeout = SafeAttributeField("ringing_timeout")
+    created_at = SafeAttributeField("created_at")
 
-    @name.setter
-    def name(self, value):
-        self._set_attr("name", value)
+    pop = RelationField("pop")
+    voice_in_trunk_group = RelationField("voice_in_trunk_group")
 
-    @property
-    def priority(self):
-        return self._attr("priority")
-
-    @property
-    def weight(self):
-        return self._attr("weight")
-
-    @property
-    def capacity_limit(self):
-        return self._attr("capacity_limit")
-
-    @property
-    def cli_format(self):
-        return self._attr("cli_format")
-
-    @property
-    def cli_prefix(self):
-        return self._attr("cli_prefix")
-
-    @property
-    def description(self):
-        return self._attr("description")
-
-    @property
-    def ringing_timeout(self):
-        return self._attr("ringing_timeout")
-
-    @property
-    def created_at(self):
-        return self._attr("created_at")
+    class Meta:
+        type = "voice_in_trunks"
 
     @property
     def configuration(self):
-        config_data = self._attr("configuration")
+        config_data = self.attributes.get("configuration")
         if config_data and isinstance(config_data, dict):
             return TrunkConfiguration.from_jsonapi(config_data)
         return config_data
@@ -63,18 +40,9 @@ class VoiceInTrunk(BaseResource):
     @configuration.setter
     def configuration(self, config):
         if isinstance(config, TrunkConfiguration):
-            self._set_attr("configuration", config.to_jsonapi())
+            self.attributes["configuration"] = config.to_jsonapi()
         else:
-            self._set_attr("configuration", config)
-
-    def set_pop(self, pop):
-        self._set_relationship("pop", pop)
-
-    def pop(self):
-        return self._get_relationship("pop")
-
-    def voice_in_trunk_group(self):
-        return self._get_relationship("voice_in_trunk_group")
+            self.attributes["configuration"] = config
 
 
 class VoiceInTrunkRepository(Repository):
