@@ -25,18 +25,6 @@ class VoiceOutTrunk(BaseResource):
         self._set_attr("allowed_sip_ips", value)
 
     @property
-    def allowed_rtp_ips(self):
-        return self._attr("allowed_rtp_ips")
-
-    @property
-    def allow_any_did_as_cli(self):
-        return self._attr("allow_any_did_as_cli")
-
-    @property
-    def status(self):
-        return self._attr("status")
-
-    @property
     def on_cli_mismatch_action(self):
         return self._attr("on_cli_mismatch_action")
 
@@ -45,8 +33,96 @@ class VoiceOutTrunk(BaseResource):
         self._set_attr("on_cli_mismatch_action", value)
 
     @property
+    def allowed_rtp_ips(self):
+        return self._attr("allowed_rtp_ips")
+
+    @allowed_rtp_ips.setter
+    def allowed_rtp_ips(self, value):
+        self._set_attr("allowed_rtp_ips", value)
+
+    @property
+    def allow_any_did_as_cli(self):
+        return self._attr("allow_any_did_as_cli")
+
+    @allow_any_did_as_cli.setter
+    def allow_any_did_as_cli(self, value):
+        self._set_attr("allow_any_did_as_cli", value)
+
+    @property
+    def status(self):
+        return self._attr("status")
+
+    @status.setter
+    def status(self, value):
+        self._set_attr("status", value)
+
+    @property
     def capacity_limit(self):
         return self._attr("capacity_limit")
+
+    @capacity_limit.setter
+    def capacity_limit(self, value):
+        self._set_attr("capacity_limit", value)
+
+    @property
+    def threshold_amount(self):
+        return self._attr("threshold_amount")
+
+    @threshold_amount.setter
+    def threshold_amount(self, value):
+        self._set_attr("threshold_amount", value)
+
+    @property
+    def threshold_reached(self):
+        return self._attr("threshold_reached")
+
+    @property
+    def media_encryption_mode(self):
+        return self._attr("media_encryption_mode")
+
+    @media_encryption_mode.setter
+    def media_encryption_mode(self, value):
+        self._set_attr("media_encryption_mode", value)
+
+    @property
+    def default_dst_action(self):
+        return self._attr("default_dst_action")
+
+    @default_dst_action.setter
+    def default_dst_action(self, value):
+        self._set_attr("default_dst_action", value)
+
+    @property
+    def dst_prefixes(self):
+        return self._attr("dst_prefixes")
+
+    @dst_prefixes.setter
+    def dst_prefixes(self, value):
+        self._set_attr("dst_prefixes", value)
+
+    @property
+    def force_symmetric_rtp(self):
+        return self._attr("force_symmetric_rtp")
+
+    @force_symmetric_rtp.setter
+    def force_symmetric_rtp(self, value):
+        self._set_attr("force_symmetric_rtp", value)
+
+    @property
+    def rtp_ping(self):
+        return self._attr("rtp_ping")
+
+    @rtp_ping.setter
+    def rtp_ping(self, value):
+        self._set_attr("rtp_ping", value)
+
+    @property
+    def callback_url(self):
+        return self._attr("callback_url")
+
+    @callback_url.setter
+    def callback_url(self, value):
+        self._set_attr("callback_url", value)
 
     @property
     def username(self):
@@ -59,18 +135,6 @@ class VoiceOutTrunk(BaseResource):
     @property
     def created_at(self):
         return self._attr("created_at")
-
-    @property
-    def media_encryption_mode(self):
-        return self._attr("media_encryption_mode")
-
-    @property
-    def force_symmetric_rtp(self):
-        return self._attr("force_symmetric_rtp")
-
-    @property
-    def rtp_ping(self):
-        return self._attr("rtp_ping")
 
     def set_default_did(self, did_id):
         self._set_relationship("default_did", "dids", did_id)
