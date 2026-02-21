@@ -13,6 +13,8 @@ class TestAddress:
         assert len(response.data) > 0
         first = response.data[0]
         assert first.country() is not None
+        assert first.country().name == "Ukraine"
+        assert first.country().iso == "UA"
 
     @my_vcr.use_cassette("addresses/create.yaml")
     def test_create_address(self, client):
@@ -30,3 +32,5 @@ class TestAddress:
         assert created.city_name == "New York"
         assert created.verified is False
         assert created.country() is not None
+        assert created.country().name == "United States"
+        assert created.country().iso == "US"

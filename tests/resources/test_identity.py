@@ -12,6 +12,8 @@ class TestIdentity:
         assert len(response.data) > 0
         first = response.data[0]
         assert first.country() is not None
+        assert first.country().name == "United States"
+        assert first.country().iso == "US"
 
     @my_vcr.use_cassette("identities/create.yaml")
     def test_create_identity(self, client):
@@ -36,3 +38,5 @@ class TestIdentity:
         assert created.first_name == "John"
         assert created.identity_type == "Business"
         assert created.country() is not None
+        assert created.country().name == "United States"
+        assert created.country().iso == "US"

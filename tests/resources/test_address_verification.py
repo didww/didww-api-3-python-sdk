@@ -13,6 +13,7 @@ class TestAddressVerification:
         assert len(response.data) > 0
         first = response.data[0]
         assert first.address() is not None
+        assert first.address().city_name == "Chicago"
 
     @my_vcr.use_cassette("address_verifications/show.yaml")
     def test_find_address_verification(self, client):
@@ -37,3 +38,4 @@ class TestAddressVerification:
         assert created.status == "Pending"
         assert created.callback_url == "http://example.com"
         assert created.address() is not None
+        assert created.address().city_name == "Chicago"

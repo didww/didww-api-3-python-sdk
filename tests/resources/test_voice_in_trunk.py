@@ -21,6 +21,7 @@ class TestVoiceInTrunk:
         assert first.weight == 65535
         assert first.cli_format == "e164"
         assert first.voice_in_trunk_group() is not None
+        assert first.voice_in_trunk_group().name == "sample trunk group"
 
     @my_vcr.use_cassette("voice_in_trunks/list.yaml")
     def test_list_sip_configuration_attributes(self, client):

@@ -10,6 +10,7 @@ class TestDid:
         assert len(response.data) > 0
         first = response.data[0]
         assert first.order() is not None
+        assert first.order().reference == "TZO-560180"
 
     @my_vcr.use_cassette("dids/show.yaml")
     def test_find_did(self, client):
