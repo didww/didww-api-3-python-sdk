@@ -1,4 +1,4 @@
-from didww.resources.base import DidwwApiModel, SafeAttributeField, RelationField, Repository
+from didww.resources.base import DidwwApiModel, SafeAttributeField, RelationField, ExclusiveRelationField, Repository
 
 class Did(DidwwApiModel):
     _writable_attrs = {
@@ -19,22 +19,14 @@ class Did(DidwwApiModel):
     dedicated_channels_count = SafeAttributeField("dedicated_channels_count")
     order = RelationField("order")
     did_group = RelationField("did_group")
-    voice_in_trunk = RelationField("voice_in_trunk")
-    voice_in_trunk_group = RelationField("voice_in_trunk_group")
+    voice_in_trunk = ExclusiveRelationField("voice_in_trunk", excludes="voice_in_trunk_group")
+    voice_in_trunk_group = ExclusiveRelationField("voice_in_trunk_group", excludes="voice_in_trunk")
     capacity_pool = RelationField("capacity_pool")
     shared_capacity_group = RelationField("shared_capacity_group")
     address_verification = RelationField("address_verification")
 
     class Meta:
         type = "dids"
-
-    def set_voice_in_trunk(self, trunk):
-        self.voice_in_trunk = trunk
-        self._null_relationship("voice_in_trunk_group")
-
-    def set_voice_in_trunk_group(self, group):
-        self.voice_in_trunk_group = group
-        self._null_relationship("voice_in_trunk")
 
 
 class DidRepository(Repository):
