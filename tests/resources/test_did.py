@@ -15,3 +15,8 @@ class TestDid:
         assert did.blocked is False
         assert did.capacity_limit == 2
         assert did.description == "something"
+        assert did.terminated is False
+        assert did.awaiting_registration is False
+        assert did.pending_removal is False
+        assert did.channels_included_count == 0
+        assert did.dedicated_channels_count == 0
