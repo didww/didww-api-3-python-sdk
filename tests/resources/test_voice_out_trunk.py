@@ -16,6 +16,19 @@ class TestVoiceOutTrunk:
         assert trunk.name == "test"
         assert trunk.status == "blocked"
         assert trunk.allowed_sip_ips == ["10.11.12.13/32"]
+        assert trunk.capacity_limit == 123
+        assert trunk.allow_any_did_as_cli is False
+        assert trunk.on_cli_mismatch_action == "replace_cli"
+        assert trunk.media_encryption_mode == "srtp_sdes"
+        assert trunk.default_dst_action == "reject_all"
+        assert trunk.dst_prefixes == ["370"]
+        assert trunk.force_symmetric_rtp is True
+        assert trunk.rtp_ping is True
+        assert trunk.threshold_reached is False
+        assert trunk.threshold_amount == "200.0"
+        assert trunk.callback_url is None
+        assert trunk.username == "dpjgwbbac9"
+        assert trunk.password == "z0hshvbcy7"
 
     @my_vcr.use_cassette("voice_out_trunks/create.yaml")
     def test_create_voice_out_trunk(self, client):
