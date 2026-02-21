@@ -1,16 +1,12 @@
-from didww.resources.base import BaseResource, Repository
+from didww.resources.base import DidwwApiModel, SafeAttributeField, Repository
 
 
-class EncryptedFile(BaseResource):
-    _type = "encrypted_files"
+class EncryptedFile(DidwwApiModel):
+    description = SafeAttributeField("description")
+    expire_at = SafeAttributeField("expire_at")
 
-    @property
-    def description(self):
-        return self._attr("description")
-
-    @property
-    def expire_at(self):
-        return self._attr("expire_at")
+    class Meta:
+        type = "encrypted_files"
 
 
 class EncryptedFileRepository(Repository):

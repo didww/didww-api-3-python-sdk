@@ -1,6 +1,7 @@
 interactions:
 - request:
-    body: null
+    body: '{"data": {"type": "capacity_pools", "id": "f288d07c-e2fc-4ae6-9837-b18fb469c324",
+      "attributes": {"total_channels_count": 25}}}'
     headers:
       Accept:
       - application/vnd.api+json

@@ -1,12 +1,13 @@
-from didww.resources.base import BaseResource, CreateOnlyRepository
+from didww.resources.base import DidwwApiModel, RelationField, CreateOnlyRepository
 
 
-class VoiceOutTrunkRegenerateCredential(BaseResource):
-    _type = "voice_out_trunk_regenerate_credentials"
+class VoiceOutTrunkRegenerateCredential(DidwwApiModel):
     _writable_attrs = set()
 
-    def set_voice_out_trunk(self, trunk_id):
-        self._set_relationship("voice_out_trunk", "voice_out_trunks", trunk_id)
+    voice_out_trunk = RelationField("voice_out_trunk")
+
+    class Meta:
+        type = "voice_out_trunk_regenerate_credentials"
 
 
 class VoiceOutTrunkRegenerateCredentialRepository(CreateOnlyRepository):

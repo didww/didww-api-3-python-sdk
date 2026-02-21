@@ -1,45 +1,19 @@
-from didww.resources.base import BaseResource, Repository
+from didww.resources.base import DidwwApiModel, SafeAttributeField, Repository
 
 
-class Export(BaseResource):
-    _type = "exports"
+class Export(DidwwApiModel):
     _writable_attrs = {"filters", "export_type", "callback_url", "callback_method"}
 
-    @property
-    def status(self):
-        return self._attr("status")
+    status = SafeAttributeField("status")
+    created_at = SafeAttributeField("created_at")
+    url = SafeAttributeField("url")
+    callback_url = SafeAttributeField("callback_url")
+    callback_method = SafeAttributeField("callback_method")
+    export_type = SafeAttributeField("export_type")
+    filters = SafeAttributeField("filters")
 
-    @property
-    def created_at(self):
-        return self._attr("created_at")
-
-    @property
-    def url(self):
-        return self._attr("url")
-
-    @property
-    def callback_url(self):
-        return self._attr("callback_url")
-
-    @property
-    def callback_method(self):
-        return self._attr("callback_method")
-
-    @property
-    def export_type(self):
-        return self._attr("export_type")
-
-    @export_type.setter
-    def export_type(self, value):
-        self._set_attr("export_type", value)
-
-    @property
-    def filters(self):
-        return self._attr("filters")
-
-    @filters.setter
-    def filters(self, value):
-        self._set_attr("filters", value)
+    class Meta:
+        type = "exports"
 
 
 class ExportRepository(Repository):

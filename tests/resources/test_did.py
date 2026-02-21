@@ -1,11 +1,16 @@
 from tests.conftest import my_vcr
+from didww.query_params import QueryParams
 
 
 class TestDid:
     @my_vcr.use_cassette("dids/list.yaml")
     def test_list_dids(self, client):
-        response = client.dids().list()
+        params = QueryParams().include("order")
+        response = client.dids().list(params)
         assert len(response.data) > 0
+        first = response.data[0]
+        assert first.order is not None
+        assert first.order.reference == "TZO-560180"
 
     @my_vcr.use_cassette("dids/show.yaml")
     def test_find_did(self, client):
@@ -15,3 +20,8 @@ class TestDid:
         assert did.blocked is False
         assert did.capacity_limit == 2
         assert did.description == "something"
+        assert did.terminated is False
+        assert did.awaiting_registration is False
+        assert did.billing_cycles_count is None
+        assert did.channels_included_count == 0
+        assert did.dedicated_channels_count == 0

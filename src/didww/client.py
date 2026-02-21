@@ -27,12 +27,12 @@ class DidwwClient:
         resp = self._session.get(self._url(path), params=params)
         return self._handle_response(resp)
 
-    def post(self, path, data):
-        resp = self._session.post(self._url(path), json=data)
+    def post(self, path, data, params=None):
+        resp = self._session.post(self._url(path), json=data, params=params)
         return self._handle_response(resp)
 
-    def patch(self, path, data):
-        resp = self._session.patch(self._url(path), json=data)
+    def patch(self, path, data, params=None):
+        resp = self._session.patch(self._url(path), json=data, params=params)
         return self._handle_response(resp)
 
     def delete(self, path):

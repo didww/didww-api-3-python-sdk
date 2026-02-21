@@ -1,12 +1,13 @@
-from didww.resources.base import BaseResource, ReadOnlyRepository
+from didww.resources.base import DidwwApiModel, SafeAttributeField, RelationField, ReadOnlyRepository
 
 
-class Area(BaseResource):
-    _type = "areas"
+class Area(DidwwApiModel):
+    name = SafeAttributeField("name")
 
-    @property
-    def name(self):
-        return self._attr("name")
+    country = RelationField("country")
+
+    class Meta:
+        type = "areas"
 
 
 class AreaRepository(ReadOnlyRepository):

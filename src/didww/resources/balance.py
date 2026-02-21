@@ -1,20 +1,13 @@
-from didww.resources.base import BaseResource, SingletonRepository
+from didww.resources.base import DidwwApiModel, SafeAttributeField, SingletonRepository
 
 
-class Balance(BaseResource):
-    _type = "balances"
+class Balance(DidwwApiModel):
+    total_balance = SafeAttributeField("total_balance")
+    credit = SafeAttributeField("credit")
+    balance = SafeAttributeField("balance")
 
-    @property
-    def total_balance(self):
-        return self._attr("total_balance")
-
-    @property
-    def credit(self):
-        return self._attr("credit")
-
-    @property
-    def balance(self):
-        return self._attr("balance")
+    class Meta:
+        type = "balances"
 
 
 class BalanceRepository(SingletonRepository):

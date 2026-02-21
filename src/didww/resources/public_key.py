@@ -1,12 +1,11 @@
-from didww.resources.base import BaseResource, ReadOnlyRepository
+from didww.resources.base import DidwwApiModel, SafeAttributeField, ReadOnlyRepository
 
 
-class PublicKey(BaseResource):
-    _type = "public_keys"
+class PublicKey(DidwwApiModel):
+    key = SafeAttributeField("key")
 
-    @property
-    def key(self):
-        return self._attr("key")
+    class Meta:
+        type = "public_keys"
 
 
 class PublicKeyRepository(ReadOnlyRepository):

@@ -126,6 +126,8 @@ balance = client.balance().find().data
 ### DIDs
 
 ```python
+from didww.resources.voice_in_trunk import VoiceInTrunk
+
 # List DIDs
 dids = client.dids().list().data
 
@@ -133,7 +135,7 @@ dids = client.dids().list().data
 did = client.dids().find("uuid").data
 did.description = "Updated"
 did.capacity_limit = 20
-did.set_voice_in_trunk("trunk-uuid")
+did.set_voice_in_trunk(VoiceInTrunk.build("trunk-uuid"))
 client.dids().update(did)
 ```
 
@@ -228,10 +230,11 @@ item.qty = 1
 
 ```python
 from didww.resources.did_reservation import DidReservation
+from didww.resources.available_did import AvailableDid
 
 reservation = DidReservation()
 reservation.description = "Reserved for client"
-reservation.set_available_did("available-did-uuid")
+reservation.available_did = AvailableDid.build("available-did-uuid")
 created = client.did_reservations().create(reservation).data
 
 # Delete reservation
@@ -242,11 +245,12 @@ client.did_reservations().delete(created.id)
 
 ```python
 from didww.resources.shared_capacity_group import SharedCapacityGroup
+from didww.resources.capacity_pool import CapacityPool
 
 scg = SharedCapacityGroup()
 scg.name = "Shared Group"
 scg.shared_channels_count = 20
-scg.set_capacity_pool("pool-uuid")
+scg.capacity_pool = CapacityPool.build("pool-uuid")
 created = client.shared_capacity_groups().create(scg).data
 ```
 

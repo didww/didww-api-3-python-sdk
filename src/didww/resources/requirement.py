@@ -1,52 +1,31 @@
-from didww.resources.base import BaseResource, ReadOnlyRepository
+from didww.resources.base import DidwwApiModel, SafeAttributeField, RelationField, ReadOnlyRepository
 
 
-class Requirement(BaseResource):
-    _type = "requirements"
+class Requirement(DidwwApiModel):
+    identity_type = SafeAttributeField("identity_type")
+    personal_area_level = SafeAttributeField("personal_area_level")
+    business_area_level = SafeAttributeField("business_area_level")
+    address_area_level = SafeAttributeField("address_area_level")
+    personal_proof_qty = SafeAttributeField("personal_proof_qty")
+    business_proof_qty = SafeAttributeField("business_proof_qty")
+    address_proof_qty = SafeAttributeField("address_proof_qty")
+    personal_mandatory_fields = SafeAttributeField("personal_mandatory_fields")
+    business_mandatory_fields = SafeAttributeField("business_mandatory_fields")
+    service_description_required = SafeAttributeField("service_description_required")
+    restriction_message = SafeAttributeField("restriction_message")
 
-    @property
-    def identity_type(self):
-        return self._attr("identity_type")
+    country = RelationField("country")
+    did_group_type = RelationField("did_group_type")
+    personal_permanent_document = RelationField("personal_permanent_document")
+    business_permanent_document = RelationField("business_permanent_document")
+    personal_onetime_document = RelationField("personal_onetime_document")
+    business_onetime_document = RelationField("business_onetime_document")
+    personal_proof_types = RelationField("personal_proof_types")
+    business_proof_types = RelationField("business_proof_types")
+    address_proof_types = RelationField("address_proof_types")
 
-    @property
-    def personal_area_level(self):
-        return self._attr("personal_area_level")
-
-    @property
-    def business_area_level(self):
-        return self._attr("business_area_level")
-
-    @property
-    def address_area_level(self):
-        return self._attr("address_area_level")
-
-    @property
-    def personal_proof_qty(self):
-        return self._attr("personal_proof_qty")
-
-    @property
-    def business_proof_qty(self):
-        return self._attr("business_proof_qty")
-
-    @property
-    def address_proof_qty(self):
-        return self._attr("address_proof_qty")
-
-    @property
-    def personal_mandatory_fields(self):
-        return self._attr("personal_mandatory_fields")
-
-    @property
-    def business_mandatory_fields(self):
-        return self._attr("business_mandatory_fields")
-
-    @property
-    def service_description_required(self):
-        return self._attr("service_description_required")
-
-    @property
-    def restriction_message(self):
-        return self._attr("restriction_message")
+    class Meta:
+        type = "requirements"
 
     def country_id(self):
         return self._relationship_id("country")

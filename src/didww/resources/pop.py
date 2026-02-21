@@ -1,12 +1,11 @@
-from didww.resources.base import BaseResource, ReadOnlyRepository
+from didww.resources.base import DidwwApiModel, SafeAttributeField, ReadOnlyRepository
 
 
-class Pop(BaseResource):
-    _type = "pops"
+class Pop(DidwwApiModel):
+    name = SafeAttributeField("name")
 
-    @property
-    def name(self):
-        return self._attr("name")
+    class Meta:
+        type = "pops"
 
 
 class PopRepository(ReadOnlyRepository):

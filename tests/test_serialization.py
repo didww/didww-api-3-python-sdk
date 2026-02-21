@@ -34,7 +34,6 @@ class TestDidSerialization:
                 "billing_cycles_count": 1,
                 "terminated": False,
                 "dedicated_channels_count": 0,
-                "pending_removal": False,
             },
         })
         doc = did.to_jsonapi(include_id=True)
@@ -51,7 +50,6 @@ class TestDidSerialization:
         assert attrs["billing_cycles_count"] == 1
         assert attrs["terminated"] is False
         assert attrs["dedicated_channels_count"] == 0
-        assert attrs["pending_removal"] is False
 
 
 class TestOrderSerialization:

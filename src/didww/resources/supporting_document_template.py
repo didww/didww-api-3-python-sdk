@@ -1,20 +1,13 @@
-from didww.resources.base import BaseResource, ReadOnlyRepository
+from didww.resources.base import DidwwApiModel, SafeAttributeField, ReadOnlyRepository
 
 
-class SupportingDocumentTemplate(BaseResource):
-    _type = "supporting_document_templates"
+class SupportingDocumentTemplate(DidwwApiModel):
+    name = SafeAttributeField("name")
+    permanent = SafeAttributeField("permanent")
+    url = SafeAttributeField("url")
 
-    @property
-    def name(self):
-        return self._attr("name")
-
-    @property
-    def permanent(self):
-        return self._attr("permanent")
-
-    @property
-    def url(self):
-        return self._attr("url")
+    class Meta:
+        type = "supporting_document_templates"
 
 
 class SupportingDocumentTemplateRepository(ReadOnlyRepository):

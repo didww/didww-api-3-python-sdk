@@ -1,28 +1,17 @@
-from didww.resources.base import BaseResource, Repository
+from didww.resources.base import DidwwApiModel, SafeAttributeField, RelationField, Repository
 
 
-class DidReservation(BaseResource):
-    _type = "did_reservations"
+class DidReservation(DidwwApiModel):
     _writable_attrs = {"description"}
 
-    @property
-    def expire_at(self):
-        return self._attr("expire_at")
+    expire_at = SafeAttributeField("expire_at")
+    created_at = SafeAttributeField("created_at")
+    description = SafeAttributeField("description")
 
-    @property
-    def created_at(self):
-        return self._attr("created_at")
+    available_did = RelationField("available_did")
 
-    @property
-    def description(self):
-        return self._attr("description")
-
-    @description.setter
-    def description(self, value):
-        self._set_attr("description", value)
-
-    def set_available_did(self, available_did_id):
-        self._set_relationship("available_did", "available_dids", available_did_id)
+    class Meta:
+        type = "did_reservations"
 
 
 class DidReservationRepository(Repository):

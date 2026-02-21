@@ -1,18 +1,15 @@
-from didww.resources.base import BaseResource, CreateOnlyRepository
+from didww.resources.base import DidwwApiModel, RelationField, CreateOnlyRepository
 
 
-class RequirementValidation(BaseResource):
-    _type = "requirement_validations"
+class RequirementValidation(DidwwApiModel):
     _writable_attrs = set()
 
-    def set_requirement(self, requirement_id):
-        self._set_relationship("requirement", "requirements", requirement_id)
+    requirement = RelationField("requirement")
+    identity = RelationField("identity")
+    address = RelationField("address")
 
-    def set_identity(self, identity_id):
-        self._set_relationship("identity", "identities", identity_id)
-
-    def set_address(self, address_id):
-        self._set_relationship("address", "addresses", address_id)
+    class Meta:
+        type = "requirement_validations"
 
 
 class RequirementValidationRepository(CreateOnlyRepository):
