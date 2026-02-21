@@ -1,8 +1,9 @@
-from didww.resources.base import BaseResource, ReadOnlyRepository
+from didww.resources.base import BaseResource, Repository
 
 
 class CapacityPool(BaseResource):
     _type = "capacity_pools"
+    _writable_attrs = {"total_channels_count"}
 
     @property
     def name(self):
@@ -15,6 +16,10 @@ class CapacityPool(BaseResource):
     @property
     def total_channels_count(self):
         return self._attr("total_channels_count")
+
+    @total_channels_count.setter
+    def total_channels_count(self, value):
+        self._set_attr("total_channels_count", value)
 
     @property
     def assigned_channels_count(self):
@@ -41,6 +46,6 @@ class CapacityPool(BaseResource):
         return self._attr("metered_rate")
 
 
-class CapacityPoolRepository(ReadOnlyRepository):
+class CapacityPoolRepository(Repository):
     _resource_class = CapacityPool
     _path = "capacity_pools"
