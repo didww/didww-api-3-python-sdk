@@ -1,4 +1,5 @@
 from tests.conftest import my_vcr
+from didww.query_params import QueryParams
 from didww.resources.voice_in_trunk import VoiceInTrunk
 from didww.resources.configuration.pstn import PstnConfiguration
 from didww.resources.configuration.sip import SipConfiguration
@@ -9,7 +10,8 @@ from didww.resources.configuration.iax2 import Iax2Configuration
 class TestVoiceInTrunk:
     @my_vcr.use_cassette("voice_in_trunks/list.yaml")
     def test_list_voice_in_trunks(self, client):
-        response = client.voice_in_trunks().list()
+        params = QueryParams().include("trunk_group", "pop")
+        response = client.voice_in_trunks().list(params)
         trunks = response.data
         assert len(trunks) > 0
         first = trunks[0]

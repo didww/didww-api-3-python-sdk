@@ -1,10 +1,12 @@
 from tests.conftest import my_vcr
+from didww.query_params import QueryParams
 
 
 class TestDid:
     @my_vcr.use_cassette("dids/list.yaml")
     def test_list_dids(self, client):
-        response = client.dids().list()
+        params = QueryParams().include("order")
+        response = client.dids().list(params)
         assert len(response.data) > 0
 
     @my_vcr.use_cassette("dids/show.yaml")

@@ -1,4 +1,5 @@
 from tests.conftest import my_vcr
+from didww.query_params import QueryParams
 
 
 class TestRequirement:
@@ -9,7 +10,13 @@ class TestRequirement:
 
     @my_vcr.use_cassette("requirements/show.yaml")
     def test_find_requirement(self, client):
-        response = client.requirements().find("25d12afe-1ec6-4fe3-9621-b250dd1fb959")
+        params = QueryParams().include(
+            "country", "did_group_type",
+            "personal_permanent_document", "business_permanent_document",
+            "personal_onetime_document", "business_onetime_document",
+            "personal_proof_types", "business_proof_types", "address_proof_types",
+        )
+        response = client.requirements().find("25d12afe-1ec6-4fe3-9621-b250dd1fb959", params)
         req = response.data
         assert req.id == "25d12afe-1ec6-4fe3-9621-b250dd1fb959"
         assert req.identity_type == "Any"

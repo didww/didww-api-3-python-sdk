@@ -1,4 +1,5 @@
 from tests.conftest import my_vcr
+from didww.query_params import QueryParams
 from didww.resources.capacity_pool import CapacityPool
 
 
@@ -10,7 +11,8 @@ class TestCapacityPool:
 
     @my_vcr.use_cassette("capacity_pools/show.yaml")
     def test_find_capacity_pool(self, client):
-        response = client.capacity_pools().find("f288d07c-e2fc-4ae6-9837-b18fb469c324")
+        params = QueryParams().include("countries", "shared_capacity_groups", "qty_based_pricings")
+        response = client.capacity_pools().find("f288d07c-e2fc-4ae6-9837-b18fb469c324", params)
         cp = response.data
         assert cp.id == "f288d07c-e2fc-4ae6-9837-b18fb469c324"
 

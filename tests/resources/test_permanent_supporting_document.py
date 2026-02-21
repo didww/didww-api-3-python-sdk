@@ -1,4 +1,5 @@
 from tests.conftest import my_vcr
+from didww.query_params import QueryParams
 from didww.resources.permanent_supporting_document import PermanentSupportingDocument
 from didww.resources.identity import Identity
 from didww.resources.supporting_document_template import SupportingDocumentTemplate
@@ -12,6 +13,7 @@ class TestPermanentSupportingDocument:
         doc.set_identity(Identity.build("5e9df058-50d2-4e34-b0d4-d1746b86f41a"))
         doc.set_template(SupportingDocumentTemplate.build("4199435f-646e-4e9d-a143-8f3b972b10c5"))
         doc.set_files([EncryptedFile.build("254b3c2d-c40c-4ff7-93b1-a677aee7fa10")])
-        response = client.permanent_supporting_documents().create(doc)
+        create_params = QueryParams().include("template")
+        response = client.permanent_supporting_documents().create(doc, create_params)
         created = response.data
         assert created.id == "19510da3-c07e-4fa9-a696-6b9ab89cc172"

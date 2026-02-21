@@ -118,9 +118,10 @@ class SingletonRepository:
 
 
 class Repository(ReadOnlyRepository):
-    def create(self, resource):
+    def create(self, resource, params=None):
         doc = {"data": resource.to_jsonapi()}
-        body = self.client.post(self._path, doc)
+        query = params.to_dict() if params else None
+        body = self.client.post(self._path, doc, params=query)
         created = self._resource_class.from_jsonapi(body["data"])
         return ApiResponse(
             data=created,
@@ -128,9 +129,10 @@ class Repository(ReadOnlyRepository):
             included=body.get("included", []),
         )
 
-    def update(self, resource):
+    def update(self, resource, params=None):
         doc = {"data": resource.to_jsonapi(include_id=True)}
-        body = self.client.patch(f"{self._path}/{resource.id}", doc)
+        query = params.to_dict() if params else None
+        body = self.client.patch(f"{self._path}/{resource.id}", doc, params=query)
         updated = self._resource_class.from_jsonapi(body["data"])
         return ApiResponse(
             data=updated,
@@ -143,9 +145,10 @@ class Repository(ReadOnlyRepository):
 
 
 class CreateOnlyRepository(ReadOnlyRepository):
-    def create(self, resource):
+    def create(self, resource, params=None):
         doc = {"data": resource.to_jsonapi()}
-        body = self.client.post(self._path, doc)
+        query = params.to_dict() if params else None
+        body = self.client.post(self._path, doc, params=query)
         created = self._resource_class.from_jsonapi(body["data"])
         return ApiResponse(
             data=created,

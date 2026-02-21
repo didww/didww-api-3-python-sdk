@@ -1,4 +1,5 @@
 from tests.conftest import my_vcr
+from didww.query_params import QueryParams
 from didww.resources.voice_out_trunk import VoiceOutTrunk
 from didww.resources.did import Did
 
@@ -11,7 +12,8 @@ class TestVoiceOutTrunk:
 
     @my_vcr.use_cassette("voice_out_trunks/show.yaml")
     def test_find_voice_out_trunk(self, client):
-        response = client.voice_out_trunks().find("425ce763-a3a9-49b4-af5b-ada1a65c8864")
+        params = QueryParams().include("dids", "default_did")
+        response = client.voice_out_trunks().find("425ce763-a3a9-49b4-af5b-ada1a65c8864", params)
         trunk = response.data
         assert trunk.id == "425ce763-a3a9-49b4-af5b-ada1a65c8864"
         assert trunk.name == "test"

@@ -1,4 +1,5 @@
 from tests.conftest import my_vcr
+from didww.query_params import QueryParams
 
 
 class TestNanpaPrefix:
@@ -9,7 +10,8 @@ class TestNanpaPrefix:
 
     @my_vcr.use_cassette("nanpa_prefixes/show.yaml")
     def test_find_nanpa_prefix(self, client):
-        response = client.nanpa_prefixes().find("6c16d51d-d376-4395-91c4-012321317e48")
+        params = QueryParams().include("country")
+        response = client.nanpa_prefixes().find("6c16d51d-d376-4395-91c4-012321317e48", params)
         np = response.data
         assert np.id == "6c16d51d-d376-4395-91c4-012321317e48"
         assert np.npa == "864"

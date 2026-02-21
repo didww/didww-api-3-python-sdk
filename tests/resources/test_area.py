@@ -1,4 +1,5 @@
 from tests.conftest import my_vcr
+from didww.query_params import QueryParams
 
 
 class TestArea:
@@ -9,7 +10,8 @@ class TestArea:
 
     @my_vcr.use_cassette("areas/show.yaml")
     def test_find_area(self, client):
-        response = client.areas().find("ab2adc18-7c94-42d9-bdde-b28dfc373a22")
+        params = QueryParams().include("country")
+        response = client.areas().find("ab2adc18-7c94-42d9-bdde-b28dfc373a22", params)
         area = response.data
         assert area.id == "ab2adc18-7c94-42d9-bdde-b28dfc373a22"
         assert area.name == "Tuscany"
