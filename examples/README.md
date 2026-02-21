@@ -31,7 +31,7 @@ DIDWW_API_KEY=your_api_key python examples/balance.py
 | [`balance.py`](balance.py) | Fetches and prints current account balance and credit. |
 | [`countries.py`](countries.py) | Lists countries, demonstrates filtering, and fetches one country by ID. |
 | [`did_groups.py`](did_groups.py) | Fetches DID groups with included SKUs and shows group details. |
-| [`trunks.py`](trunks.py) | Creates a SIP trunk with configuration, prints details, then deletes it. |
+| [`trunks.py`](trunks.py) | Creates SIP and PSTN trunks, prints details, then deletes them. |
 | [`orders_sku.py`](orders_sku.py) | Creates a DID order with all item types: by SKU, by available DID, and by reservation. Fetches ordered DIDs. |
 | [`upload_file.py`](upload_file.py) | Reads a file, encrypts it, and uploads to `encrypted_files`. |
 | [`identity_address_proofs.py`](identity_address_proofs.py) | Creates identity and address, encrypts and uploads files, attaches proofs to both. |
