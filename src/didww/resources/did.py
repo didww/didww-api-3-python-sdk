@@ -3,7 +3,7 @@ from didww.resources.base import BaseResource, Repository
 
 class Did(BaseResource):
     _type = "dids"
-    _writable_attrs = {"billing_cycles_count", "capacity_limit", "description", "terminated", "dedicated_channels_count"}
+    _writable_attrs = {"billing_cycles_count", "capacity_limit", "description", "terminated", "dedicated_channels_count", "pending_removal"}
 
     @property
     def number(self):

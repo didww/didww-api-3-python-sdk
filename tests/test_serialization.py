@@ -45,13 +45,13 @@ class TestDidSerialization:
         assert "created_at" not in attrs
         assert "expires_at" not in attrs
         assert "channels_included_count" not in attrs
-        assert "pending_removal" not in attrs
         # writable fields must be present
         assert attrs["capacity_limit"] == 10
         assert attrs["description"] == "test"
         assert attrs["billing_cycles_count"] == 1
         assert attrs["terminated"] is False
         assert attrs["dedicated_channels_count"] == 0
+        assert attrs["pending_removal"] is False
 
 
 class TestOrderSerialization:
