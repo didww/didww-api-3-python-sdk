@@ -1,5 +1,7 @@
 from tests.conftest import my_vcr
 from didww.resources.address import Address
+from didww.resources.country import Country
+from didww.resources.identity import Identity
 
 
 class TestAddress:
@@ -15,8 +17,8 @@ class TestAddress:
         addr.postal_code = "123"
         addr.address = "some street"
         addr.description = "test address"
-        addr.set_country("1f6fc2bd-f081-4202-9b1a-d9cb88d942b9")
-        addr.set_identity("5e9df058-50d2-4e34-b0d4-d1746b86f41a")
+        addr.set_country(Country.build("1f6fc2bd-f081-4202-9b1a-d9cb88d942b9"))
+        addr.set_identity(Identity.build("5e9df058-50d2-4e34-b0d4-d1746b86f41a"))
         response = client.addresses().create(addr)
         created = response.data
         assert created.id == "bf69bc70-e1c2-442c-9f30-335ee299b663"

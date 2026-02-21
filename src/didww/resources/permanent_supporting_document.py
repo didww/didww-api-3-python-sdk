@@ -9,16 +9,14 @@ class PermanentSupportingDocument(BaseResource):
     def created_at(self):
         return self._attr("created_at")
 
-    def set_identity(self, identity_id):
-        self._set_relationship("identity", "identities", identity_id)
+    def set_identity(self, identity):
+        self._set_relationship("identity", identity)
 
-    def set_template(self, template_id):
-        self._set_relationship("template", "supporting_document_templates", template_id)
+    def set_template(self, template):
+        self._set_relationship("template", template)
 
-    def set_files(self, file_ids):
-        self._relationships["files"] = {
-            "data": [{"type": "encrypted_files", "id": fid} for fid in file_ids]
-        }
+    def set_files(self, files):
+        self._set_relationships("files", files)
 
 
 class PermanentSupportingDocumentRepository(CreateOnlyRepository):

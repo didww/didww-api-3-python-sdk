@@ -33,13 +33,11 @@ class SharedCapacityGroup(BaseResource):
     def created_at(self):
         return self._attr("created_at")
 
-    def set_capacity_pool(self, capacity_pool_id):
-        self._set_relationship("capacity_pool", "capacity_pools", capacity_pool_id)
+    def set_capacity_pool(self, capacity_pool):
+        self._set_relationship("capacity_pool", capacity_pool)
 
-    def set_dids(self, did_ids):
-        self._relationships["dids"] = {
-            "data": [{"type": "dids", "id": did_id} for did_id in did_ids]
-        }
+    def set_dids(self, dids):
+        self._set_relationships("dids", dids)
 
 
 class SharedCapacityGroupRepository(Repository):

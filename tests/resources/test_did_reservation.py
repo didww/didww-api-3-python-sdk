@@ -1,5 +1,6 @@
 from tests.conftest import my_vcr
 from didww.resources.did_reservation import DidReservation
+from didww.resources.available_did import AvailableDid
 
 
 class TestDidReservation:
@@ -19,7 +20,7 @@ class TestDidReservation:
     def test_create_did_reservation(self, client):
         dr = DidReservation()
         dr.description = "DIDWW"
-        dr.set_available_did("857d1462-5f43-4238-b007-ff05f282e41b")
+        dr.set_available_did(AvailableDid.build("857d1462-5f43-4238-b007-ff05f282e41b"))
         response = client.did_reservations().create(dr)
         created = response.data
         assert created.id == "fd38d3ff-80cf-4e67-a605-609a2884a5c4"

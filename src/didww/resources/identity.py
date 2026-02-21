@@ -119,8 +119,8 @@ class Identity(BaseResource):
     def verified(self):
         return self._attr("verified")
 
-    def set_country(self, country_id):
-        self._set_relationship("country", "countries", country_id)
+    def set_country(self, country):
+        self._set_relationship("country", country)
 
 
 class IdentityRepository(Repository):

@@ -65,22 +65,22 @@ class Did(BaseResource):
     def dedicated_channels_count(self):
         return self._attr("dedicated_channels_count")
 
-    def set_voice_in_trunk(self, trunk_id):
-        self._set_relationship("voice_in_trunk", "voice_in_trunks", trunk_id)
+    def set_voice_in_trunk(self, trunk):
+        self._set_relationship("voice_in_trunk", trunk)
         self._relationships["voice_in_trunk_group"] = {"data": None}
 
-    def set_voice_in_trunk_group(self, group_id):
-        self._set_relationship("voice_in_trunk_group", "voice_in_trunk_groups", group_id)
+    def set_voice_in_trunk_group(self, group):
+        self._set_relationship("voice_in_trunk_group", group)
         self._relationships["voice_in_trunk"] = {"data": None}
 
-    def set_capacity_pool(self, pool_id):
-        self._set_relationship("capacity_pool", "capacity_pools", pool_id)
+    def set_capacity_pool(self, pool):
+        self._set_relationship("capacity_pool", pool)
 
-    def set_shared_capacity_group(self, group_id):
-        self._set_relationship("shared_capacity_group", "shared_capacity_groups", group_id)
+    def set_shared_capacity_group(self, group):
+        self._set_relationship("shared_capacity_group", group)
 
-    def set_address_verification(self, av_id):
-        self._set_relationship("address_verification", "address_verifications", av_id)
+    def set_address_verification(self, av):
+        self._set_relationship("address_verification", av)
 
 
 class DidRepository(Repository):

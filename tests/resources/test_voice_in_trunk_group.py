@@ -1,5 +1,6 @@
 from tests.conftest import my_vcr
 from didww.resources.voice_in_trunk_group import VoiceInTrunkGroup
+from didww.resources.voice_in_trunk import VoiceInTrunk
 
 
 class TestVoiceInTrunkGroup:
@@ -14,8 +15,8 @@ class TestVoiceInTrunkGroup:
         group.name = "trunk group sample with 2 trunks"
         group.capacity_limit = 1000
         group.set_voice_in_trunks([
-            "7c15bca2-7f17-46fb-9486-7e2a17158c7e",
-            "b07a4cab-48c6-4b3a-9670-11b90b81bdef",
+            VoiceInTrunk.build("7c15bca2-7f17-46fb-9486-7e2a17158c7e"),
+            VoiceInTrunk.build("b07a4cab-48c6-4b3a-9670-11b90b81bdef"),
         ])
         response = client.voice_in_trunk_groups().create(group)
         created = response.data

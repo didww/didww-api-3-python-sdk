@@ -25,10 +25,8 @@ class VoiceInTrunkGroup(BaseResource):
     def created_at(self):
         return self._attr("created_at")
 
-    def set_voice_in_trunks(self, trunk_ids):
-        self._relationships["voice_in_trunks"] = {
-            "data": [{"type": "voice_in_trunks", "id": tid} for tid in trunk_ids]
-        }
+    def set_voice_in_trunks(self, trunks):
+        self._set_relationships("voice_in_trunks", trunks)
 
 
 class VoiceInTrunkGroupRepository(Repository):

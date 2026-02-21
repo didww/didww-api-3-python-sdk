@@ -28,9 +28,14 @@ class BaseResource:
             return [item.get("id") for item in data]
         return []
 
-    def _set_relationship(self, key, resource_type, resource_id):
+    def _set_relationship(self, key, resource):
         self._relationships[key] = {
-            "data": {"type": resource_type, "id": resource_id}
+            "data": {"type": resource._type, "id": resource.id}
+        }
+
+    def _set_relationships(self, key, resources):
+        self._relationships[key] = {
+            "data": [{"type": r._type, "id": r.id} for r in resources]
         }
 
     def to_jsonapi(self, include_id=False):
@@ -43,6 +48,10 @@ class BaseResource:
         if self._relationships:
             doc["relationships"] = dict(self._relationships)
         return doc
+
+    @classmethod
+    def build(cls, id, **attributes):
+        return cls(id=id, attributes=attributes if attributes else {})
 
     @classmethod
     def from_jsonapi(cls, data):

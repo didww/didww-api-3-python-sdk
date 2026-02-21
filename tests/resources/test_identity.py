@@ -1,5 +1,6 @@
 from tests.conftest import my_vcr
 from didww.resources.identity import Identity
+from didww.resources.country import Country
 
 
 class TestIdentity:
@@ -23,7 +24,7 @@ class TestIdentity:
         identity.personal_tax_id = "987654321"
         identity.identity_type = "Business"
         identity.external_reference_id = "111"
-        identity.set_country("1f6fc2bd-f081-4202-9b1a-d9cb88d942b9")
+        identity.set_country(Country.build("1f6fc2bd-f081-4202-9b1a-d9cb88d942b9"))
         response = client.identities().create(identity)
         created = response.data
         assert created.id == "e96ae7d1-11d5-42bc-a5c5-211f3c3788ae"

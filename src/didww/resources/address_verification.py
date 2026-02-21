@@ -41,13 +41,11 @@ class AddressVerification(BaseResource):
     def created_at(self):
         return self._attr("created_at")
 
-    def set_address(self, address_id):
-        self._set_relationship("address", "addresses", address_id)
+    def set_address(self, address):
+        self._set_relationship("address", address)
 
-    def set_dids(self, did_ids):
-        self._relationships["dids"] = {
-            "data": [{"type": "dids", "id": did_id} for did_id in did_ids]
-        }
+    def set_dids(self, dids):
+        self._set_relationships("dids", dids)
 
 
 class AddressVerificationRepository(CreateOnlyRepository):

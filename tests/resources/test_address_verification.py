@@ -1,5 +1,7 @@
 from tests.conftest import my_vcr
 from didww.resources.address_verification import AddressVerification
+from didww.resources.address import Address
+from didww.resources.did import Did
 
 
 class TestAddressVerification:
@@ -22,8 +24,8 @@ class TestAddressVerification:
         av = AddressVerification()
         av.callback_url = "http://example.com"
         av.callback_method = "GET"
-        av.set_address("d3414687-40f4-4346-a267-c2c65117d28c")
-        av.set_dids(["a9d64c02-4486-4acb-a9a1-be4c81ff0659"])
+        av.set_address(Address.build("d3414687-40f4-4346-a267-c2c65117d28c"))
+        av.set_dids([Did.build("a9d64c02-4486-4acb-a9a1-be4c81ff0659")])
         response = client.address_verifications().create(av)
         created = response.data
         assert created.id == "78182ef2-8377-41cd-89e1-26e8266c9c94"

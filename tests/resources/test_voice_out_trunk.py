@@ -1,5 +1,6 @@
 from tests.conftest import my_vcr
 from didww.resources.voice_out_trunk import VoiceOutTrunk
+from didww.resources.did import Did
 
 
 class TestVoiceOutTrunk:
@@ -36,8 +37,9 @@ class TestVoiceOutTrunk:
         trunk.name = "php-test"
         trunk.allowed_sip_ips = ["0.0.0.0/0"]
         trunk.on_cli_mismatch_action = "replace_cli"
-        trunk.set_default_did("7a028c32-e6b6-4c86-bf01-90f901b37012")
-        trunk.set_dids(["7a028c32-e6b6-4c86-bf01-90f901b37012"])
+        did = Did.build("7a028c32-e6b6-4c86-bf01-90f901b37012")
+        trunk.set_default_did(did)
+        trunk.set_dids([did])
         response = client.voice_out_trunks().create(trunk)
         created = response.data
         assert created.id == "b60201c1-21f0-4d9a-aafa-0e6d1e12f22e"

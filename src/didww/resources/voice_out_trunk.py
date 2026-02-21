@@ -136,13 +136,11 @@ class VoiceOutTrunk(BaseResource):
     def created_at(self):
         return self._attr("created_at")
 
-    def set_default_did(self, did_id):
-        self._set_relationship("default_did", "dids", did_id)
+    def set_default_did(self, did):
+        self._set_relationship("default_did", did)
 
-    def set_dids(self, did_ids):
-        self._relationships["dids"] = {
-            "data": [{"type": "dids", "id": did_id} for did_id in did_ids]
-        }
+    def set_dids(self, dids):
+        self._set_relationships("dids", dids)
 
 
 class VoiceOutTrunkRepository(Repository):

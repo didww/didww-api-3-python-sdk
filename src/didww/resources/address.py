@@ -45,11 +45,11 @@ class Address(BaseResource):
     def verified(self):
         return self._attr("verified")
 
-    def set_country(self, country_id):
-        self._set_relationship("country", "countries", country_id)
+    def set_country(self, country):
+        self._set_relationship("country", country)
 
-    def set_identity(self, identity_id):
-        self._set_relationship("identity", "identities", identity_id)
+    def set_identity(self, identity):
+        self._set_relationship("identity", identity)
 
 
 class AddressRepository(Repository):
