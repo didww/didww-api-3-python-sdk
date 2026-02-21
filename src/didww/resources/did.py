@@ -67,9 +67,11 @@ class Did(BaseResource):
 
     def set_voice_in_trunk(self, trunk_id):
         self._set_relationship("voice_in_trunk", "voice_in_trunks", trunk_id)
+        self._relationships["voice_in_trunk_group"] = {"data": None}
 
     def set_voice_in_trunk_group(self, group_id):
         self._set_relationship("voice_in_trunk_group", "voice_in_trunk_groups", group_id)
+        self._relationships["voice_in_trunk"] = {"data": None}
 
     def set_capacity_pool(self, pool_id):
         self._set_relationship("capacity_pool", "capacity_pools", pool_id)
