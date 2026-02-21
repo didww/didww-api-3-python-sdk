@@ -28,6 +28,9 @@ class VoiceInTrunkGroup(BaseResource):
     def set_voice_in_trunks(self, trunks):
         self._set_relationships("voice_in_trunks", trunks)
 
+    def voice_in_trunks(self):
+        return self._get_relationships("voice_in_trunks")
+
 
 class VoiceInTrunkGroupRepository(Repository):
     _resource_class = VoiceInTrunkGroup

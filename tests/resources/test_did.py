@@ -8,6 +8,8 @@ class TestDid:
         params = QueryParams().include("order")
         response = client.dids().list(params)
         assert len(response.data) > 0
+        first = response.data[0]
+        assert first.order() is not None
 
     @my_vcr.use_cassette("dids/show.yaml")
     def test_find_did(self, client):

@@ -47,6 +47,12 @@ class AddressVerification(BaseResource):
     def set_dids(self, dids):
         self._set_relationships("dids", dids)
 
+    def address(self):
+        return self._get_relationship("address")
+
+    def dids(self):
+        return self._get_relationships("dids")
+
 
 class AddressVerificationRepository(CreateOnlyRepository):
     _resource_class = AddressVerification

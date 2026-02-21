@@ -32,6 +32,8 @@ class TestVoiceOutTrunk:
         assert trunk.callback_url is None
         assert trunk.username == "dpjgwbbac9"
         assert trunk.password == "z0hshvbcy7"
+        assert len(trunk.dids()) == 2
+        assert trunk.default_did() is not None
 
     @my_vcr.use_cassette("voice_out_trunks/create.yaml")
     def test_create_voice_out_trunk(self, client):

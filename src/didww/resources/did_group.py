@@ -27,6 +27,21 @@ class DidGroup(BaseResource):
     def requirement_id(self):
         return self._relationship_id("requirement")
 
+    def country(self):
+        return self._get_relationship("country")
+
+    def region(self):
+        return self._get_relationship("region")
+
+    def city(self):
+        return self._get_relationship("city")
+
+    def did_group_type(self):
+        return self._get_relationship("did_group_type")
+
+    def stock_keeping_units(self):
+        return self._get_relationships("stock_keeping_units")
+
 
 class DidGroupRepository(ReadOnlyRepository):
     _resource_class = DidGroup

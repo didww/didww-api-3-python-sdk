@@ -15,3 +15,6 @@ class TestProof:
         response = client.proofs().create(proof, create_params)
         created = response.data
         assert created.id == "ed46925b-a830-482d-917d-015858cf7ab9"
+        pt = created.proof_type()
+        assert pt is not None
+        assert pt.name == "Drivers License"

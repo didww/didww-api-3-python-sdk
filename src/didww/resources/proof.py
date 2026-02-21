@@ -22,6 +22,12 @@ class Proof(BaseResource):
     def set_files(self, files):
         self._set_relationships("files", files)
 
+    def proof_type(self):
+        return self._get_relationship("proof_type")
+
+    def entity(self):
+        return self._get_relationship("entity")
+
 
 class ProofRepository(CreateOnlyRepository):
     _resource_class = Proof

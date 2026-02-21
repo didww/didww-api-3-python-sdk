@@ -16,3 +16,6 @@ class TestNanpaPrefix:
         assert np.id == "6c16d51d-d376-4395-91c4-012321317e48"
         assert np.npa == "864"
         assert np.nxx == "920"
+        country = np.country()
+        assert country is not None
+        assert country.name == "United States"

@@ -11,6 +11,8 @@ class TestAddressVerification:
         params = QueryParams().include("address", "dids")
         response = client.address_verifications().list(params)
         assert len(response.data) > 0
+        first = response.data[0]
+        assert first.address() is not None
 
     @my_vcr.use_cassette("address_verifications/show.yaml")
     def test_find_address_verification(self, client):
@@ -34,3 +36,4 @@ class TestAddressVerification:
         assert created.id == "78182ef2-8377-41cd-89e1-26e8266c9c94"
         assert created.status == "Pending"
         assert created.callback_url == "http://example.com"
+        assert created.address() is not None

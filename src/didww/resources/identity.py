@@ -122,6 +122,9 @@ class Identity(BaseResource):
     def set_country(self, country):
         self._set_relationship("country", country)
 
+    def country(self):
+        return self._get_relationship("country")
+
 
 class IdentityRepository(Repository):
     _resource_class = Identity

@@ -10,6 +10,8 @@ class TestIdentity:
         params = QueryParams().include("country", "addresses", "proofs", "permanent_documents")
         response = client.identities().list(params)
         assert len(response.data) > 0
+        first = response.data[0]
+        assert first.country() is not None
 
     @my_vcr.use_cassette("identities/create.yaml")
     def test_create_identity(self, client):
@@ -33,3 +35,4 @@ class TestIdentity:
         assert created.id == "e96ae7d1-11d5-42bc-a5c5-211f3c3788ae"
         assert created.first_name == "John"
         assert created.identity_type == "Business"
+        assert created.country() is not None

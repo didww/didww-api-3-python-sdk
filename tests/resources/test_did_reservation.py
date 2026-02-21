@@ -17,6 +17,9 @@ class TestDidReservation:
         dr = response.data
         assert dr.id == "fd38d3ff-80cf-4e67-a605-609a2884a5c4"
         assert dr.description == "DIDWW"
+        ad = dr.available_did()
+        assert ad is not None
+        assert ad.number == "19492033398"
 
     @my_vcr.use_cassette("did_reservations/create.yaml")
     def test_create_did_reservation(self, client):

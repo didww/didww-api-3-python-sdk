@@ -11,6 +11,9 @@ class AvailableDid(BaseResource):
     def nanpa_prefix_id(self):
         return self._relationship_id("nanpa_prefix")
 
+    def did_group(self):
+        return self._get_relationship("did_group")
+
 
 class AvailableDidRepository(ReadOnlyRepository):
     _resource_class = AvailableDid

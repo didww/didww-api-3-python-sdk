@@ -75,6 +75,33 @@ class Requirement(BaseResource):
     def address_proof_type_ids(self):
         return self._relationship_ids("address_proof_types")
 
+    def country(self):
+        return self._get_relationship("country")
+
+    def did_group_type(self):
+        return self._get_relationship("did_group_type")
+
+    def personal_permanent_document(self):
+        return self._get_relationship("personal_permanent_document")
+
+    def business_permanent_document(self):
+        return self._get_relationship("business_permanent_document")
+
+    def personal_onetime_document(self):
+        return self._get_relationship("personal_onetime_document")
+
+    def business_onetime_document(self):
+        return self._get_relationship("business_onetime_document")
+
+    def personal_proof_types(self):
+        return self._get_relationships("personal_proof_types")
+
+    def business_proof_types(self):
+        return self._get_relationships("business_proof_types")
+
+    def address_proof_types(self):
+        return self._get_relationships("address_proof_types")
+
 
 class RequirementRepository(ReadOnlyRepository):
     _resource_class = Requirement

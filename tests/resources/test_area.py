@@ -15,3 +15,7 @@ class TestArea:
         area = response.data
         assert area.id == "ab2adc18-7c94-42d9-bdde-b28dfc373a22"
         assert area.name == "Tuscany"
+        country = area.country()
+        assert country is not None
+        assert country.name == "Italy"
+        assert country.iso == "IT"

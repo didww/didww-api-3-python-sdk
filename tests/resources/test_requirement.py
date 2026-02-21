@@ -42,3 +42,13 @@ class TestRequirement:
         assert len(req.personal_proof_type_ids()) == 1
         assert len(req.business_proof_type_ids()) == 7
         assert len(req.address_proof_type_ids()) == 1
+        # included resource assertions
+        assert req.country() is not None
+        assert req.did_group_type() is not None
+        assert req.personal_permanent_document() is not None
+        assert req.business_permanent_document() is not None
+        assert req.personal_onetime_document() is not None
+        assert req.business_onetime_document() is not None
+        assert len(req.personal_proof_types()) == 1
+        assert len(req.business_proof_types()) == 7
+        assert len(req.address_proof_types()) == 1

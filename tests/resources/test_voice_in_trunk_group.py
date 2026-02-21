@@ -25,3 +25,4 @@ class TestVoiceInTrunkGroup:
         assert created.id == "b2319703-ce6c-480d-bb53-614e7abcfc96"
         assert created.name == "trunk group sample with 2 trunks"
         assert created.capacity_limit == 1000
+        assert len(created.voice_in_trunks()) == 2

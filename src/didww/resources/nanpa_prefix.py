@@ -12,6 +12,9 @@ class NanpaPrefix(BaseResource):
     def nxx(self):
         return self._attr("nxx")
 
+    def country(self):
+        return self._get_relationship("country")
+
 
 class NanpaPrefixRepository(ReadOnlyRepository):
     _resource_class = NanpaPrefix

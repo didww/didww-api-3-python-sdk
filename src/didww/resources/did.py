@@ -82,6 +82,12 @@ class Did(BaseResource):
     def set_address_verification(self, av):
         self._set_relationship("address_verification", av)
 
+    def order(self):
+        return self._get_relationship("order")
+
+    def did_group(self):
+        return self._get_relationship("did_group")
+
 
 class DidRepository(Repository):
     _resource_class = Did

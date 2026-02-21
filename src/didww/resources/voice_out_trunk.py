@@ -142,6 +142,12 @@ class VoiceOutTrunk(BaseResource):
     def set_dids(self, dids):
         self._set_relationships("dids", dids)
 
+    def default_did(self):
+        return self._get_relationship("default_did")
+
+    def dids(self):
+        return self._get_relationships("dids")
+
 
 class VoiceOutTrunkRepository(Repository):
     _resource_class = VoiceOutTrunk

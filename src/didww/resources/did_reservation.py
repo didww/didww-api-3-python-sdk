@@ -24,6 +24,9 @@ class DidReservation(BaseResource):
     def set_available_did(self, available_did):
         self._set_relationship("available_did", available_did)
 
+    def available_did(self):
+        return self._get_relationship("available_did")
+
 
 class DidReservationRepository(Repository):
     _resource_class = DidReservation

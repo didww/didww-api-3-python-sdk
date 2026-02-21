@@ -51,6 +51,18 @@ class Address(BaseResource):
     def set_identity(self, identity):
         self._set_relationship("identity", identity)
 
+    def country(self):
+        return self._get_relationship("country")
+
+    def identity(self):
+        return self._get_relationship("identity")
+
+    def area(self):
+        return self._get_relationship("area")
+
+    def city(self):
+        return self._get_relationship("city")
+
 
 class AddressRepository(Repository):
     _resource_class = Address

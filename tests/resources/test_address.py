@@ -11,6 +11,8 @@ class TestAddress:
         params = QueryParams().include("country", "identity", "proofs", "area", "city")
         response = client.addresses().list(params)
         assert len(response.data) > 0
+        first = response.data[0]
+        assert first.country() is not None
 
     @my_vcr.use_cassette("addresses/create.yaml")
     def test_create_address(self, client):
@@ -27,3 +29,4 @@ class TestAddress:
         assert created.id == "bf69bc70-e1c2-442c-9f30-335ee299b663"
         assert created.city_name == "New York"
         assert created.verified is False
+        assert created.country() is not None

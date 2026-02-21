@@ -70,6 +70,12 @@ class VoiceInTrunk(BaseResource):
     def set_pop(self, pop):
         self._set_relationship("pop", pop)
 
+    def pop(self):
+        return self._get_relationship("pop")
+
+    def voice_in_trunk_group(self):
+        return self._get_relationship("voice_in_trunk_group")
+
 
 class VoiceInTrunkRepository(Repository):
     _resource_class = VoiceInTrunk

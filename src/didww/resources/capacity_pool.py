@@ -45,6 +45,15 @@ class CapacityPool(BaseResource):
     def metered_rate(self):
         return self._attr("metered_rate")
 
+    def countries(self):
+        return self._get_relationships("countries")
+
+    def shared_capacity_groups(self):
+        return self._get_relationships("shared_capacity_groups")
+
+    def qty_based_pricings(self):
+        return self._get_relationships("qty_based_pricings")
+
 
 class CapacityPoolRepository(Repository):
     _resource_class = CapacityPool

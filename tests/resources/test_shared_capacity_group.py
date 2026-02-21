@@ -16,3 +16,7 @@ class TestSharedCapacityGroup:
         scg = response.data
         assert scg.id is not None
         assert scg.name is not None
+        cp = scg.capacity_pool()
+        assert cp is not None
+        assert cp.name == "Standard"
+        assert len(scg.dids()) >= 16

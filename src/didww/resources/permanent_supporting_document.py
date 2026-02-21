@@ -18,6 +18,12 @@ class PermanentSupportingDocument(BaseResource):
     def set_files(self, files):
         self._set_relationships("files", files)
 
+    def template(self):
+        return self._get_relationship("template")
+
+    def identity(self):
+        return self._get_relationship("identity")
+
 
 class PermanentSupportingDocumentRepository(CreateOnlyRepository):
     _resource_class = PermanentSupportingDocument

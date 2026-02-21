@@ -17,3 +17,6 @@ class TestPermanentSupportingDocument:
         response = client.permanent_supporting_documents().create(doc, create_params)
         created = response.data
         assert created.id == "19510da3-c07e-4fa9-a696-6b9ab89cc172"
+        tmpl = created.template()
+        assert tmpl is not None
+        assert tmpl.name == "Germany Special Registration Form"

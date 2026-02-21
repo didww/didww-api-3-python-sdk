@@ -39,6 +39,12 @@ class SharedCapacityGroup(BaseResource):
     def set_dids(self, dids):
         self._set_relationships("dids", dids)
 
+    def capacity_pool(self):
+        return self._get_relationship("capacity_pool")
+
+    def dids(self):
+        return self._get_relationships("dids")
+
 
 class SharedCapacityGroupRepository(Repository):
     _resource_class = SharedCapacityGroup
