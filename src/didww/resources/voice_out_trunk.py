@@ -1,4 +1,10 @@
-from didww.resources.base import DidwwApiModel, SafeAttributeField, RelationField, Repository
+from didww.enums import (
+    DefaultDstAction,
+    MediaEncryptionMode,
+    OnCliMismatchAction,
+    VoiceOutTrunkStatus,
+)
+from didww.resources.base import DidwwApiModel, SafeAttributeField, EnumAttributeField, RelationField, Repository
 
 
 class VoiceOutTrunk(DidwwApiModel):
@@ -11,15 +17,15 @@ class VoiceOutTrunk(DidwwApiModel):
 
     name = SafeAttributeField("name")
     allowed_sip_ips = SafeAttributeField("allowed_sip_ips")
-    on_cli_mismatch_action = SafeAttributeField("on_cli_mismatch_action")
+    on_cli_mismatch_action = EnumAttributeField("on_cli_mismatch_action", OnCliMismatchAction)
     allowed_rtp_ips = SafeAttributeField("allowed_rtp_ips")
     allow_any_did_as_cli = SafeAttributeField("allow_any_did_as_cli")
-    status = SafeAttributeField("status")
+    status = EnumAttributeField("status", VoiceOutTrunkStatus)
     capacity_limit = SafeAttributeField("capacity_limit")
     threshold_amount = SafeAttributeField("threshold_amount")
     threshold_reached = SafeAttributeField("threshold_reached")
-    media_encryption_mode = SafeAttributeField("media_encryption_mode")
-    default_dst_action = SafeAttributeField("default_dst_action")
+    media_encryption_mode = EnumAttributeField("media_encryption_mode", MediaEncryptionMode)
+    default_dst_action = EnumAttributeField("default_dst_action", DefaultDstAction)
     dst_prefixes = SafeAttributeField("dst_prefixes")
     force_symmetric_rtp = SafeAttributeField("force_symmetric_rtp")
     rtp_ping = SafeAttributeField("rtp_ping")

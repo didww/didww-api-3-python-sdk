@@ -1,4 +1,5 @@
 from tests.conftest import my_vcr
+from didww.enums import CallbackMethod, OrderStatus
 from didww.resources.order import Order
 from didww.resources.order_item.did_order_item import DidOrderItem
 from didww.resources.order_item.capacity_order_item import CapacityOrderItem
@@ -12,7 +13,7 @@ class TestOrder:
         response = client.orders().find("9df11dac-9d83-448c-8866-19c998be33db")
         order = response.data
         assert order.id == "9df11dac-9d83-448c-8866-19c998be33db"
-        assert order.status == "Completed"
+        assert order.status == OrderStatus.COMPLETED
         assert order.description == "Payment processing fee"
         assert order.reference == "SPT-474057"
         assert len(order.items) > 0
@@ -34,7 +35,7 @@ class TestOrder:
         response = client.orders().create(order)
         created = response.data
         assert created.id == "5da18706-be9f-49b0-aeec-0480aacd49ad"
-        assert created.status == "Pending"
+        assert created.status == OrderStatus.PENDING
         assert created.description == "DID"
         assert len(created.items) == 2
 
@@ -52,7 +53,7 @@ class TestOrder:
         response = client.orders().create(order)
         created = response.data
         assert created.id == "9b9f2121-8d9e-4aa8-9754-dbaf6f695fd6"
-        assert created.status == "Pending"
+        assert created.status == OrderStatus.PENDING
         assert len(created.items) == 1
 
     @my_vcr.use_cassette("orders/create_3.yaml")
@@ -67,7 +68,7 @@ class TestOrder:
         response = client.orders().create(order)
         created = response.data
         assert created.id == "9b9f2121-8d9e-4aa8-9754-dbaf6f695fd6"
-        assert created.status == "Pending"
+        assert created.status == OrderStatus.PENDING
         assert len(created.items) == 1
 
     @my_vcr.use_cassette("orders/create_1.yaml")
@@ -82,7 +83,7 @@ class TestOrder:
         response = client.orders().create(order)
         created = response.data
         assert created.id == "a9a7ff2d-d634-4545-bf28-dfda92d1c723"
-        assert created.status == "Pending"
+        assert created.status == OrderStatus.PENDING
         assert len(created.items) == 1
 
     @my_vcr.use_cassette("orders/create_2.yaml")
@@ -97,7 +98,7 @@ class TestOrder:
         response = client.orders().create(order)
         created = response.data
         assert created.id == "68a46dd5-d405-4283-b7a5-62503267e9f8"
-        assert created.status == "Completed"
+        assert created.status == OrderStatus.COMPLETED
         assert created.description == "Capacity"
         assert len(created.items) == 1
 
@@ -115,7 +116,7 @@ class TestOrder:
         response = client.orders().create(order)
         created = response.data
         assert created.id == "c617f0ff-f819-477f-a17b-a8d248c4443e"
-        assert created.status == "Pending"
+        assert created.status == OrderStatus.PENDING
         assert len(created.items) == 1
 
     @my_vcr.use_cassette("orders_with_callback/create.yaml")
@@ -127,13 +128,13 @@ class TestOrder:
         order = Order()
         order.allow_back_ordering = True
         order.callback_url = "https://example.com/callback"
-        order.callback_method = "POST"
+        order.callback_method = CallbackMethod.POST
         order.items = [item]
 
         response = client.orders().create(order)
         created = response.data
         assert created.id == "5da18706-be9f-49b0-aeec-0480aacd49ad"
-        assert created.status == "Pending"
+        assert created.status == OrderStatus.PENDING
         assert created.callback_url == "https://example.com/callback"
-        assert created.callback_method == "POST"
+        assert created.callback_method == CallbackMethod.POST
         assert len(created.items) == 1

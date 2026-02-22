@@ -1,12 +1,13 @@
-from didww.resources.base import DidwwApiModel, SafeAttributeField, RelationField, CreateOnlyRepository
+from didww.enums import AddressVerificationStatus, CallbackMethod
+from didww.resources.base import DidwwApiModel, SafeAttributeField, EnumAttributeField, RelationField, CreateOnlyRepository
 
 
 class AddressVerification(DidwwApiModel):
     _writable_attrs = {"service_description", "callback_url", "callback_method"}
 
-    status = SafeAttributeField("status")
+    status = EnumAttributeField("status", AddressVerificationStatus)
     callback_url = SafeAttributeField("callback_url")
-    callback_method = SafeAttributeField("callback_method")
+    callback_method = EnumAttributeField("callback_method", CallbackMethod)
     service_description = SafeAttributeField("service_description")
     reject_reasons = SafeAttributeField("reject_reasons")
     reference = SafeAttributeField("reference")

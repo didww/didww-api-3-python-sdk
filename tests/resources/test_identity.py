@@ -1,4 +1,5 @@
 from tests.conftest import my_vcr
+from didww.enums import IdentityType
 from didww.query_params import QueryParams
 from didww.resources.identity import Identity
 from didww.resources.country import Country
@@ -28,7 +29,7 @@ class TestIdentity:
         identity.vat_id = "GB1234"
         identity.description = "test identity"
         identity.personal_tax_id = "987654321"
-        identity.identity_type = "Business"
+        identity.identity_type = IdentityType.BUSINESS
         identity.external_reference_id = "111"
         identity.country = Country.build("1f6fc2bd-f081-4202-9b1a-d9cb88d942b9")
         create_params = QueryParams().include("country")
@@ -36,7 +37,7 @@ class TestIdentity:
         created = response.data
         assert created.id == "e96ae7d1-11d5-42bc-a5c5-211f3c3788ae"
         assert created.first_name == "John"
-        assert created.identity_type == "Business"
+        assert created.identity_type == IdentityType.BUSINESS
         assert created.country is not None
         assert created.country.name == "United States"
         assert created.country.iso == "US"

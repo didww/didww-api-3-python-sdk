@@ -1,4 +1,17 @@
 from didww.resources.configuration.base import TrunkConfiguration
+from didww.enums import (
+    Codec,
+    MediaEncryptionMode,
+    RxDtmfFormat,
+    SstRefreshMethod,
+    StirShakenMode,
+    TransportProtocol,
+    TxDtmfFormat,
+    enum_value,
+    enum_value_list,
+    to_enum,
+    to_enum_list,
+)
 
 
 class SipConfiguration(TrunkConfiguration):
@@ -30,19 +43,19 @@ class SipConfiguration(TrunkConfiguration):
 
     @property
     def codec_ids(self):
-        return self._attr("codec_ids")
+        return to_enum_list(Codec, self._attr("codec_ids"))
 
     @codec_ids.setter
     def codec_ids(self, value):
-        self._set_attr("codec_ids", value)
+        self._set_attr("codec_ids", enum_value_list(value))
 
     @property
     def transport_protocol_id(self):
-        return self._attr("transport_protocol_id")
+        return to_enum(TransportProtocol, self._attr("transport_protocol_id"))
 
     @transport_protocol_id.setter
     def transport_protocol_id(self, value):
-        self._set_attr("transport_protocol_id", value)
+        self._set_attr("transport_protocol_id", enum_value(value))
 
     @property
     def auth_enabled(self):
@@ -94,19 +107,19 @@ class SipConfiguration(TrunkConfiguration):
 
     @property
     def rx_dtmf_format_id(self):
-        return self._attr("rx_dtmf_format_id")
+        return to_enum(RxDtmfFormat, self._attr("rx_dtmf_format_id"))
 
     @rx_dtmf_format_id.setter
     def rx_dtmf_format_id(self, value):
-        self._set_attr("rx_dtmf_format_id", value)
+        self._set_attr("rx_dtmf_format_id", enum_value(value))
 
     @property
     def tx_dtmf_format_id(self):
-        return self._attr("tx_dtmf_format_id")
+        return to_enum(TxDtmfFormat, self._attr("tx_dtmf_format_id"))
 
     @tx_dtmf_format_id.setter
     def tx_dtmf_format_id(self, value):
-        self._set_attr("tx_dtmf_format_id", value)
+        self._set_attr("tx_dtmf_format_id", enum_value(value))
 
     @property
     def sst_enabled(self):
@@ -150,11 +163,11 @@ class SipConfiguration(TrunkConfiguration):
 
     @property
     def sst_refresh_method_id(self):
-        return self._attr("sst_refresh_method_id")
+        return to_enum(SstRefreshMethod, self._attr("sst_refresh_method_id"))
 
     @sst_refresh_method_id.setter
     def sst_refresh_method_id(self, value):
-        self._set_attr("sst_refresh_method_id", value)
+        self._set_attr("sst_refresh_method_id", enum_value(value))
 
     @property
     def sip_timer_b(self):
@@ -214,19 +227,19 @@ class SipConfiguration(TrunkConfiguration):
 
     @property
     def media_encryption_mode(self):
-        return self._attr("media_encryption_mode")
+        return to_enum(MediaEncryptionMode, self._attr("media_encryption_mode"))
 
     @media_encryption_mode.setter
     def media_encryption_mode(self, value):
-        self._set_attr("media_encryption_mode", value)
+        self._set_attr("media_encryption_mode", enum_value(value))
 
     @property
     def stir_shaken_mode(self):
-        return self._attr("stir_shaken_mode")
+        return to_enum(StirShakenMode, self._attr("stir_shaken_mode"))
 
     @stir_shaken_mode.setter
     def stir_shaken_mode(self, value):
-        self._set_attr("stir_shaken_mode", value)
+        self._set_attr("stir_shaken_mode", enum_value(value))
 
     @property
     def allowed_rtp_ips(self):
