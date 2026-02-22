@@ -52,15 +52,15 @@ def test_voice_in_trunk_and_sip_enums():
 
 def test_did_group_features_enum_round_trip():
     group = DidGroup()
-    group.features = [Feature.VOICE, Feature.SMS]
-    assert group.features == [Feature.VOICE, Feature.SMS]
-    assert group.to_jsonapi()["attributes"]["features"] == ["voice", "sms"]
+    group.features = [Feature.VOICE_IN, Feature.SMS_IN]
+    assert group.features == [Feature.VOICE_IN, Feature.SMS_IN]
+    assert group.to_jsonapi()["attributes"]["features"] == ["voice_in", "sms_in"]
 
 
 def test_did_group_features_accepts_strings_for_backward_compatibility():
     group = DidGroup()
-    group.features = ["voice", "t38"]
-    assert group.features == [Feature.VOICE, Feature.T38]
+    group.features = ["voice_in", "t38"]
+    assert group.features == [Feature.VOICE_IN, Feature.T38]
 
 
 def test_export_type_accepts_string_for_backward_compatibility():

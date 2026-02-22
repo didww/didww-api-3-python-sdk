@@ -15,7 +15,7 @@ interactions:
       string: "{\n  \"data\": {\n    \"id\": \"2187c36d-28fb-436f-8861-5a0f5b5a3ee1\"\
         ,\n    \"type\": \"did_groups\",\n    \"attributes\": {\n      \"prefix\"\
         : \"241\",\n      \"local_prefix\": \"\",\n      \"features\": [\n       \
-        \ \"voice\"\n      ],\n      \"is_metered\": false,\n      \"area_name\":\
+        \ \"voice_in\"\n      ],\n      \"is_metered\": false,\n      \"area_name\":\
         \ \"Aachen\",\n      \"allow_additional_channels\": true\n    },\n    \"relationships\"\
         : {\n      \"country\": {\n        \"links\": {\n          \"self\": \"https://sandbox-api.didww.com/v3/did_groups/2187c36d-28fb-436f-8861-5a0f5b5a3ee1/relationships/country\"\
         ,\n          \"related\": \"https://sandbox-api.didww.com/v3/did_groups/2187c36d-28fb-436f-8861-5a0f5b5a3ee1/country\"\

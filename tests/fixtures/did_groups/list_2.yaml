@@ -14,7 +14,7 @@ interactions:
     body:
       string: "{\n  \"data\": [\n    {\n      \"id\": \"2187c36d-28fb-436f-8861-5a0f5b5a3ee1\"\
         ,\n      \"type\": \"did_groups\",\n      \"attributes\": {\n        \"prefix\"\
-        : \"241\",\n        \"features\": [\n          \"voice\"\n        ],\n   \
+        : \"241\",\n        \"features\": [\n          \"voice_in\"\n        ],\n   \
         \     \"is_metered\": false,\n        \"area_name\": \"Aachen\",\n       \
         \ \"allow_additional_channels\": true\n      },\n      \"relationships\":\
         \ {\n        \"country\": {\n          \"links\": {\n            \"self\"\
@@ -36,7 +36,7 @@ interactions:
         : true,\n        \"is_available\": true,\n        \"available_dids_enabled\"\
         : false\n      }\n    },\n    {\n      \"id\": \"9ed5d612-e107-4d43-967f-3181f1fa394c\"\
         ,\n      \"type\": \"did_groups\",\n      \"attributes\": {\n        \"prefix\"\
-        : \"334\",\n        \"features\": [\n          \"voice\"\n        ],\n   \
+        : \"334\",\n        \"features\": [\n          \"voice_in\"\n        ],\n   \
         \     \"is_metered\": false,\n        \"area_name\": \"Abbeville\",\n    \
         \    \"allow_additional_channels\": true\n      },\n      \"relationships\"\
         : {\n        \"country\": {\n          \"links\": {\n            \"self\"\
@@ -58,7 +58,7 @@ interactions:
         : false,\n        \"is_available\": false,\n        \"available_dids_enabled\"\
         : true\n      }\n    },\n    {\n      \"id\": \"af7b65c4-6276-4aec-a029-ed4174720875\"\
         ,\n      \"type\": \"did_groups\",\n      \"attributes\": {\n        \"prefix\"\
-        : \"1224\",\n        \"features\": [\n          \"voice\"\n        ],\n  \
+        : \"1224\",\n        \"features\": [\n          \"voice_in\"\n        ],\n  \
         \      \"is_metered\": false,\n        \"area_name\": \"Aberdeen\",\n    \
         \    \"allow_additional_channels\": true\n      },\n      \"relationships\"\
         : {\n        \"country\": {\n          \"links\": {\n            \"self\"\
@@ -80,7 +80,7 @@ interactions:
         : false,\n        \"is_available\": false,\n        \"available_dids_enabled\"\
         : true\n      }\n    },\n    {\n      \"id\": \"e70e5ec1-8668-4ae3-893d-d04a592a5a71\"\
         ,\n      \"type\": \"did_groups\",\n      \"attributes\": {\n        \"prefix\"\
-        : \"744\",\n        \"features\": [\n          \"voice\"\n        ],\n   \
+        : \"744\",\n        \"features\": [\n          \"voice_in\"\n        ],\n   \
         \     \"is_metered\": false,\n        \"area_name\": \"Acapulco\",\n     \
         \   \"allow_additional_channels\": true\n      },\n      \"relationships\"\
         : {\n        \"country\": {\n          \"links\": {\n            \"self\"\
@@ -102,7 +102,7 @@ interactions:
         : false,\n        \"is_available\": false,\n        \"available_dids_enabled\"\
         : true\n      }\n    },\n    {\n      \"id\": \"26fab939-29c2-4918-b495-cfab95c078db\"\
         ,\n      \"type\": \"did_groups\",\n      \"attributes\": {\n        \"prefix\"\
-        : \"881\",\n        \"features\": [\n          \"voice\"\n        ],\n   \
+        : \"881\",\n        \"features\": [\n          \"voice_in\"\n        ],\n   \
         \     \"is_metered\": false,\n        \"area_name\": \"A Coruna\",\n     \
         \   \"allow_additional_channels\": true\n      },\n      \"relationships\"\
         : {\n        \"country\": {\n          \"links\": {\n            \"self\"\
@@ -124,7 +124,7 @@ interactions:
         : false,\n        \"is_available\": true,\n        \"available_dids_enabled\"\
         : false\n      }\n    },\n    {\n      \"id\": \"f83e2aa5-3262-4932-b7c9-a1b49daf9ebb\"\
         ,\n      \"type\": \"did_groups\",\n      \"attributes\": {\n        \"prefix\"\
-        : \"322\",\n        \"features\": [\n          \"voice\"\n        ],\n   \
+        : \"322\",\n        \"features\": [\n          \"voice_in\"\n        ],\n   \
         \     \"is_metered\": false,\n        \"area_name\": \"Adana\",\n        \"\
         allow_additional_channels\": true\n      },\n      \"relationships\": {\n\
         \        \"country\": {\n          \"links\": {\n            \"self\": \"\
@@ -146,7 +146,7 @@ interactions:
         : true,\n        \"is_available\": true,\n        \"available_dids_enabled\"\
         : false\n      }\n    },\n    {\n      \"id\": \"92c30efd-d503-4dbb-8bd3-07bfb8771459\"\
         ,\n      \"type\": \"did_groups\",\n      \"attributes\": {\n        \"prefix\"\
-        : \"87\",\n        \"features\": [\n          \"voice\",\n          \"voice_out\"\
+        : \"87\",\n        \"features\": [\n          \"voice_in\",\n          \"voice_out\"\
         \n        ],\n        \"is_metered\": false,\n        \"area_name\": \"Adelaide\"\
         ,\n        \"allow_additional_channels\": true\n      },\n      \"relationships\"\
         : {\n        \"country\": {\n          \"links\": {\n            \"self\"\
@@ -168,7 +168,7 @@ interactions:
         : false,\n        \"is_available\": true,\n        \"available_dids_enabled\"\
         : true\n      }\n    },\n    {\n      \"id\": \"cefd01db-da7b-4133-8eee-b9b19c97dfa3\"\
         ,\n      \"type\": \"did_groups\",\n      \"attributes\": {\n        \"prefix\"\
-        : \"787\",\n        \"features\": [\n          \"voice\"\n        ],\n   \
+        : \"787\",\n        \"features\": [\n          \"voice_in\"\n        ],\n   \
         \     \"is_metered\": false,\n        \"area_name\": \"Aguadilla\",\n    \
         \    \"allow_additional_channels\": true\n      },\n      \"relationships\"\
         : {\n        \"country\": {\n          \"links\": {\n            \"self\"\
@@ -190,7 +190,7 @@ interactions:
         : false,\n        \"is_available\": true,\n        \"available_dids_enabled\"\
         : false\n      }\n    },\n    {\n      \"id\": \"5b9337d9-2125-474a-a690-8c637f01742a\"\
         ,\n      \"type\": \"did_groups\",\n      \"attributes\": {\n        \"prefix\"\
-        : \"449\",\n        \"features\": [\n          \"voice\"\n        ],\n   \
+        : \"449\",\n        \"features\": [\n          \"voice_in\"\n        ],\n   \
         \     \"is_metered\": false,\n        \"area_name\": \"Aguascalientes\",\n\
         \        \"allow_additional_channels\": true\n      },\n      \"relationships\"\
         : {\n        \"country\": {\n          \"links\": {\n            \"self\"\
@@ -212,7 +212,7 @@ interactions:
         : false,\n        \"is_available\": true,\n        \"available_dids_enabled\"\
         : true\n      }\n    },\n    {\n      \"id\": \"2ec3b4d3-2e55-47d5-9f46-858c358dd67a\"\
         ,\n      \"type\": \"did_groups\",\n      \"attributes\": {\n        \"prefix\"\
-        : \"289\",\n        \"features\": [\n          \"voice\"\n        ],\n   \
+        : \"289\",\n        \"features\": [\n          \"voice_in\"\n        ],\n   \
         \     \"is_metered\": false,\n        \"area_name\": \"Ajax-Pickering\",\n\
         \        \"allow_additional_channels\": true\n      },\n      \"relationships\"\
         : {\n        \"country\": {\n          \"links\": {\n            \"self\"\
@@ -234,7 +234,7 @@ interactions:
         : false,\n        \"is_available\": true,\n        \"available_dids_enabled\"\
         : true\n      }\n    },\n    {\n      \"id\": \"83850b12-8933-410a-b965-101f9b48cbb5\"\
         ,\n      \"type\": \"did_groups\",\n      \"attributes\": {\n        \"prefix\"\
-        : \"63\",\n        \"features\": [\n          \"voice\"\n        ],\n    \
+        : \"63\",\n        \"features\": [\n          \"voice_in\"\n        ],\n    \
         \    \"is_metered\": false,\n        \"area_name\": \"Akershus\",\n      \
         \  \"allow_additional_channels\": true\n      },\n      \"relationships\"\
         : {\n        \"country\": {\n          \"links\": {\n            \"self\"\
@@ -256,7 +256,7 @@ interactions:
         : false,\n        \"is_available\": true,\n        \"available_dids_enabled\"\
         : false\n      }\n    },\n    {\n      \"id\": \"7c652e1f-0cfc-443e-9fd7-6f371edf9fd0\"\
         ,\n      \"type\": \"did_groups\",\n      \"attributes\": {\n        \"prefix\"\
-        : \"330\",\n        \"features\": [\n          \"voice\"\n        ],\n   \
+        : \"330\",\n        \"features\": [\n          \"voice_in\"\n        ],\n   \
         \     \"is_metered\": false,\n        \"area_name\": \"Akron\",\n        \"\
         allow_additional_channels\": true\n      },\n      \"relationships\": {\n\
         \        \"country\": {\n          \"links\": {\n            \"self\": \"\
@@ -278,7 +278,7 @@ interactions:
         : false,\n        \"is_available\": true,\n        \"available_dids_enabled\"\
         : true\n      }\n    },\n    {\n      \"id\": \"e1e6db01-2b85-453a-9ff3-f8a944370651\"\
         ,\n      \"type\": \"did_groups\",\n      \"attributes\": {\n        \"prefix\"\
-        : \"96\",\n        \"features\": [\n          \"voice\"\n        ],\n    \
+        : \"96\",\n        \"features\": [\n          \"voice_in\"\n        ],\n    \
         \    \"is_metered\": false,\n        \"area_name\": \"Alacant\",\n       \
         \ \"allow_additional_channels\": true\n      },\n      \"relationships\":\
         \ {\n        \"country\": {\n          \"links\": {\n            \"self\"\
@@ -300,7 +300,7 @@ interactions:
         : false,\n        \"is_available\": true,\n        \"available_dids_enabled\"\
         : false\n      }\n    },\n    {\n      \"id\": \"ceb98056-30e4-427d-9bf5-274af5417a38\"\
         ,\n      \"type\": \"did_groups\",\n      \"attributes\": {\n        \"prefix\"\
-        : \"86\",\n        \"features\": [\n          \"voice\"\n        ],\n    \
+        : \"86\",\n        \"features\": [\n          \"voice_in\"\n        ],\n    \
         \    \"is_metered\": false,\n        \"area_name\": \"Alacant\",\n       \
         \ \"allow_additional_channels\": true\n      },\n      \"relationships\":\
         \ {\n        \"country\": {\n          \"links\": {\n            \"self\"\
@@ -322,7 +322,7 @@ interactions:
         : false,\n        \"is_available\": true,\n        \"available_dids_enabled\"\
         : false\n      }\n    },\n    {\n      \"id\": \"b0dfdfcb-d2b1-44f1-bce9-ee49e8f3fa62\"\
         ,\n      \"type\": \"did_groups\",\n      \"attributes\": {\n        \"prefix\"\
-        : \"945\",\n        \"features\": [\n          \"voice\"\n        ],\n   \
+        : \"945\",\n        \"features\": [\n          \"voice_in\"\n        ],\n   \
         \     \"is_metered\": false,\n        \"area_name\": \"Alava\",\n        \"\
         allow_additional_channels\": true\n      },\n      \"relationships\": {\n\
         \        \"country\": {\n          \"links\": {\n            \"self\": \"\
@@ -344,7 +344,7 @@ interactions:
         : false,\n        \"is_available\": true,\n        \"available_dids_enabled\"\
         : false\n      }\n    },\n    {\n      \"id\": \"77b0aaa1-d469-4737-bfb4-3204dc05cf8a\"\
         ,\n      \"type\": \"did_groups\",\n      \"attributes\": {\n        \"prefix\"\
-        : \"967\",\n        \"features\": [\n          \"voice\"\n        ],\n   \
+        : \"967\",\n        \"features\": [\n          \"voice_in\"\n        ],\n   \
         \     \"is_metered\": false,\n        \"area_name\": \"Albacete\",\n     \
         \   \"allow_additional_channels\": true\n      },\n      \"relationships\"\
         : {\n        \"country\": {\n          \"links\": {\n            \"self\"\
@@ -366,7 +366,7 @@ interactions:
         : false,\n        \"is_available\": true,\n        \"available_dids_enabled\"\
         : false\n      }\n    },\n    {\n      \"id\": \"89ce7c81-4e1f-40dd-8524-fa258c55e7f3\"\
         ,\n      \"type\": \"did_groups\",\n      \"attributes\": {\n        \"prefix\"\
-        : \"518\",\n        \"features\": [\n          \"voice\"\n        ],\n   \
+        : \"518\",\n        \"features\": [\n          \"voice_in\"\n        ],\n   \
         \     \"is_metered\": false,\n        \"area_name\": \"Albany\",\n       \
         \ \"allow_additional_channels\": true\n      },\n      \"relationships\":\
         \ {\n        \"country\": {\n          \"links\": {\n            \"self\"\
@@ -388,7 +388,7 @@ interactions:
         : false,\n        \"is_available\": false,\n        \"available_dids_enabled\"\
         : true\n      }\n    },\n    {\n      \"id\": \"b9f94ae8-a0ec-405c-8372-c402b3ebb46e\"\
         ,\n      \"type\": \"did_groups\",\n      \"attributes\": {\n        \"prefix\"\
-        : \"505\",\n        \"features\": [\n          \"voice\"\n        ],\n   \
+        : \"505\",\n        \"features\": [\n          \"voice_in\"\n        ],\n   \
         \     \"is_metered\": false,\n        \"area_name\": \"Albuqurque\",\n   \
         \     \"allow_additional_channels\": true\n      },\n      \"relationships\"\
         : {\n        \"country\": {\n          \"links\": {\n            \"self\"\
@@ -410,7 +410,7 @@ interactions:
         : false,\n        \"is_available\": true,\n        \"available_dids_enabled\"\
         : true\n      }\n    },\n    {\n      \"id\": \"12759fa7-41f0-4369-972e-7b0c25345e6c\"\
         ,\n      \"type\": \"did_groups\",\n      \"attributes\": {\n        \"prefix\"\
-        : \"318\",\n        \"features\": [\n          \"voice\"\n        ],\n   \
+        : \"318\",\n        \"features\": [\n          \"voice_in\"\n        ],\n   \
         \     \"is_metered\": false,\n        \"area_name\": \"Alexandria\",\n   \
         \     \"allow_additional_channels\": true\n      },\n      \"relationships\"\
         : {\n        \"country\": {\n          \"links\": {\n            \"self\"\
@@ -432,7 +432,7 @@ interactions:
         : false,\n        \"is_available\": true,\n        \"available_dids_enabled\"\
         : true\n      }\n    },\n    {\n      \"id\": \"d0b607fd-3bbb-4bcf-9b80-33691422fe8e\"\
         ,\n      \"type\": \"did_groups\",\n      \"attributes\": {\n        \"prefix\"\
-        : \"224\",\n        \"features\": [\n          \"voice\"\n        ],\n   \
+        : \"224\",\n        \"features\": [\n          \"voice_in\"\n        ],\n   \
         \     \"is_metered\": false,\n        \"area_name\": \"Algonquin\",\n    \
         \    \"allow_additional_channels\": true\n      },\n      \"relationships\"\
         : {\n        \"country\": {\n          \"links\": {\n            \"self\"\
@@ -454,7 +454,7 @@ interactions:
         : false,\n        \"is_available\": true,\n        \"available_dids_enabled\"\
         : true\n      }\n    },\n    {\n      \"id\": \"417e9f42-508b-4b7c-812e-2f32f484af39\"\
         ,\n      \"type\": \"did_groups\",\n      \"attributes\": {\n        \"prefix\"\
-        : \"626\",\n        \"features\": [\n          \"voice\"\n        ],\n   \
+        : \"626\",\n        \"features\": [\n          \"voice_in\"\n        ],\n   \
         \     \"is_metered\": false,\n        \"area_name\": \"Alhambra\",\n     \
         \   \"allow_additional_channels\": true\n      },\n      \"relationships\"\
         : {\n        \"country\": {\n          \"links\": {\n            \"self\"\
@@ -476,7 +476,7 @@ interactions:
         : false,\n        \"is_available\": false,\n        \"available_dids_enabled\"\
         : true\n      }\n    },\n    {\n      \"id\": \"872ba08f-880d-4a64-b77c-f47e638e193e\"\
         ,\n      \"type\": \"did_groups\",\n      \"attributes\": {\n        \"prefix\"\
-        : \"303\",\n        \"features\": [\n          \"voice\"\n        ],\n   \
+        : \"303\",\n        \"features\": [\n          \"voice_in\"\n        ],\n   \
         \     \"is_metered\": false,\n        \"area_name\": \"Allens Park Lyons\"\
         ,\n        \"allow_additional_channels\": true\n      },\n      \"relationships\"\
         : {\n        \"country\": {\n          \"links\": {\n            \"self\"\
@@ -498,7 +498,7 @@ interactions:
         : false,\n        \"is_available\": true,\n        \"available_dids_enabled\"\
         : true\n      }\n    },\n    {\n      \"id\": \"72006362-01e1-4577-b680-c2af15a8b1e2\"\
         ,\n      \"type\": \"did_groups\",\n      \"attributes\": {\n        \"prefix\"\
-        : \"610\",\n        \"features\": [\n          \"voice\"\n        ],\n   \
+        : \"610\",\n        \"features\": [\n          \"voice_in\"\n        ],\n   \
         \     \"is_metered\": false,\n        \"area_name\": \"Allentown\",\n    \
         \    \"allow_additional_channels\": true\n      },\n      \"relationships\"\
         : {\n        \"country\": {\n          \"links\": {\n            \"self\"\
@@ -520,7 +520,7 @@ interactions:
         : false,\n        \"is_available\": true,\n        \"available_dids_enabled\"\
         : true\n      }\n    },\n    {\n      \"id\": \"a567fefd-f594-4d0f-a8dd-20b0329aeb2c\"\
         ,\n      \"type\": \"did_groups\",\n      \"attributes\": {\n        \"prefix\"\
-        : \"484\",\n        \"features\": [\n          \"voice\"\n        ],\n   \
+        : \"484\",\n        \"features\": [\n          \"voice_in\"\n        ],\n   \
         \     \"is_metered\": false,\n        \"area_name\": \"Allentown\",\n    \
         \    \"allow_additional_channels\": true\n      },\n      \"relationships\"\
         : {\n        \"country\": {\n          \"links\": {\n            \"self\"\
@@ -542,7 +542,7 @@ interactions:
         : false,\n        \"is_available\": true,\n        \"available_dids_enabled\"\
         : true\n      }\n    },\n    {\n      \"id\": \"df0e67f3-6aec-4d93-b339-19f8cfbcdd96\"\
         ,\n      \"type\": \"did_groups\",\n      \"attributes\": {\n        \"prefix\"\
-        : \"581\",\n        \"features\": [\n          \"voice\"\n        ],\n   \
+        : \"581\",\n        \"features\": [\n          \"voice_in\"\n        ],\n   \
         \     \"is_metered\": false,\n        \"area_name\": \"Alma\",\n        \"\
         allow_additional_channels\": true\n      },\n      \"relationships\": {\n\
         \        \"country\": {\n          \"links\": {\n            \"self\": \"\
@@ -564,7 +564,7 @@ interactions:
         : false,\n        \"is_available\": false,\n        \"available_dids_enabled\"\
         : true\n      }\n    },\n    {\n      \"id\": \"92bcc142-eede-4ad4-b4af-dc471de0c1a5\"\
         ,\n      \"type\": \"did_groups\",\n      \"attributes\": {\n        \"prefix\"\
-        : \"36\",\n        \"features\": [\n          \"voice\"\n        ],\n    \
+        : \"36\",\n        \"features\": [\n          \"voice_in\"\n        ],\n    \
         \    \"is_metered\": false,\n        \"area_name\": \"Almere\",\n        \"\
         allow_additional_channels\": true\n      },\n      \"relationships\": {\n\
         \        \"country\": {\n          \"links\": {\n            \"self\": \"\
@@ -586,7 +586,7 @@ interactions:
         : true,\n        \"is_available\": true,\n        \"available_dids_enabled\"\
         : false\n      }\n    },\n    {\n      \"id\": \"1d5b93cd-e39c-477a-ae28-f8c51eadf4d9\"\
         ,\n      \"type\": \"did_groups\",\n      \"attributes\": {\n        \"prefix\"\
-        : \"950\",\n        \"features\": [\n          \"voice\"\n        ],\n   \
+        : \"950\",\n        \"features\": [\n          \"voice_in\"\n        ],\n   \
         \     \"is_metered\": false,\n        \"area_name\": \"Almeria\",\n      \
         \  \"allow_additional_channels\": true\n      },\n      \"relationships\"\
         : {\n        \"country\": {\n          \"links\": {\n            \"self\"\
@@ -608,7 +608,7 @@ interactions:
         : false,\n        \"is_available\": true,\n        \"available_dids_enabled\"\
         : false\n      }\n    },\n    {\n      \"id\": \"6059151f-d6f0-42da-bba8-6a83f80aaf73\"\
         ,\n      \"type\": \"did_groups\",\n      \"attributes\": {\n        \"prefix\"\
-        : \"618\",\n        \"features\": [\n          \"voice\"\n        ],\n   \
+        : \"618\",\n        \"features\": [\n          \"voice_in\"\n        ],\n   \
         \     \"is_metered\": false,\n        \"area_name\": \"Alton\",\n        \"\
         allow_additional_channels\": true\n      },\n      \"relationships\": {\n\
         \        \"country\": {\n          \"links\": {\n            \"self\": \"\
@@ -630,7 +630,7 @@ interactions:
         : false,\n        \"is_available\": false,\n        \"available_dids_enabled\"\
         : true\n      }\n    },\n    {\n      \"id\": \"81e1f8f1-ab2f-4260-b132-a98d000d9c35\"\
         ,\n      \"type\": \"did_groups\",\n      \"attributes\": {\n        \"prefix\"\
-        : \"1420\",\n        \"features\": [\n          \"voice\"\n        ],\n  \
+        : \"1420\",\n        \"features\": [\n          \"voice_in\"\n        ],\n  \
         \      \"is_metered\": false,\n        \"area_name\": \"Alton\",\n       \
         \ \"allow_additional_channels\": true\n      },\n      \"relationships\":\
         \ {\n        \"country\": {\n          \"links\": {\n            \"self\"\
@@ -652,7 +652,7 @@ interactions:
         : false,\n        \"is_available\": false,\n        \"available_dids_enabled\"\
         : true\n      }\n    },\n    {\n      \"id\": \"3bdc6002-4859-46b0-9cf7-ae95d1af66e2\"\
         ,\n      \"type\": \"did_groups\",\n      \"attributes\": {\n        \"prefix\"\
-        : \"6560\",\n        \"features\": [\n          \"voice\"\n        ],\n  \
+        : \"6560\",\n        \"features\": [\n          \"voice_in\"\n        ],\n  \
         \      \"is_metered\": false,\n        \"area_name\": \"Alushta\",\n     \
         \   \"allow_additional_channels\": true\n      },\n      \"relationships\"\
         : {\n        \"country\": {\n          \"links\": {\n            \"self\"\
@@ -674,7 +674,7 @@ interactions:
         : false,\n        \"is_available\": true,\n        \"available_dids_enabled\"\
         : false\n      }\n    },\n    {\n      \"id\": \"509cbd5c-5997-41a3-a1f9-aed86f42c3e5\"\
         ,\n      \"type\": \"did_groups\",\n      \"attributes\": {\n        \"prefix\"\
-        : \"20\",\n        \"features\": [\n          \"voice\"\n        ],\n    \
+        : \"20\",\n        \"features\": [\n          \"voice_in\"\n        ],\n    \
         \    \"is_metered\": false,\n        \"area_name\": \"Amsterdam\",\n     \
         \   \"allow_additional_channels\": true\n      },\n      \"relationships\"\
         : {\n        \"country\": {\n          \"links\": {\n            \"self\"\
@@ -696,7 +696,7 @@ interactions:
         : true,\n        \"is_available\": true,\n        \"available_dids_enabled\"\
         : false\n      }\n    },\n    {\n      \"id\": \"d26601b3-db99-45e5-afd2-54a84f30ed77\"\
         ,\n      \"type\": \"did_groups\",\n      \"attributes\": {\n        \"prefix\"\
-        : \"714\",\n        \"features\": [\n          \"voice\"\n        ],\n   \
+        : \"714\",\n        \"features\": [\n          \"voice_in\"\n        ],\n   \
         \     \"is_metered\": false,\n        \"area_name\": \"Anaheim\",\n      \
         \  \"allow_additional_channels\": true\n      },\n      \"relationships\"\
         : {\n        \"country\": {\n          \"links\": {\n            \"self\"\
@@ -718,7 +718,7 @@ interactions:
         : false,\n        \"is_available\": true,\n        \"available_dids_enabled\"\
         : true\n      }\n    },\n    {\n      \"id\": \"605efca2-d9b0-4b54-b10b-5fcfe343796d\"\
         ,\n      \"type\": \"did_groups\",\n      \"attributes\": {\n        \"prefix\"\
-        : \"289\",\n        \"features\": [\n          \"voice\"\n        ],\n   \
+        : \"289\",\n        \"features\": [\n          \"voice_in\"\n        ],\n   \
         \     \"is_metered\": false,\n        \"area_name\": \"Ancaster\",\n     \
         \   \"allow_additional_channels\": true\n      },\n      \"relationships\"\
         : {\n        \"country\": {\n          \"links\": {\n            \"self\"\
@@ -740,7 +740,7 @@ interactions:
         : false,\n        \"is_available\": true,\n        \"available_dids_enabled\"\
         : true\n      }\n    },\n    {\n      \"id\": \"92adc6cb-428f-4d78-98de-dfcb77154094\"\
         ,\n      \"type\": \"did_groups\",\n      \"attributes\": {\n        \"prefix\"\
-        : \"765\",\n        \"features\": [\n          \"voice\"\n        ],\n   \
+        : \"765\",\n        \"features\": [\n          \"voice_in\"\n        ],\n   \
         \     \"is_metered\": false,\n        \"area_name\": \"Anderson\",\n     \
         \   \"allow_additional_channels\": true\n      },\n      \"relationships\"\
         : {\n        \"country\": {\n          \"links\": {\n            \"self\"\
@@ -762,7 +762,7 @@ interactions:
         : false,\n        \"is_available\": false,\n        \"available_dids_enabled\"\
         : true\n      }\n    },\n    {\n      \"id\": \"24e1f333-6da2-4180-b73a-43a9a3bfa688\"\
         ,\n      \"type\": \"did_groups\",\n      \"attributes\": {\n        \"prefix\"\
-        : \"864\",\n        \"features\": [\n          \"voice\",\n          \"t38\"\
+        : \"864\",\n        \"features\": [\n          \"voice_in\",\n          \"t38\"\
         \n        ],\n        \"is_metered\": false,\n        \"area_name\": \"Anderson\"\
         ,\n        \"allow_additional_channels\": true\n      },\n      \"relationships\"\
         : {\n        \"country\": {\n          \"links\": {\n            \"self\"\
@@ -784,7 +784,7 @@ interactions:
         : false,\n        \"is_available\": true,\n        \"available_dids_enabled\"\
         : true\n      }\n    },\n    {\n      \"id\": \"80da4aee-c30b-496e-8b84-221ae87e452e\"\
         ,\n      \"type\": \"did_groups\",\n      \"attributes\": {\n        \"prefix\"\
-        : \"312\",\n        \"features\": [\n          \"voice\"\n        ],\n   \
+        : \"312\",\n        \"features\": [\n          \"voice_in\"\n        ],\n   \
         \     \"is_metered\": false,\n        \"area_name\": \"Ankara\",\n       \
         \ \"allow_additional_channels\": true\n      },\n      \"relationships\":\
         \ {\n        \"country\": {\n          \"links\": {\n            \"self\"\
@@ -806,7 +806,7 @@ interactions:
         : true,\n        \"is_available\": true,\n        \"available_dids_enabled\"\
         : false\n      }\n    },\n    {\n      \"id\": \"d0bf176f-05c5-4499-b163-a60e013d065e\"\
         ,\n      \"type\": \"did_groups\",\n      \"attributes\": {\n        \"prefix\"\
-        : \"734\",\n        \"features\": [\n          \"voice\"\n        ],\n   \
+        : \"734\",\n        \"features\": [\n          \"voice_in\"\n        ],\n   \
         \     \"is_metered\": false,\n        \"area_name\": \"Ann Arbor\",\n    \
         \    \"allow_additional_channels\": true\n      },\n      \"relationships\"\
         : {\n        \"country\": {\n          \"links\": {\n            \"self\"\
@@ -828,7 +828,7 @@ interactions:
         : false,\n        \"is_available\": true,\n        \"available_dids_enabled\"\
         : true\n      }\n    },\n    {\n      \"id\": \"8303fc4e-cbab-4336-9dea-b5f7ad2c0238\"\
         ,\n      \"type\": \"did_groups\",\n      \"attributes\": {\n        \"prefix\"\
-        : \"242\",\n        \"features\": [\n          \"voice\"\n        ],\n   \
+        : \"242\",\n        \"features\": [\n          \"voice_in\"\n        ],\n   \
         \     \"is_metered\": false,\n        \"area_name\": \"Antalya\",\n      \
         \  \"allow_additional_channels\": true\n      },\n      \"relationships\"\
         : {\n        \"country\": {\n          \"links\": {\n            \"self\"\
@@ -850,7 +850,7 @@ interactions:
         : true,\n        \"is_available\": true,\n        \"available_dids_enabled\"\
         : false\n      }\n    },\n    {\n      \"id\": \"49562b96-65bc-4ed9-ae4d-6c5353a31a02\"\
         ,\n      \"type\": \"did_groups\",\n      \"attributes\": {\n        \"prefix\"\
-        : \"552\",\n        \"features\": [\n          \"voice\"\n        ],\n   \
+        : \"552\",\n        \"features\": [\n          \"voice_in\"\n        ],\n   \
         \     \"is_metered\": false,\n        \"area_name\": \"Antofagasta\",\n  \
         \      \"allow_additional_channels\": true\n      },\n      \"relationships\"\
         : {\n        \"country\": {\n          \"links\": {\n            \"self\"\
@@ -872,7 +872,7 @@ interactions:
         : false,\n        \"is_available\": true,\n        \"available_dids_enabled\"\
         : false\n      }\n    },\n    {\n      \"id\": \"16f7a8ea-cbfd-4429-8b94-995421d73814\"\
         ,\n      \"type\": \"did_groups\",\n      \"attributes\": {\n        \"prefix\"\
-        : \"3\",\n        \"features\": [\n          \"voice\"\n        ],\n     \
+        : \"3\",\n        \"features\": [\n          \"voice_in\"\n        ],\n     \
         \   \"is_metered\": false,\n        \"area_name\": \"Antwerp\",\n        \"\
         allow_additional_channels\": true\n      },\n      \"relationships\": {\n\
         \        \"country\": {\n          \"links\": {\n            \"self\": \"\
@@ -894,7 +894,7 @@ interactions:
         : true,\n        \"is_available\": true,\n        \"available_dids_enabled\"\
         : false\n      }\n    },\n    {\n      \"id\": \"1e413391-8353-42fc-98fd-1334a3ee04f4\"\
         ,\n      \"type\": \"did_groups\",\n      \"attributes\": {\n        \"prefix\"\
-        : \"55\",\n        \"features\": [\n          \"voice\"\n        ],\n    \
+        : \"55\",\n        \"features\": [\n          \"voice_in\"\n        ],\n    \
         \    \"is_metered\": false,\n        \"area_name\": \"Apeldoorn\",\n     \
         \   \"allow_additional_channels\": true\n      },\n      \"relationships\"\
         : {\n        \"country\": {\n          \"links\": {\n            \"self\"\
@@ -916,7 +916,7 @@ interactions:
         : true,\n        \"is_available\": true,\n        \"available_dids_enabled\"\
         : false\n      }\n    },\n    {\n      \"id\": \"85f564b8-6929-49c3-a3ee-e565db10ec1c\"\
         ,\n      \"type\": \"did_groups\",\n      \"attributes\": {\n        \"prefix\"\
-        : \"920\",\n        \"features\": [\n          \"voice\"\n        ],\n   \
+        : \"920\",\n        \"features\": [\n          \"voice_in\"\n        ],\n   \
         \     \"is_metered\": false,\n        \"area_name\": \"Appleton\",\n     \
         \   \"allow_additional_channels\": true\n      },\n      \"relationships\"\
         : {\n        \"country\": {\n          \"links\": {\n            \"self\"\
@@ -938,7 +938,7 @@ interactions:
         : false,\n        \"is_available\": true,\n        \"available_dids_enabled\"\
         : true\n      }\n    },\n    {\n      \"id\": \"63767eee-a2c5-45ab-9be5-95cb8557b63d\"\
         ,\n      \"type\": \"did_groups\",\n      \"attributes\": {\n        \"prefix\"\
-        : \"831\",\n        \"features\": [\n          \"voice\"\n        ],\n   \
+        : \"831\",\n        \"features\": [\n          \"voice_in\"\n        ],\n   \
         \     \"is_metered\": false,\n        \"area_name\": \"Aptos\",\n        \"\
         allow_additional_channels\": true\n      },\n      \"relationships\": {\n\
         \        \"country\": {\n          \"links\": {\n            \"self\": \"\
@@ -960,7 +960,7 @@ interactions:
         : false,\n        \"is_available\": true,\n        \"available_dids_enabled\"\
         : true\n      }\n    },\n    {\n      \"id\": \"e4edd6ab-a483-44fe-bc4a-b4571efb937e\"\
         ,\n      \"type\": \"did_groups\",\n      \"attributes\": {\n        \"prefix\"\
-        : \"357\",\n        \"features\": [\n          \"voice\"\n        ],\n   \
+        : \"357\",\n        \"features\": [\n          \"voice_in\"\n        ],\n   \
         \     \"is_metered\": false,\n        \"area_name\": \"Arad\",\n        \"\
         allow_additional_channels\": true\n      },\n      \"relationships\": {\n\
         \        \"country\": {\n          \"links\": {\n            \"self\": \"\
@@ -982,7 +982,7 @@ interactions:
         : false,\n        \"is_available\": false,\n        \"available_dids_enabled\"\
         : false\n      }\n    },\n    {\n      \"id\": \"2d981adc-d353-496f-a5b0-5f5e9dc4eff6\"\
         ,\n      \"type\": \"did_groups\",\n      \"attributes\": {\n        \"prefix\"\
-        : \"787\",\n        \"features\": [\n          \"voice\"\n        ],\n   \
+        : \"787\",\n        \"features\": [\n          \"voice_in\"\n        ],\n   \
         \     \"is_metered\": false,\n        \"area_name\": \"Arecibo\",\n      \
         \  \"allow_additional_channels\": true\n      },\n      \"relationships\"\
         : {\n        \"country\": {\n          \"links\": {\n            \"self\"\
@@ -1004,7 +1004,7 @@ interactions:
         : false,\n        \"is_available\": true,\n        \"available_dids_enabled\"\
         : false\n      }\n    },\n    {\n      \"id\": \"60b4bd4c-f547-4061-a777-c4ccba4d773e\"\
         ,\n      \"type\": \"did_groups\",\n      \"attributes\": {\n        \"prefix\"\
-        : \"54\",\n        \"features\": [\n          \"voice\"\n        ],\n    \
+        : \"54\",\n        \"features\": [\n          \"voice_in\"\n        ],\n    \
         \    \"is_metered\": false,\n        \"area_name\": \"Arequipa\",\n      \
         \  \"allow_additional_channels\": true\n      },\n      \"relationships\"\
         : {\n        \"country\": {\n          \"links\": {\n            \"self\"\
@@ -1026,7 +1026,7 @@ interactions:
         : false,\n        \"is_available\": true,\n        \"available_dids_enabled\"\
         : false\n      }\n    },\n    {\n      \"id\": \"f87dd7cb-800b-4a4e-b459-ea424c55c7ad\"\
         ,\n      \"type\": \"did_groups\",\n      \"attributes\": {\n        \"prefix\"\
-        : \"582\",\n        \"features\": [\n          \"voice\"\n        ],\n   \
+        : \"582\",\n        \"features\": [\n          \"voice_in\"\n        ],\n   \
         \     \"is_metered\": false,\n        \"area_name\": \"Arica\",\n        \"\
         allow_additional_channels\": true\n      },\n      \"relationships\": {\n\
         \        \"country\": {\n          \"links\": {\n            \"self\": \"\
@@ -1048,7 +1048,7 @@ interactions:
         : false,\n        \"is_available\": true,\n        \"available_dids_enabled\"\
         : false\n      }\n    },\n    {\n      \"id\": \"32011159-7f96-4fa8-a211-a0e9d9f978ab\"\
         ,\n      \"type\": \"did_groups\",\n      \"attributes\": {\n        \"prefix\"\
-        : \"682\",\n        \"features\": [\n          \"voice\"\n        ],\n   \
+        : \"682\",\n        \"features\": [\n          \"voice_in\"\n        ],\n   \
         \     \"is_metered\": false,\n        \"area_name\": \"Arlington\",\n    \
         \    \"allow_additional_channels\": true\n      },\n      \"relationships\"\
         : {\n        \"country\": {\n          \"links\": {\n            \"self\"\
@@ -1070,7 +1070,7 @@ interactions:
         : false,\n        \"is_available\": true,\n        \"available_dids_enabled\"\
         : true\n      }\n    },\n    {\n      \"id\": \"42cd9dd9-7fd9-46f0-973c-c39d4067af97\"\
         ,\n      \"type\": \"did_groups\",\n      \"attributes\": {\n        \"prefix\"\
-        : \"817\",\n        \"features\": [\n          \"voice\"\n        ],\n   \
+        : \"817\",\n        \"features\": [\n          \"voice_in\"\n        ],\n   \
         \     \"is_metered\": false,\n        \"area_name\": \"Arlington\",\n    \
         \    \"allow_additional_channels\": true\n      },\n      \"relationships\"\
         : {\n        \"country\": {\n          \"links\": {\n            \"self\"\
@@ -1092,7 +1092,7 @@ interactions:
         : false,\n        \"is_available\": true,\n        \"available_dids_enabled\"\
         : true\n      }\n    },\n    {\n      \"id\": \"4c660348-5ea0-488e-9a8d-06c14b0c0b30\"\
         ,\n      \"type\": \"did_groups\",\n      \"attributes\": {\n        \"prefix\"\
-        : \"224\",\n        \"features\": [\n          \"voice\"\n        ],\n   \
+        : \"224\",\n        \"features\": [\n          \"voice_in\"\n        ],\n   \
         \     \"is_metered\": false,\n        \"area_name\": \"Arlington Heights\"\
         ,\n        \"allow_additional_channels\": true\n      },\n      \"relationships\"\
         : {\n        \"country\": {\n          \"links\": {\n            \"self\"\
