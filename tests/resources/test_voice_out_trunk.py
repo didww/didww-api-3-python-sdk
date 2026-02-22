@@ -56,3 +56,8 @@ class TestVoiceOutTrunk:
         assert created.id == "b60201c1-21f0-4d9a-aafa-0e6d1e12f22e"
         assert created.name == "python-test"
         assert created.status == VoiceOutTrunkStatus.ACTIVE
+
+    @my_vcr.use_cassette("voice_out_trunks/delete.yaml")
+    def test_delete_voice_out_trunk(self, client):
+        result = client.voice_out_trunks().delete("425ce763-a3a9-49b4-af5b-ada1a65c8864")
+        assert result is None

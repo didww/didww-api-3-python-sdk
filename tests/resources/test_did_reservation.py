@@ -30,3 +30,13 @@ class TestDidReservation:
         created = response.data
         assert created.id == "fd38d3ff-80cf-4e67-a605-609a2884a5c4"
         assert created.description == "DIDWW"
+
+    @my_vcr.use_cassette("did_reservations/delete.yaml")
+    def test_delete_did_reservation(self, client):
+        result = client.did_reservations().delete("fd38d3ff-80cf-4e67-a605-609a2884a5c4")
+        assert result is None
+
+    @my_vcr.use_cassette("did_reservations/delete_not_found.yaml")
+    def test_delete_did_reservation_not_found(self, client):
+        result = client.did_reservations().delete("fd38d3ff-80cf-4e67-a605-609a2884a5c4")
+        assert result is None

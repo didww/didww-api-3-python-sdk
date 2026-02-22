@@ -18,3 +18,8 @@ class TestProof:
         pt = created.proof_type
         assert pt is not None
         assert pt.name == "Drivers License"
+
+    @my_vcr.use_cassette("proofs/delete.yaml")
+    def test_delete_proof(self, client):
+        result = client.proofs().delete("ed46925b-a830-482d-917d-015858cf7ab9")
+        assert result is None

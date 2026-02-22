@@ -34,3 +34,8 @@ class TestAddress:
         assert created.country is not None
         assert created.country.name == "United States"
         assert created.country.iso == "US"
+
+    @my_vcr.use_cassette("addresses/delete.yaml")
+    def test_delete_address(self, client):
+        result = client.addresses().delete("bf69bc70-e1c2-442c-9f30-335ee299b663")
+        assert result is None

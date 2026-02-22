@@ -26,3 +26,8 @@ class TestVoiceInTrunkGroup:
         assert created.name == "trunk group sample with 2 trunks"
         assert created.capacity_limit == 1000
         assert len(created.voice_in_trunks) == 2
+
+    @my_vcr.use_cassette("voice_in_trunk_groups/delete.yaml")
+    def test_delete_voice_in_trunk_group(self, client):
+        result = client.voice_in_trunk_groups().delete("b2319703-ce6c-480d-bb53-614e7abcfc96")
+        assert result is None

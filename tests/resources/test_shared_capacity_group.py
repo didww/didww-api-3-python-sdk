@@ -20,3 +20,8 @@ class TestSharedCapacityGroup:
         assert cp is not None
         assert cp.name == "Standard"
         assert len(scg.dids) >= 16
+
+    @my_vcr.use_cassette("shared_capacity_groups/delete.yaml")
+    def test_delete_shared_capacity_group(self, client):
+        result = client.shared_capacity_groups().delete("3688a9c3-354f-4e16-b458-1d2df9f02547")
+        assert result is None

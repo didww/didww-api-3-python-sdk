@@ -37,3 +37,8 @@ class TestEncryptedFile:
                 fingerprint="fingerprint-123",
                 files=[{"data": b"example"}],
             )
+
+    @my_vcr.use_cassette("encrypted_files/delete.yaml")
+    def test_delete_encrypted_file(self, client):
+        result = client.encrypted_files().delete("7f2fbdca-8008-44ce-bcb6-3537ea5efaac")
+        assert result is None
