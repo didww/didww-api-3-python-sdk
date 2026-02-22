@@ -1,3 +1,4 @@
+from didww.exceptions import DidwwApiError
 from didww.resources.base import DidwwApiModel, SafeAttributeField, RelationField, Repository
 
 
@@ -17,3 +18,10 @@ class DidReservation(DidwwApiModel):
 class DidReservationRepository(Repository):
     _resource_class = DidReservation
     _path = "did_reservations"
+
+    def delete(self, resource_id):
+        try:
+            self.client.delete(f"{self._path}/{resource_id}")
+        except DidwwApiError as e:
+            if e.status_code != 404:
+                raise

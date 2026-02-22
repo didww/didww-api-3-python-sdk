@@ -9,7 +9,7 @@ interactions:
       Content-Type:
       - application/vnd.api+json
     method: DELETE
-    uri: https://sandbox-api.didww.com/v3/did_reservations/fd38d3ff-80cf-4e67-a605-609a2884a5c4
+    uri: https://sandbox-api.didww.com/v3/shared_capacity_groups/3688a9c3-354f-4e16-b458-1d2df9f02547
   response:
     body:
       string: ''

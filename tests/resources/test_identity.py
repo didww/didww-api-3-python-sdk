@@ -41,3 +41,8 @@ class TestIdentity:
         assert created.country is not None
         assert created.country.name == "United States"
         assert created.country.iso == "US"
+
+    @my_vcr.use_cassette("identities/delete.yaml")
+    def test_delete_identity(self, client):
+        result = client.identities().delete("e96ae7d1-11d5-42bc-a5c5-211f3c3788ae")
+        assert result is None

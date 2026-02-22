@@ -20,3 +20,8 @@ class TestPermanentSupportingDocument:
         tmpl = created.template
         assert tmpl is not None
         assert tmpl.name == "Germany Special Registration Form"
+
+    @my_vcr.use_cassette("permanent_supporting_documents/delete.yaml")
+    def test_delete_permanent_supporting_document(self, client):
+        result = client.permanent_supporting_documents().delete("19510da3-c07e-4fa9-a696-6b9ab89cc172")
+        assert result is None

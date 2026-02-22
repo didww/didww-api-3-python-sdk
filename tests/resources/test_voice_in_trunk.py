@@ -140,3 +140,8 @@ class TestVoiceInTrunk:
         config = TrunkConfiguration.from_jsonapi(data)
         assert isinstance(config, SipConfiguration)
         assert config.username == "user"
+
+    @my_vcr.use_cassette("voice_in_trunks/delete.yaml")
+    def test_delete_voice_in_trunk(self, client):
+        result = client.voice_in_trunks().delete("41b94706-325e-4704-a433-d65105758836")
+        assert result is None
