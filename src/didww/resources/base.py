@@ -5,7 +5,7 @@ from jsonapi_requests.orm.api import OrmApi
 from jsonapi_requests.orm.api_model import ApiModel
 from jsonapi_requests.orm.fields import AttributeField, RelationField
 from jsonapi_requests.data import JsonApiResponse
-from didww.enums import enum_value, to_enum
+from didww.enums import enum_value, enum_value_list, to_enum, to_enum_list
 
 # Map of JSON:API types to module:class for lazy loading
 _TYPE_MAP = {
@@ -94,6 +94,23 @@ class EnumAttributeField(SafeAttributeField):
             instance.attributes[self.source] = enum_value(value)
             return
         instance.attributes[self.source] = value
+
+
+class EnumListAttributeField(SafeAttributeField):
+    """AttributeField that serializes/deserializes lists of Enum values."""
+
+    def __init__(self, source, enum_cls):
+        super().__init__(source)
+        self.enum_cls = enum_cls
+
+    def __get__(self, instance, type=None):
+        raw = super().__get__(instance, type)
+        if instance is None:
+            return self
+        return to_enum_list(self.enum_cls, raw)
+
+    def __set__(self, instance, value):
+        instance.attributes[self.source] = enum_value_list(value)
 
 
 class ExclusiveRelationField(RelationField):

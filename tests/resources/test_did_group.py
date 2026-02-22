@@ -1,3 +1,4 @@
+from didww.enums import Feature
 from tests.conftest import my_vcr
 from didww.query_params import QueryParams
 
@@ -15,7 +16,7 @@ class TestDidGroup:
         dg = response.data
         assert dg.id == "2187c36d-28fb-436f-8861-5a0f5b5a3ee1"
         assert dg.prefix == "241"
-        assert dg.features == ["voice"]
+        assert dg.features == [Feature.VOICE]
         assert dg.is_metered is False
         assert dg.area_name == "Aachen"
         assert dg.allow_additional_channels is True
