@@ -30,7 +30,7 @@ interactions:
         \  }\n        }\n      }\n    },\n    {\n      \"id\": \"23bc0f41-67c0-40c3-b877-dccbbb65d5e4\"\
         ,\n      \"type\": \"did_groups\",\n      \"attributes\": {\n        \"prefix\"\
         : \"949\",\n        \"local_prefix\": \"\",\n        \"features\": [\n   \
-        \       \"voice\"\n        ],\n        \"is_metered\": false,\n        \"\
+        \       \"voice_in\"\n        ],\n        \"is_metered\": false,\n        \"\
         area_name\": \"Saddleback Valley\",\n        \"allow_additional_channels\"\
         : true\n      },\n      \"relationships\": {\n        \"country\": {\n   \
         \       \"links\": {\n            \"self\": \"https://sandbox-api.didww.com/v3/did_groups/23bc0f41-67c0-40c3-b877-dccbbb65d5e4/relationships/country\"\

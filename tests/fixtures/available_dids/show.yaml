@@ -22,7 +22,7 @@ interactions:
         \    }\n    }\n  },\n  \"included\": [\n    {\n      \"id\": \"a9e3d346-d7bc-4a85-adb0-8ef1119cf237\"\
         ,\n      \"type\": \"did_groups\",\n      \"attributes\": {\n        \"prefix\"\
         : \"616\",\n        \"local_prefix\": \"\",\n        \"features\": [\n   \
-        \       \"voice\"\n        ],\n        \"is_metered\": false,\n        \"\
+        \       \"voice_in\"\n        ],\n        \"is_metered\": false,\n        \"\
         area_name\": \"Grand Rapids\",\n        \"allow_additional_channels\": true\n\
         \      },\n      \"relationships\": {\n        \"country\": {\n          \"\
         links\": {\n            \"self\": \"https://sandbox-api.didww.com/v3/did_groups/a9e3d346-d7bc-4a85-adb0-8ef1119cf237/relationships/country\"\

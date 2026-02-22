@@ -3,12 +3,14 @@ from didww.enums import (
     CliFormat,
     Codec,
     ExportType,
+    Feature,
     IdentityType,
     OrderStatus,
     TransportProtocol,
     enum_value,
 )
 from didww.resources.configuration.sip import SipConfiguration
+from didww.resources.did_group import DidGroup
 from didww.resources.identity import Identity
 from didww.resources.order import Order
 from didww.resources.voice_in_trunk import VoiceInTrunk
@@ -46,6 +48,19 @@ def test_voice_in_trunk_and_sip_enums():
     data = sip.to_jsonapi()
     assert data["attributes"]["codec_ids"] == [9, 10]
     assert data["attributes"]["transport_protocol_id"] == 1
+
+
+def test_did_group_features_enum_round_trip():
+    group = DidGroup()
+    group.features = [Feature.VOICE_IN, Feature.SMS_IN]
+    assert group.features == [Feature.VOICE_IN, Feature.SMS_IN]
+    assert group.to_jsonapi()["attributes"]["features"] == ["voice_in", "sms_in"]
+
+
+def test_did_group_features_accepts_strings_for_backward_compatibility():
+    group = DidGroup()
+    group.features = ["voice_in", "t38"]
+    assert group.features == [Feature.VOICE_IN, Feature.T38]
 
 
 def test_export_type_accepts_string_for_backward_compatibility():
