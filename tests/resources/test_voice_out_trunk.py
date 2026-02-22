@@ -45,7 +45,7 @@ class TestVoiceOutTrunk:
     @my_vcr.use_cassette("voice_out_trunks/create.yaml")
     def test_create_voice_out_trunk(self, client):
         trunk = VoiceOutTrunk()
-        trunk.name = "php-test"
+        trunk.name = "python-test"
         trunk.allowed_sip_ips = ["0.0.0.0/0"]
         trunk.on_cli_mismatch_action = OnCliMismatchAction.REPLACE_CLI
         did = Did.build("7a028c32-e6b6-4c86-bf01-90f901b37012")
@@ -54,5 +54,5 @@ class TestVoiceOutTrunk:
         response = client.voice_out_trunks().create(trunk)
         created = response.data
         assert created.id == "b60201c1-21f0-4d9a-aafa-0e6d1e12f22e"
-        assert created.name == "php-test"
+        assert created.name == "python-test"
         assert created.status == VoiceOutTrunkStatus.ACTIVE
