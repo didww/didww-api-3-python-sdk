@@ -1,4 +1,5 @@
 from tests.conftest import my_vcr
+from didww.enums import AreaLevel, IdentityType
 from didww.query_params import QueryParams
 
 
@@ -19,11 +20,11 @@ class TestRequirement:
         response = client.requirements().find("25d12afe-1ec6-4fe3-9621-b250dd1fb959", params)
         req = response.data
         assert req.id == "25d12afe-1ec6-4fe3-9621-b250dd1fb959"
-        assert req.identity_type == "Any"
+        assert req.identity_type == IdentityType.ANY
         assert req.service_description_required is True
-        assert req.personal_area_level == "WorldWide"
-        assert req.business_area_level == "WorldWide"
-        assert req.address_area_level == "WorldWide"
+        assert req.personal_area_level == AreaLevel.WORLDWIDE
+        assert req.business_area_level == AreaLevel.WORLDWIDE
+        assert req.address_area_level == AreaLevel.WORLDWIDE
         assert req.personal_proof_qty == 1
         assert req.business_proof_qty == 1
         assert req.address_proof_qty == 1

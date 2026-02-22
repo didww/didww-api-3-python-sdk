@@ -1,6 +1,7 @@
 import os
 import tempfile
 from tests.conftest import my_vcr
+from didww.enums import ExportStatus, ExportType
 from didww.resources.export import Export
 
 
@@ -15,18 +16,18 @@ class TestExport:
         response = client.exports().find("da15f006-5da4-45ca-b0df-735baeadf423")
         export = response.data
         assert export.id == "da15f006-5da4-45ca-b0df-735baeadf423"
-        assert export.status == "Completed"
-        assert export.export_type == "cdr_in"
+        assert export.status == ExportStatus.COMPLETED
+        assert export.export_type == ExportType.CDR_IN
 
     @my_vcr.use_cassette("exports/create.yaml")
     def test_create_export(self, client):
         export = Export()
-        export.export_type = "cdr_in"
+        export.export_type = ExportType.CDR_IN
         export.filters = {"did_number": "1234556789", "year": "2019", "month": "01"}
         response = client.exports().create(export)
         created = response.data
         assert created.id == "da15f006-5da4-45ca-b0df-735baeadf423"
-        assert created.status == "Pending"
+        assert created.status == ExportStatus.PENDING
 
     @my_vcr.use_cassette("exports/download.yaml")
     def test_download_export_to_path(self, client):

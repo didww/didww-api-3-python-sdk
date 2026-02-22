@@ -1,4 +1,5 @@
 from didww.resources.configuration.base import TrunkConfiguration
+from didww.enums import Codec, enum_value_list, to_enum_list
 
 
 class Iax2Configuration(TrunkConfiguration):
@@ -30,11 +31,11 @@ class Iax2Configuration(TrunkConfiguration):
 
     @property
     def codec_ids(self):
-        return self._attr("codec_ids")
+        return to_enum_list(Codec, self._attr("codec_ids"))
 
     @codec_ids.setter
     def codec_ids(self, value):
-        self._set_attr("codec_ids", value)
+        self._set_attr("codec_ids", enum_value_list(value))
 
     @property
     def auth_enabled(self):

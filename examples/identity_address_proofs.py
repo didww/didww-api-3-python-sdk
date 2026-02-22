@@ -12,6 +12,7 @@ Demonstrates:
 import os
 
 from client_factory import create_client
+from didww.enums import IdentityType, enum_value
 from didww.encrypt import Encrypt
 from didww.query_params import QueryParams
 from didww.resources.identity import Identity
@@ -33,7 +34,7 @@ identity = Identity()
 identity.first_name = "John"
 identity.last_name = "Doe"
 identity.phone_number = "12125551234"
-identity.identity_type = "Personal"
+identity.identity_type = IdentityType.PERSONAL
 identity.country = Country.build(country.id)
 identity = client.identities().create(identity).data
 print(f"Created identity: {identity.id} ({identity.first_name} {identity.last_name})")
@@ -53,7 +54,7 @@ proof_types = client.proof_types().list().data
 identity_proof_type = None
 address_proof_type = None
 for pt in proof_types:
-    if pt.entity_type == "Personal" and identity_proof_type is None:
+    if pt.entity_type == enum_value(IdentityType.PERSONAL) and identity_proof_type is None:
         identity_proof_type = pt
     elif pt.entity_type == "Address" and address_proof_type is None:
         address_proof_type = pt

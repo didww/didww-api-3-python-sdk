@@ -15,6 +15,12 @@ from didww.resources.shared_capacity_group import SharedCapacityGroup
 from didww.resources.voice_in_trunk import VoiceInTrunk
 from didww.resources.voice_in_trunk_group import VoiceInTrunkGroup
 from didww.resources.voice_out_trunk import VoiceOutTrunk
+from didww.enums import (
+    CallbackMethod,
+    ExportType,
+    IdentityType,
+    enum_value,
+)
 
 
 class TestDidSerialization:
@@ -78,7 +84,7 @@ class TestOrderSerialization:
         assert "reference" not in attrs
         # writable fields must be present
         assert attrs["callback_url"] == "http://example.com"
-        assert attrs["callback_method"] == "POST"
+        assert attrs["callback_method"] == enum_value(CallbackMethod.POST)
         assert attrs["allow_back_ordering"] is True
         assert attrs["items"] == []
 
@@ -104,10 +110,10 @@ class TestExportSerialization:
         assert "created_at" not in attrs
         assert "url" not in attrs
         # writable fields must be present
-        assert attrs["export_type"] == "cdr_in"
+        assert attrs["export_type"] == enum_value(ExportType.CDR_IN)
         assert attrs["filters"] == {"year": "2021"}
         assert attrs["callback_url"] == "http://example.com"
-        assert attrs["callback_method"] == "POST"
+        assert attrs["callback_method"] == enum_value(CallbackMethod.POST)
 
 
 class TestIdentitySerialization:
@@ -140,7 +146,7 @@ class TestIdentitySerialization:
         # writable fields must be present
         assert attrs["first_name"] == "John"
         assert attrs["last_name"] == "Doe"
-        assert attrs["identity_type"] == "Personal"
+        assert attrs["identity_type"] == enum_value(IdentityType.PERSONAL)
         assert attrs["contact_email"] == "john@example.com"
 
 
@@ -193,7 +199,7 @@ class TestAddressVerificationSerialization:
         # writable fields must be present
         assert attrs["service_description"] == "svc"
         assert attrs["callback_url"] == "http://example.com"
-        assert attrs["callback_method"] == "GET"
+        assert attrs["callback_method"] == enum_value(CallbackMethod.GET)
 
 
 class TestSharedCapacityGroupSerialization:

@@ -69,7 +69,7 @@ created = client.orders().create(order).data
 
 print(f"\nOrder ID: {created.id}")
 print(f"Amount: {created.amount}")
-print(f"Status: {created.status}")
+print(f"Status: {created.status.value}")
 print(f"Created at: {created.created_at}")
 print(f"Reference: {created.reference}")
 print(f"Items count: {len(created.items)}")

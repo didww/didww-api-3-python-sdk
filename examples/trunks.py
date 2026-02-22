@@ -1,6 +1,7 @@
 import uuid
 
 from client_factory import create_client
+from didww.enums import Codec, TransportProtocol
 from didww.resources.voice_in_trunk import VoiceInTrunk
 from didww.resources.configuration.sip import SipConfiguration
 from didww.resources.configuration.pstn import PstnConfiguration
@@ -14,8 +15,8 @@ sip = SipConfiguration()
 sip.username = "username"
 sip.host = "216.58.215.110"
 sip.port = 5060
-sip.codec_ids = [9, 10]
-sip.transport_protocol_id = 1
+sip.codec_ids = [Codec.PCMU, Codec.PCMA]
+sip.transport_protocol_id = TransportProtocol.UDP
 
 trunk = VoiceInTrunk()
 trunk.name = f"My New SIP Trunk {suffix}"

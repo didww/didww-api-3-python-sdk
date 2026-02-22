@@ -1,4 +1,5 @@
-from didww.resources.base import DidwwApiModel, SafeAttributeField, RelationField, Repository
+from didww.enums import CliFormat
+from didww.resources.base import DidwwApiModel, SafeAttributeField, EnumAttributeField, RelationField, Repository
 from didww.resources.configuration.base import TrunkConfiguration
 
 # Import to register types
@@ -18,7 +19,7 @@ class VoiceInTrunk(DidwwApiModel):
     priority = SafeAttributeField("priority")
     weight = SafeAttributeField("weight")
     capacity_limit = SafeAttributeField("capacity_limit")
-    cli_format = SafeAttributeField("cli_format")
+    cli_format = EnumAttributeField("cli_format", CliFormat)
     cli_prefix = SafeAttributeField("cli_prefix")
     description = SafeAttributeField("description")
     ringing_timeout = SafeAttributeField("ringing_timeout")

@@ -1,4 +1,5 @@
-from didww.resources.base import DidwwApiModel, SafeAttributeField, Repository
+from didww.enums import CallbackMethod, OrderStatus
+from didww.resources.base import DidwwApiModel, SafeAttributeField, EnumAttributeField, Repository
 from didww.resources.order_item.base import OrderItem
 
 # Import to register types
@@ -13,12 +14,12 @@ class Order(DidwwApiModel):
     _writable_attrs = {"allow_back_ordering", "items", "callback_url", "callback_method"}
 
     amount = SafeAttributeField("amount")
-    status = SafeAttributeField("status")
+    status = EnumAttributeField("status", OrderStatus)
     created_at = SafeAttributeField("created_at")
     description = SafeAttributeField("description")
     reference = SafeAttributeField("reference")
     callback_url = SafeAttributeField("callback_url")
-    callback_method = SafeAttributeField("callback_method")
+    callback_method = EnumAttributeField("callback_method", CallbackMethod)
     allow_back_ordering = SafeAttributeField("allow_back_ordering")
 
     class Meta:

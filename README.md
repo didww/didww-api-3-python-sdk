@@ -150,6 +150,7 @@ client.dids().update(did)
 ### Voice In Trunks
 
 ```python
+from didww.enums import CliFormat, Codec, TransportProtocol
 from didww.resources.voice_in_trunk import VoiceInTrunk
 from didww.resources.configuration.sip import SipConfiguration
 
@@ -158,14 +159,14 @@ trunk = VoiceInTrunk()
 trunk.name = "My SIP Trunk"
 trunk.priority = 1
 trunk.weight = 100
-trunk.cli_format = "e164"
+trunk.cli_format = CliFormat.E164
 trunk.ringing_timeout = 30
 
 sip = SipConfiguration()
 sip.host = "sip.example.com"
 sip.port = 5060
-sip.codec_ids = [9, 10]
-sip.transport_protocol_id = 1
+sip.codec_ids = [Codec.PCMU, Codec.PCMA]
+sip.transport_protocol_id = TransportProtocol.UDP
 trunk.configuration = sip
 
 created = client.voice_in_trunks().create(trunk).data
@@ -192,12 +193,13 @@ created = client.voice_in_trunk_groups().create(group).data
 ### Voice Out Trunks
 
 ```python
+from didww.enums import OnCliMismatchAction
 from didww.resources.voice_out_trunk import VoiceOutTrunk
 
 trunk = VoiceOutTrunk()
 trunk.name = "My Outbound Trunk"
 trunk.allowed_sip_ips = ["0.0.0.0/0"]
-trunk.on_cli_mismatch_action = "replace_cli"
+trunk.on_cli_mismatch_action = OnCliMismatchAction.REPLACE_CLI
 created = client.voice_out_trunks().create(trunk).data
 ```
 
@@ -265,6 +267,7 @@ created = client.shared_capacity_groups().create(scg).data
 ### Identities
 
 ```python
+from didww.enums import IdentityType
 from didww.resources.identity import Identity
 from didww.resources.country import Country
 
@@ -272,7 +275,7 @@ identity = Identity()
 identity.first_name = "John"
 identity.last_name = "Doe"
 identity.phone_number = "12125551234"
-identity.identity_type = "Personal"
+identity.identity_type = IdentityType.PERSONAL
 identity.country = Country.build("country-uuid")
 created = client.identities().create(identity).data
 ```
@@ -296,10 +299,11 @@ created = client.addresses().create(address).data
 ### Exports
 
 ```python
+from didww.enums import ExportType
 from didww.resources.export import Export
 
 export = Export()
-export.export_type = "cdr_in"
+export.export_type = ExportType.CDR_IN
 export.filters = {"year": 2025, "month": 1}
 created = client.exports().create(export).data
 
@@ -322,6 +326,22 @@ params = (
 )
 
 regions = client.regions().list(params).data
+```
+
+## Enums
+
+The SDK provides enum classes aligned with the Java SDK (for example `CallbackMethod`, `IdentityType`, `OrderStatus`, `ExportType`, `CliFormat`, `OnCliMismatchAction`, `MediaEncryptionMode`, `TransportProtocol`, `Codec`, and more).
+
+```python
+from didww.enums import CallbackMethod, IdentityType
+from didww.resources.order import Order
+from didww.resources.identity import Identity
+
+order = Order()
+order.callback_method = CallbackMethod.POST
+
+identity = Identity()
+identity.identity_type = IdentityType.BUSINESS
 ```
 
 ## File Encryption

@@ -1,4 +1,5 @@
-from didww.resources.base import DidwwApiModel, SafeAttributeField, RelationField, Repository
+from didww.enums import IdentityType
+from didww.resources.base import DidwwApiModel, SafeAttributeField, EnumAttributeField, RelationField, Repository
 
 
 class Identity(DidwwApiModel):
@@ -18,7 +19,7 @@ class Identity(DidwwApiModel):
     vat_id = SafeAttributeField("vat_id")
     description = SafeAttributeField("description")
     personal_tax_id = SafeAttributeField("personal_tax_id")
-    identity_type = SafeAttributeField("identity_type")
+    identity_type = EnumAttributeField("identity_type", IdentityType)
     contact_email = SafeAttributeField("contact_email")
     external_reference_id = SafeAttributeField("external_reference_id")
     created_at = SafeAttributeField("created_at")
