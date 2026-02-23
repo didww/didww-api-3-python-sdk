@@ -4,8 +4,9 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "didww"
-version = "0.1.0"
+version = "1.0.0"
 description = "Python SDK for DIDWW API v3"
+long_description = "Python SDK for DIDWW API v3"
 requires-python = ">=3.9"
 dependencies = [
     "jsonapi-requests>=0.6.2",
