@@ -1,6 +1,6 @@
 interactions:
 - request:
-    body: null
+    body: '{"data":{"type":"voice_out_trunks","id":"425ce763-a3a9-49b4-af5b-ada1a65c8864","attributes":{"media_encryption_mode":"disabled"}}}'
     headers:
       Accept:
       - application/vnd.api+json

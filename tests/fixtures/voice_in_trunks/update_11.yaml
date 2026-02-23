@@ -1,6 +1,6 @@
 interactions:
 - request:
-    body: null
+    body: '{"data":{"type":"voice_in_trunks","id":"a80006b6-4183-4865-8b99-7ebbd359a762","attributes":{"configuration":{"type":"sip_configurations","attributes":{"username":"new-username","max_transfers":5}},"name":"hello, updated test sip trunk","description":"just a description"}}}'
     headers:
       Accept:
       - application/vnd.api+json

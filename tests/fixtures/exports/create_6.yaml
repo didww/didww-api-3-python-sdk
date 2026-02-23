@@ -1,6 +1,6 @@
 interactions:
 - request:
-    body: null
+    body: '{"data":{"type":"exports","attributes":{"export_type":"cdr_in","filters":{"did_number":"1234556789","year":"2019","month":"01"}}}}'
     headers:
       Accept:
       - application/vnd.api+json
