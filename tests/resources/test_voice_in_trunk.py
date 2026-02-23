@@ -13,8 +13,6 @@ from didww.query_params import QueryParams
 from didww.resources.voice_in_trunk import VoiceInTrunk
 from didww.resources.configuration.pstn import PstnConfiguration
 from didww.resources.configuration.sip import SipConfiguration
-from didww.resources.configuration.h323 import H323Configuration
-from didww.resources.configuration.iax2 import Iax2Configuration
 
 
 class TestVoiceInTrunk:
@@ -25,13 +23,12 @@ class TestVoiceInTrunk:
         trunks = response.data
         assert len(trunks) > 0
         first = trunks[0]
-        assert first.id == "9cbadd6f-0665-46bc-b3aa-687d22157808"
-        assert first.name == "iax2 trunk sample"
+        assert first.id == "2b4b1fcf-fe6a-4de9-8a58-7df46820ba13"
+        assert first.name == "sample trunk pstn"
         assert first.priority == 1
         assert first.weight == 65535
         assert first.cli_format == CliFormat.E164
-        assert first.voice_in_trunk_group is not None
-        assert first.voice_in_trunk_group.name == "sample trunk group"
+        assert first.voice_in_trunk_group is None
 
     @my_vcr.use_cassette("voice_in_trunks/list.yaml")
     def test_list_sip_configuration_attributes(self, client):
@@ -111,22 +108,6 @@ class TestVoiceInTrunk:
         assert data["attributes"]["username"] == "user"
         assert data["attributes"]["host"] == "example.com"
         assert data["attributes"]["codec_ids"] == [9, 10, 8]
-
-    def test_h323_configuration_serialization(self):
-        config = H323Configuration()
-        config.dst = "{CALL_DID}"
-        config.host = "127.0.0.1"
-        data = config.to_jsonapi()
-        assert data["type"] == "h323_configurations"
-        assert data["attributes"]["dst"] == "{CALL_DID}"
-
-    def test_iax2_configuration_serialization(self):
-        config = Iax2Configuration()
-        config.dst = "test"
-        config.host = "127.0.0.1"
-        data = config.to_jsonapi()
-        assert data["type"] == "iax2_configurations"
-        assert data["attributes"]["dst"] == "test"
 
     def test_configuration_deserialization(self):
         from didww.resources.configuration.base import TrunkConfiguration

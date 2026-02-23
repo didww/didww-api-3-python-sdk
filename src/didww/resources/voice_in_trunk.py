@@ -4,8 +4,6 @@ from didww.resources.configuration.base import TrunkConfiguration
 
 # Import to register types
 import didww.resources.configuration.sip  # noqa: F401
-import didww.resources.configuration.h323  # noqa: F401
-import didww.resources.configuration.iax2  # noqa: F401
 import didww.resources.configuration.pstn  # noqa: F401
 
 
