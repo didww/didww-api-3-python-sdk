@@ -1,6 +1,6 @@
 interactions:
 - request:
-    body: null
+    body: '{"data":{"type":"voice_in_trunk_groups","id":"b2319703-ce6c-480d-bb53-614e7abcfc96","attributes":{"name":"trunk group sample updated with 2 trunks","capacity_limit":500}}}'
     headers:
       Accept:
       - application/vnd.api+json

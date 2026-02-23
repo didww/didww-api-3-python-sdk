@@ -1,6 +1,6 @@
 interactions:
 - request:
-    body: null
+    body: '{"data":{"type":"addresses","id":"bf69bc70-e1c2-442c-9f30-335ee299b663","attributes":{"city_name":"Chicago","postal_code":"1234","address":"Main street","description":"some address"}}}'
     headers:
       Accept:
       - application/vnd.api+json

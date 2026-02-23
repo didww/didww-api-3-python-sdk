@@ -1,6 +1,6 @@
 interactions:
 - request:
-    body: null
+    body: '{"data":{"type":"voice_in_trunks","id":"41b94706-325e-4704-a433-d65105758836","attributes":{"configuration":{"type":"pstn_configurations","attributes":{"dst":"558540420025"}},"name":"hello, updated test pstn trunk"}}}'
     headers:
       Accept:
       - application/vnd.api+json

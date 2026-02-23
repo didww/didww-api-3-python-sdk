@@ -1,6 +1,6 @@
 interactions:
 - request:
-    body: null
+    body: '{"data":{"type":"dids","id":"unknown-id","relationships":{"voice_in_trunk_group":{"data":{"type":"voice_in_trunk_groups","id":"invalid"}},"voice_in_trunk":{"data":null}}}}'
     headers:
       Accept:
       - application/vnd.api+json

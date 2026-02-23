@@ -1,6 +1,6 @@
 interactions:
 - request:
-    body: null
+    body: '{"data":{"type":"exports","attributes":{"export_type":"cdr_out","filters":{"voice_out_trunk.id":"1f6fc2bd-f081-4202-9b1a-d9cb88d942b9","year":"2019","month":"01","day":"03"}}}}'
     headers:
       Accept:
       - application/vnd.api+json

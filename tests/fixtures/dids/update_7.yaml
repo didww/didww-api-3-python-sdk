@@ -1,6 +1,6 @@
 interactions:
 - request:
-    body: null
+    body: '{"data":{"type":"dids","id":"9df99644-f1a5-4a3c-99a4-559d758eb96b","attributes":{"capacity_limit":2,"description":"something","terminated":true,"billing_cycles_count":0,"dedicated_channels_count":0}}}'
     headers:
       Accept:
       - application/vnd.api+json

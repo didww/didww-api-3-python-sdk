@@ -1,6 +1,6 @@
 interactions:
 - request:
-    body: null
+    body: '{"data":{"type":"dids","id":"unknown-id","attributes":{"capacity_pools_id":"f288d07c-e2fc-4ae6-9837-b18fb469c324"},"relationships":{"capacity_pool":{"data":{"type":"capacity_pools","id":"f288d07c-e2fc-4ae6-9837-b18fb469c324"}}}}}'
     headers:
       Accept:
       - application/vnd.api+json

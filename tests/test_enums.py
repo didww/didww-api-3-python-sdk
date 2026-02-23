@@ -6,6 +6,7 @@ from didww.enums import (
     Feature,
     IdentityType,
     OrderStatus,
+    ReroutingDisconnectCode,
     TransportProtocol,
     enum_value,
 )
@@ -48,6 +49,16 @@ def test_voice_in_trunk_and_sip_enums():
     data = sip.to_jsonapi()
     assert data["attributes"]["codec_ids"] == [9, 10]
     assert data["attributes"]["transport_protocol_id"] == 1
+
+
+def test_rerouting_disconnect_code_enum_serialization():
+    sip = SipConfiguration()
+    sip.rerouting_disconnect_code_ids = [
+        ReroutingDisconnectCode.SIP_480_TEMPORARILY_UNAVAILABLE,
+        ReroutingDisconnectCode.RINGING_TIMEOUT,
+    ]
+    data = sip.to_jsonapi()
+    assert data["attributes"]["rerouting_disconnect_code_ids"] == [84, 1505]
 
 
 def test_did_group_features_enum_round_trip():
