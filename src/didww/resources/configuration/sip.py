@@ -2,6 +2,7 @@ from didww.resources.configuration.base import TrunkConfiguration
 from didww.enums import (
     Codec,
     MediaEncryptionMode,
+    ReroutingDisconnectCode,
     RxDtmfFormat,
     SstRefreshMethod,
     StirShakenMode,
@@ -203,11 +204,11 @@ class SipConfiguration(TrunkConfiguration):
 
     @property
     def rerouting_disconnect_code_ids(self):
-        return self._attr("rerouting_disconnect_code_ids")
+        return to_enum_list(ReroutingDisconnectCode, self._attr("rerouting_disconnect_code_ids"))
 
     @rerouting_disconnect_code_ids.setter
     def rerouting_disconnect_code_ids(self, value):
-        self._set_attr("rerouting_disconnect_code_ids", value)
+        self._set_attr("rerouting_disconnect_code_ids", enum_value_list(value))
 
     @property
     def max_transfers(self):

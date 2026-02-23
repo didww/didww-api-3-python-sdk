@@ -1,7 +1,7 @@
 import uuid
 
 from client_factory import create_client
-from didww.enums import Codec, TransportProtocol
+from didww.enums import Codec, ReroutingDisconnectCode, TransportProtocol
 from didww.resources.voice_in_trunk import VoiceInTrunk
 from didww.resources.configuration.sip import SipConfiguration
 from didww.resources.configuration.pstn import PstnConfiguration
@@ -17,6 +17,10 @@ sip.host = "216.58.215.110"
 sip.port = 5060
 sip.codec_ids = [Codec.PCMU, Codec.PCMA]
 sip.transport_protocol_id = TransportProtocol.UDP
+sip.rerouting_disconnect_code_ids = [
+    ReroutingDisconnectCode.SIP_480_TEMPORARILY_UNAVAILABLE,
+    ReroutingDisconnectCode.SIP_503_SERVICE_UNAVAILABLE,
+]
 
 trunk = VoiceInTrunk()
 trunk.name = f"My New SIP Trunk {suffix}"
