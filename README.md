@@ -457,6 +457,28 @@ except DidwwClientError as e:
 
 Bug reports and pull requests are welcome on GitHub at https://github.com/didww/didww-api-3-python-sdk
 
+### Build and Release
+
+**Note:** don't forget to change **version** in `pyproject.toml`
+
+prepare venv
+```shell
+python3 -m pip install twine
+python3 -m pip install build
+```
+
+build and check
+```shell
+python3 -m build --sdist
+python3 -m build --wheel
+twine check dist/*
+```
+
+upload
+```shell
+twine upload dist/*
+```
+
 ## License
 
 The package is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
