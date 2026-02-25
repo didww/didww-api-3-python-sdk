@@ -35,6 +35,13 @@ DIDWW_API_KEY=your_api_key python examples/balance.py
 | [`orders_sku.py`](orders_sku.py) | Creates a DID order with all item types: by SKU, by available DID, and by reservation. Fetches ordered DIDs. |
 | [`upload_file.py`](upload_file.py) | Reads a file, encrypts it, and uploads to `encrypted_files`. |
 | [`identity_address_proofs.py`](identity_address_proofs.py) | Creates identity and address, encrypts and uploads files, attaches proofs to both. |
+| [`voice_in_trunk_groups.py`](voice_in_trunk_groups.py) | Creates trunks and a trunk group, lists groups with includes, updates, and deletes (cascade). |
+| [`voice_out_trunks.py`](voice_out_trunks.py) | Creates, lists, updates, and deletes a voice out trunk. Requires account configuration. |
+| [`did_trunk_assignment.py`](did_trunk_assignment.py) | Demonstrates exclusive DID trunk/trunk group assignment and re-assignment. |
+| [`did_reservations.py`](did_reservations.py) | Creates, lists, finds, and deletes a DID reservation. |
+| [`exports.py`](exports.py) | Creates a CDR export and lists all exports. |
+| [`capacity_pools.py`](capacity_pools.py) | Lists capacity pools with included shared capacity groups and qty-based pricings. |
+| [`shared_capacity_groups.py`](shared_capacity_groups.py) | Creates and deletes a shared capacity group. |
 
 ## Upload file example
 
