@@ -192,14 +192,17 @@ created = client.voice_in_trunk_groups().create(group).data
 
 ### Voice Out Trunks
 
+> **Note:** Voice Out Trunks require additional account configuration. Contact DIDWW support to enable.
+
 ```python
-from didww.enums import OnCliMismatchAction
+from didww.enums import DefaultDstAction, OnCliMismatchAction
 from didww.resources.voice_out_trunk import VoiceOutTrunk
 
 trunk = VoiceOutTrunk()
 trunk.name = "My Outbound Trunk"
 trunk.allowed_sip_ips = ["0.0.0.0/0"]
-trunk.on_cli_mismatch_action = OnCliMismatchAction.REPLACE_CLI
+trunk.default_dst_action = DefaultDstAction.ALLOW_ALL
+trunk.on_cli_mismatch_action = OnCliMismatchAction.REJECT_CALL
 created = client.voice_out_trunks().create(trunk).data
 ```
 
@@ -332,6 +335,9 @@ regions = client.regions().list(params).data
 
 The SDK provides enum classes aligned with the Java SDK (for example `CallbackMethod`, `IdentityType`, `OrderStatus`, `ExportType`, `CliFormat`, `OnCliMismatchAction`, `MediaEncryptionMode`, `TransportProtocol`, `Codec`, and more).
 
+> **Note:** `OnCliMismatchAction.REPLACE_CLI` and `OnCliMismatchAction.RANDOMIZE_CLI` require additional
+> account configuration. Contact DIDWW support to enable these values.
+
 ```python
 from didww.enums import CallbackMethod, IdentityType
 from didww.resources.order import Order
@@ -452,6 +458,11 @@ except DidwwClientError as e:
 | PermanentSupportingDocument | `client.permanent_supporting_documents()` | create, delete |
 | Proof | `client.proofs()` | create, delete |
 | RequirementValidation | `client.requirement_validations()` | create |
+| StockKeepingUnit | _(include-only)_ | included via `did_groups`, `available_dids` |
+| QtyBasedPricing | _(include-only)_ | included via `capacity_pools` |
+
+> **Include-only resources** have no standalone API endpoint. They are returned as included
+> relationships when fetching their parent resources with the appropriate `include` parameter.
 
 ## Contributing
 
