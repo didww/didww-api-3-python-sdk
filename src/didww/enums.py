@@ -100,11 +100,9 @@ class AreaLevel(str, Enum):
 
 
 class Feature(str, Enum):
-    VOICE = "voice"
     VOICE_IN = "voice_in"
     VOICE_OUT = "voice_out"
     T38 = "t38"
-    SMS = "sms"
     SMS_IN = "sms_in"
     SMS_OUT = "sms_out"
 
