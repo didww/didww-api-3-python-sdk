@@ -5,13 +5,24 @@ from didww.exceptions import DidwwClientError
 
 
 class DidwwClient:
-    def __init__(self, api_key, environment=Environment.SANDBOX, base_url=None):
+    def __init__(self, api_key, environment=Environment.SANDBOX, base_url=None, session=None):
         if not api_key:
             raise DidwwClientError("API key is required")
         self.api_key = api_key
         self.environment = environment
         self.base_url = base_url or environment.value
-        self._session = requests.Session()
+        if session is not None:
+            # Defensive copy: build a new session preserving settings from the original
+            self._session = requests.Session()
+            self._session.proxies.update(session.proxies)
+            self._session.verify = session.verify
+            self._session.cert = session.cert
+            self._session.auth = session.auth
+            self._session.max_redirects = session.max_redirects
+            for prefix, adapter in session.adapters.items():
+                self._session.mount(prefix, adapter)
+        else:
+            self._session = requests.Session()
         self._session.headers.update(
             {
                 "Accept": "application/vnd.api+json",

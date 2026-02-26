@@ -74,6 +74,30 @@ client = DidwwClient(api_key="YOUR_API_KEY", environment=Environment.PRODUCTION)
 | `Environment.PRODUCTION` | `https://api.didww.com/v3` |
 | `Environment.SANDBOX` | `https://sandbox-api.didww.com/v3` |
 
+### Custom HTTP Session (Proxy, SSL, etc.)
+
+You can pass a pre-configured `requests.Session` for advanced configuration such as proxy support:
+
+```python
+import requests
+from didww.client import DidwwClient
+from didww.configuration import Environment
+
+session = requests.Session()
+session.proxies = {
+    "http": "http://proxy.example.com:8080",
+    "https": "http://proxy.example.com:8080",
+}
+
+client = DidwwClient(
+    api_key="YOUR_API_KEY",
+    environment=Environment.PRODUCTION,
+    session=session,
+)
+```
+
+The SDK headers (Accept, Content-Type, Api-Key) are added automatically. The provided session is defensively copied, so your original session object is not modified. Any `requests.Session` settings are supported, including proxies, SSL certificates (`verify`, `cert`), authentication, and custom transport adapters.
+
 ## Resources
 
 ### Read-Only Resources
