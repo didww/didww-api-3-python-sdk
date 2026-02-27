@@ -74,6 +74,25 @@ client = DidwwClient(api_key="YOUR_API_KEY", environment=Environment.PRODUCTION)
 | `Environment.PRODUCTION` | `https://api.didww.com/v3` |
 | `Environment.SANDBOX` | `https://sandbox-api.didww.com/v3` |
 
+### HTTPS Proxy
+
+```python
+import requests
+from didww.client import DidwwClient
+from didww.configuration import Environment
+
+session = requests.Session()
+session.proxies = {
+    "https": "http://proxy.example.com:8080",
+}
+
+client = DidwwClient(
+    api_key="YOUR_API_KEY",
+    environment=Environment.PRODUCTION,
+    session=session,
+)
+```
+
 ## Resources
 
 ### Read-Only Resources

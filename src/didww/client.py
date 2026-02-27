@@ -1,42 +1,66 @@
 import requests
+from requests.adapters import HTTPAdapter
 
 from didww.configuration import Environment
 from didww.exceptions import DidwwClientError
 
 
 class DidwwClient:
-    def __init__(self, api_key, environment=Environment.SANDBOX, base_url=None):
+    def __init__(self, api_key, environment=Environment.SANDBOX, base_url=None, session=None):
         if not api_key:
             raise DidwwClientError("API key is required")
         self.api_key = api_key
         self.environment = environment
         self.base_url = base_url or environment.value
-        self._session = requests.Session()
+        if session is not None:
+            # Defensive copy: build a new session preserving settings from the original
+            self._session = requests.Session()
+            self._session.proxies.update(session.proxies)
+            self._session.verify = session.verify
+            self._session.cert = session.cert
+            self._session.auth = session.auth
+            self._session.max_redirects = session.max_redirects
+            for prefix, adapter in session.adapters.items():
+                self._session.mount(
+                    prefix,
+                    HTTPAdapter(
+                        pool_connections=adapter._pool_connections,
+                        pool_maxsize=adapter._pool_maxsize,
+                        max_retries=adapter.max_retries,
+                        pool_block=adapter._pool_block,
+                    ),
+                )
+        else:
+            self._session = requests.Session()
         self._session.headers.update(
             {
                 "Accept": "application/vnd.api+json",
                 "Content-Type": "application/vnd.api+json",
-                "Api-Key": self.api_key,
             }
         )
 
     def _url(self, path):
         return f"{self.base_url}/{path}"
 
+    def _auth_headers(self, path):
+        if path == "public_keys" or path.startswith("public_keys/"):
+            return {}
+        return {"Api-Key": self.api_key}
+
     def get(self, path, params=None):
-        resp = self._session.get(self._url(path), params=params)
+        resp = self._session.get(self._url(path), params=params, headers=self._auth_headers(path))
         return self._handle_response(resp)
 
     def post(self, path, data, params=None):
-        resp = self._session.post(self._url(path), json=data, params=params)
+        resp = self._session.post(self._url(path), json=data, params=params, headers=self._auth_headers(path))
         return self._handle_response(resp)
 
     def patch(self, path, data, params=None):
-        resp = self._session.patch(self._url(path), json=data, params=params)
+        resp = self._session.patch(self._url(path), json=data, params=params, headers=self._auth_headers(path))
         return self._handle_response(resp)
 
     def delete(self, path):
-        resp = self._session.delete(self._url(path))
+        resp = self._session.delete(self._url(path), headers=self._auth_headers(path))
         if resp.status_code == 204:
             return None
         return self._handle_response(resp)
@@ -90,7 +114,7 @@ class DidwwClient:
         resp = self._session.post(
             url,
             files=multipart_fields,
-            headers={"Accept": "application/json", "Content-Type": None},
+            headers={"Accept": "application/json", "Content-Type": None, "Api-Key": self.api_key},
         )
         if resp.status_code >= 400:
             from didww.exceptions import DidwwApiError
@@ -113,7 +137,7 @@ class DidwwClient:
         """
         resp = self._session.get(
             url,
-            headers={"Accept": None, "Content-Type": None},
+            headers={"Accept": None, "Content-Type": None, "Api-Key": self.api_key},
             stream=True,
         )
         if resp.status_code >= 400:
