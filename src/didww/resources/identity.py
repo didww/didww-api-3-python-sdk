@@ -26,6 +26,9 @@ class Identity(DidwwApiModel):
     verified = SafeAttributeField("verified")
 
     country = RelationField("country")
+    proofs = RelationField("proofs")
+    addresses = RelationField("addresses")
+    permanent_documents = RelationField("permanent_documents")
 
     class Meta:
         type = "identities"

@@ -1,10 +1,12 @@
-from didww.resources.base import DidwwApiModel, SafeAttributeField, ReadOnlyRepository
+from didww.resources.base import DidwwApiModel, SafeAttributeField, RelationField, ReadOnlyRepository
 
 
 class Country(DidwwApiModel):
     name = SafeAttributeField("name")
     prefix = SafeAttributeField("prefix")
     iso = SafeAttributeField("iso")
+
+    regions = RelationField("regions")
 
     class Meta:
         type = "countries"

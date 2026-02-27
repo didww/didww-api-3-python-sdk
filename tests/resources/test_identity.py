@@ -15,6 +15,10 @@ class TestIdentity:
         assert first.country is not None
         assert first.country.name == "United States"
         assert first.country.iso == "US"
+        assert len(first.addresses) == 1
+        assert first.addresses[0].city_name == "Chicago"
+        assert len(first.proofs) == 0
+        assert len(first.permanent_documents) == 0
 
     @my_vcr.use_cassette("identities/create.yaml")
     def test_create_identity(self, client):

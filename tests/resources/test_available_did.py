@@ -19,3 +19,15 @@ class TestAvailableDid:
         assert dg is not None
         assert dg.prefix == "616"
         assert len(dg.stock_keeping_units) == 2
+
+    @my_vcr.use_cassette("available_dids/show_with_nanpa_prefix.yaml")
+    def test_find_available_did_with_nanpa_prefix(self, client):
+        params = QueryParams().include("nanpa_prefix")
+        response = client.available_dids().find("0e1c548e-c6b5-43b0-9c12-2e300178e820", params)
+        ad = response.data
+        assert ad.id == "0e1c548e-c6b5-43b0-9c12-2e300178e820"
+        assert ad.number == "12012213879"
+        np = ad.nanpa_prefix
+        assert np is not None
+        assert np.npa == "201"
+        assert np.nxx == "221"

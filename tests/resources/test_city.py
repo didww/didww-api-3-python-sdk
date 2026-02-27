@@ -21,3 +21,4 @@ class TestCity:
         region = city.region
         assert region is not None
         assert region.name == "New York"
+        assert city.area is None
