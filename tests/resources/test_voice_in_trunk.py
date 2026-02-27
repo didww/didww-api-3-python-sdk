@@ -30,6 +30,10 @@ class TestVoiceInTrunk:
         assert first.weight == 65535
         assert first.cli_format == CliFormat.E164
         assert first.voice_in_trunk_group is None
+        assert first.pop is None
+        second = trunks[1]
+        assert second.pop is not None
+        assert second.pop.name == "DE, FRA"
 
     @my_vcr.use_cassette("voice_in_trunks/list.yaml")
     def test_list_sip_configuration_attributes(self, client):

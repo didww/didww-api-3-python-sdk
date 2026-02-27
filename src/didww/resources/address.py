@@ -13,6 +13,7 @@ class Address(DidwwApiModel):
 
     country = RelationField("country")
     identity = RelationField("identity")
+    proofs = RelationField("proofs")
     area = RelationField("area")
     city = RelationField("city")
 

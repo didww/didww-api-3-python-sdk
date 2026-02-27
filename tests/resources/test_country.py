@@ -1,4 +1,5 @@
 from tests.conftest import my_vcr
+from didww.query_params import QueryParams
 
 
 class TestCountry:
@@ -23,3 +24,17 @@ class TestCountry:
         assert country.name == "United Kingdom"
         assert country.prefix == "44"
         assert country.iso == "GB"
+
+    @my_vcr.use_cassette("countries/show_with_regions.yaml")
+    def test_find_country_with_regions(self, client):
+        params = QueryParams().include("regions")
+        response = client.countries().find("661d8448-8897-4765-acda-00cc1740148d", params)
+        country = response.data
+
+        assert country.name == "Lithuania"
+        assert country.prefix == "370"
+        assert country.iso == "LT"
+        assert len(country.regions) == 10
+        region_names = [r.name for r in country.regions]
+        assert "Vilniaus Apskritis" in region_names
+        assert "Kauno Apskritis" in region_names

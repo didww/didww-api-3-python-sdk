@@ -1,4 +1,5 @@
 from tests.conftest import my_vcr
+from didww.enums import AddressVerificationStatus
 from didww.query_params import QueryParams
 
 
@@ -25,3 +26,19 @@ class TestDid:
         assert did.billing_cycles_count is None
         assert did.channels_included_count == 0
         assert did.dedicated_channels_count == 0
+
+    @my_vcr.use_cassette("dids/show_with_address_verification_and_did_group.yaml")
+    def test_find_did_with_address_verification_and_did_group(self, client):
+        params = QueryParams().include("address_verification", "did_group")
+        response = client.dids().find("21d0b02c-b556-4d3e-acbf-504b78295dbe", params)
+        did = response.data
+        assert did.number == "61488943592"
+        assert did.blocked is False
+        av = did.address_verification
+        assert av is not None
+        assert av.status == AddressVerificationStatus.APPROVED
+        assert av.reference == "AHB-291174"
+        dg = did.did_group
+        assert dg is not None
+        assert dg.prefix == "4"
+        assert dg.area_name == "Mobile"

@@ -41,7 +41,7 @@ interactions:
         \n          },\n          \"data\": null\n        }\n      }\n    }\n  ],\n\
         \  \"included\": [\n    {\n      \"id\": \"b4fe0262-a79e-4c1f-a313-bd32739c44e5\"\
         ,\n      \"type\": \"identities\",\n      \"attributes\": {\n        \"first_name\"\
-        : \"Denis\",\n        \"last_name\": \"Talakevich\",\n        \"phone_number\"\
+        : \"John\",\n        \"last_name\": \"Doe\",\n        \"phone_number\"\
         : \"12345678\",\n        \"id_number\": null,\n        \"birth_date\": \"\
         1987-01-02\",\n        \"company_name\": null,\n        \"company_reg_number\"\
         : null,\n        \"vat_id\": null,\n        \"description\": null,\n     \

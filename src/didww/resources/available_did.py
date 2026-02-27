@@ -5,6 +5,7 @@ class AvailableDid(DidwwApiModel):
     number = SafeAttributeField("number")
 
     did_group = RelationField("did_group")
+    nanpa_prefix = RelationField("nanpa_prefix")
 
     class Meta:
         type = "available_dids"
