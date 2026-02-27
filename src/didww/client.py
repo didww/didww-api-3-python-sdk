@@ -27,27 +27,31 @@ class DidwwClient:
             {
                 "Accept": "application/vnd.api+json",
                 "Content-Type": "application/vnd.api+json",
-                "Api-Key": self.api_key,
             }
         )
 
     def _url(self, path):
         return f"{self.base_url}/{path}"
 
+    def _auth_headers(self, path):
+        if "public_keys" in path:
+            return {}
+        return {"Api-Key": self.api_key}
+
     def get(self, path, params=None):
-        resp = self._session.get(self._url(path), params=params)
+        resp = self._session.get(self._url(path), params=params, headers=self._auth_headers(path))
         return self._handle_response(resp)
 
     def post(self, path, data, params=None):
-        resp = self._session.post(self._url(path), json=data, params=params)
+        resp = self._session.post(self._url(path), json=data, params=params, headers=self._auth_headers(path))
         return self._handle_response(resp)
 
     def patch(self, path, data, params=None):
-        resp = self._session.patch(self._url(path), json=data, params=params)
+        resp = self._session.patch(self._url(path), json=data, params=params, headers=self._auth_headers(path))
         return self._handle_response(resp)
 
     def delete(self, path):
-        resp = self._session.delete(self._url(path))
+        resp = self._session.delete(self._url(path), headers=self._auth_headers(path))
         if resp.status_code == 204:
             return None
         return self._handle_response(resp)
@@ -101,7 +105,7 @@ class DidwwClient:
         resp = self._session.post(
             url,
             files=multipart_fields,
-            headers={"Accept": "application/json", "Content-Type": None},
+            headers={"Accept": "application/json", "Content-Type": None, "Api-Key": self.api_key},
         )
         if resp.status_code >= 400:
             from didww.exceptions import DidwwApiError
@@ -124,7 +128,7 @@ class DidwwClient:
         """
         resp = self._session.get(
             url,
-            headers={"Accept": None, "Content-Type": None},
+            headers={"Accept": None, "Content-Type": None, "Api-Key": self.api_key},
             stream=True,
         )
         if resp.status_code >= 400:

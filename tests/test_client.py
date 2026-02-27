@@ -51,3 +51,16 @@ def test_custom_session_preserves_verify():
     session.verify = "/path/to/ca-bundle.crt"
     client = DidwwClient(api_key="test", session=session)
     assert client._session.verify == "/path/to/ca-bundle.crt"
+
+
+def test_auth_headers_sent_for_regular_paths():
+    client = DidwwClient(api_key="my-secret-key")
+    assert client._auth_headers("countries") == {"Api-Key": "my-secret-key"}
+    assert client._auth_headers("dids") == {"Api-Key": "my-secret-key"}
+    assert client._auth_headers("voice_in_trunks") == {"Api-Key": "my-secret-key"}
+
+
+def test_auth_headers_not_sent_for_public_keys():
+    client = DidwwClient(api_key="my-secret-key")
+    assert client._auth_headers("public_keys") == {}
+    assert client._auth_headers("public_keys/some-uuid") == {}
