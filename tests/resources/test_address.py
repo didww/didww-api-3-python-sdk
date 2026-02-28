@@ -84,6 +84,22 @@ class TestAddress:
         assert identity.country is not None
         assert identity.country.name == "Algeria"
 
+    @my_vcr.use_cassette("addresses/update.yaml")
+    def test_update_address(self, client):
+        addr = Address()
+        addr.id = "bf69bc70-e1c2-442c-9f30-335ee299b663"
+        addr.city_name = "Chicago"
+        addr.postal_code = "1234"
+        addr.address = "Main street"
+        addr.description = "some address"
+        response = client.addresses().update(addr)
+        updated = response.data
+        assert updated.id == "bf69bc70-e1c2-442c-9f30-335ee299b663"
+        assert updated.city_name == "Chicago"
+        assert updated.postal_code == "1234"
+        assert updated.address == "Main street"
+        assert updated.description == "some address"
+
     @my_vcr.use_cassette("addresses/delete.yaml")
     def test_delete_address(self, client):
         result = client.addresses().delete("bf69bc70-e1c2-442c-9f30-335ee299b663")

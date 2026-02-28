@@ -128,7 +128,7 @@ class TestVoiceInTrunk:
         assert isinstance(config, SipConfiguration)
         assert config.username == "user"
 
-    @my_vcr.use_cassette("voice_in_trunks/create_10.yaml")
+    @my_vcr.use_cassette("voice_in_trunks/create_sip_with_rerouting.yaml")
     def test_create_sip_trunk_with_rerouting_disconnect_codes(self, client):
         config = SipConfiguration()
         config.username = "username"
@@ -202,6 +202,42 @@ class TestVoiceInTrunk:
         assert codes[0] == ReroutingDisconnectCode.SIP_400_BAD_REQUEST
         assert codes[-1] == ReroutingDisconnectCode.RINGING_TIMEOUT
         assert ReroutingDisconnectCode.SIP_480_TEMPORARILY_UNAVAILABLE in codes
+
+    @my_vcr.use_cassette("voice_in_trunks/update_pstn.yaml")
+    def test_update_voice_in_trunk_pstn(self, client):
+        config = PstnConfiguration()
+        config.dst = "558540420025"
+        trunk = VoiceInTrunk()
+        trunk.id = "41b94706-325e-4704-a433-d65105758836"
+        trunk.name = "hello, updated test pstn trunk"
+        trunk.configuration = config
+        response = client.voice_in_trunks().update(trunk)
+        updated = response.data
+        assert updated.id == "41b94706-325e-4704-a433-d65105758836"
+        assert updated.name == "hello, updated test pstn trunk"
+        config_obj = updated.configuration
+        assert isinstance(config_obj, PstnConfiguration)
+        assert config_obj.dst == "558540420025"
+
+    @my_vcr.use_cassette("voice_in_trunks/update_sip.yaml")
+    def test_update_voice_in_trunk_sip(self, client):
+        config = SipConfiguration()
+        config.username = "new-username"
+        config.max_transfers = 5
+        trunk = VoiceInTrunk()
+        trunk.id = "a80006b6-4183-4865-8b99-7ebbd359a762"
+        trunk.name = "hello, updated test sip trunk"
+        trunk.description = "just a description"
+        trunk.configuration = config
+        response = client.voice_in_trunks().update(trunk)
+        updated = response.data
+        assert updated.id == "a80006b6-4183-4865-8b99-7ebbd359a762"
+        assert updated.name == "hello, updated test sip trunk"
+        assert updated.description == "just a description"
+        sip_config = updated.configuration
+        assert isinstance(sip_config, SipConfiguration)
+        assert sip_config.username == "new-username"
+        assert sip_config.max_transfers == 5
 
     @my_vcr.use_cassette("voice_in_trunks/delete.yaml")
     def test_delete_voice_in_trunk(self, client):

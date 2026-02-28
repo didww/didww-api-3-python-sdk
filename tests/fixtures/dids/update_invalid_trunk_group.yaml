@@ -1,6 +1,6 @@
 interactions:
 - request:
-    body: '{"data":{"type":"dids","id":"unknown-id","relationships":{"voice_in_trunk_group":{"data":{"type":"voice_in_trunk_groups","id":"invalid"}},"voice_in_trunk":{"data":null}}}}'
+    body: '{"data":{"type":"dids","id":"unknown-id","attributes":{},"relationships":{"voice_in_trunk_group":{"data":{"type":"voice_in_trunk_groups","id":"invalid"}},"voice_in_trunk":{"data":null}}}}'
     headers:
       Accept:
       - application/vnd.api+json
@@ -20,6 +20,6 @@ interactions:
       Content-Type:
       - application/vnd.api+json
     status:
-      code: 200
-      message: OK
+      code: 422
+      message: Unprocessable Entity
 version: 1

@@ -46,6 +46,28 @@ class TestIdentity:
         assert created.country.name == "United States"
         assert created.country.iso == "US"
 
+    @my_vcr.use_cassette("identities/update.yaml")
+    def test_update_identity(self, client):
+        identity = Identity()
+        identity.id = "e96ae7d1-11d5-42bc-a5c5-211f3c3788ae"
+        identity.first_name = "Jake"
+        identity.last_name = "Johnson"
+        identity.phone_number = "1111111"
+        identity.id_number = "CED4321"
+        identity.birth_date = "1979-01-01"
+        identity.company_name = "Some Company Limited"
+        identity.company_reg_number = "1222776"
+        identity.vat_id = "GB1235"
+        identity.description = "test"
+        identity.personal_tax_id = "983217654"
+        identity.external_reference_id = "112"
+        response = client.identities().update(identity)
+        updated = response.data
+        assert updated.id == "e96ae7d1-11d5-42bc-a5c5-211f3c3788ae"
+        assert updated.first_name == "Jake"
+        assert updated.last_name == "Johnson"
+        assert updated.identity_type == IdentityType.BUSINESS
+
     @my_vcr.use_cassette("identities/delete.yaml")
     def test_delete_identity(self, client):
         result = client.identities().delete("e96ae7d1-11d5-42bc-a5c5-211f3c3788ae")
