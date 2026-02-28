@@ -57,6 +57,17 @@ class TestVoiceOutTrunk:
         assert created.name == "python-test"
         assert created.status == VoiceOutTrunkStatus.ACTIVE
 
+    @my_vcr.use_cassette("voice_out_trunks/update.yaml")
+    def test_update_voice_out_trunk(self, client):
+        trunk = VoiceOutTrunk()
+        trunk.id = "425ce763-a3a9-49b4-af5b-ada1a65c8864"
+        trunk.media_encryption_mode = MediaEncryptionMode.DISABLED
+        response = client.voice_out_trunks().update(trunk)
+        updated = response.data
+        assert updated.id == "425ce763-a3a9-49b4-af5b-ada1a65c8864"
+        assert updated.media_encryption_mode == MediaEncryptionMode.DISABLED
+        assert updated.name == "test"
+
     @my_vcr.use_cassette("voice_out_trunks/delete.yaml")
     def test_delete_voice_out_trunk(self, client):
         result = client.voice_out_trunks().delete("425ce763-a3a9-49b4-af5b-ada1a65c8864")

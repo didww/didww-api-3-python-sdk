@@ -39,7 +39,7 @@ class TestOrder:
         assert created.description == "DID"
         assert len(created.items) == 2
 
-    @my_vcr.use_cassette("orders/create_5.yaml")
+    @my_vcr.use_cassette("orders/create_billing_cycles.yaml")
     def test_order_billing_cycles_count(self, client):
         item = DidOrderItem()
         item.sku_id = "f36d2812-2195-4385-85e8-e59c3484a8bc"
@@ -56,7 +56,7 @@ class TestOrder:
         assert created.status == OrderStatus.PENDING
         assert len(created.items) == 1
 
-    @my_vcr.use_cassette("orders/create_3.yaml")
+    @my_vcr.use_cassette("orders/create_available_did.yaml")
     def test_order_available_did(self, client):
         item = AvailableDidOrderItem()
         item.sku_id = "acc46374-0b34-4912-9f67-8340339db1e5"
@@ -71,7 +71,7 @@ class TestOrder:
         assert created.status == OrderStatus.PENDING
         assert len(created.items) == 1
 
-    @my_vcr.use_cassette("orders/create_1.yaml")
+    @my_vcr.use_cassette("orders/create_reservation.yaml")
     def test_order_reservation(self, client):
         item = ReservationDidOrderItem()
         item.sku_id = "32840f64-5c3f-4278-8c8d-887fbe2f03f4"
@@ -86,7 +86,7 @@ class TestOrder:
         assert created.status == OrderStatus.PENDING
         assert len(created.items) == 1
 
-    @my_vcr.use_cassette("orders/create_2.yaml")
+    @my_vcr.use_cassette("orders/create_capacity.yaml")
     def test_order_capacity(self, client):
         item = CapacityOrderItem()
         item.capacity_pool_id = "b7522a31-4bf3-4c23-81e8-e7a14b23663f"
@@ -102,7 +102,7 @@ class TestOrder:
         assert created.description == "Capacity"
         assert len(created.items) == 1
 
-    @my_vcr.use_cassette("orders/create_6.yaml")
+    @my_vcr.use_cassette("orders/create_nanpa.yaml")
     def test_order_nanpa_prefix(self, client):
         item = DidOrderItem()
         item.sku_id = "fe77889c-f05a-40ad-a845-96aca3c28054"

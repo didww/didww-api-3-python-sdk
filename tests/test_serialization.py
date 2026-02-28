@@ -57,6 +57,30 @@ class TestDidSerialization:
         assert attrs["terminated"] is False
         assert attrs["dedicated_channels_count"] == 0
 
+    def test_nullifies_voice_in_trunk_when_trunk_group_assigned(self):
+        did = Did()
+        did.id = "abc"
+        group = VoiceInTrunkGroup()
+        group.id = "group-1"
+        did.voice_in_trunk_group = group
+        doc = did.to_jsonapi(include_id=True)
+        rels = doc["relationships"]
+        assert rels["voice_in_trunk_group"]["data"]["type"] == "voice_in_trunk_groups"
+        assert rels["voice_in_trunk_group"]["data"]["id"] == "group-1"
+        assert rels["voice_in_trunk"]["data"] is None
+
+    def test_nullifies_voice_in_trunk_group_when_trunk_assigned(self):
+        did = Did()
+        did.id = "abc"
+        trunk = VoiceInTrunk()
+        trunk.id = "trunk-1"
+        did.voice_in_trunk = trunk
+        doc = did.to_jsonapi(include_id=True)
+        rels = doc["relationships"]
+        assert rels["voice_in_trunk"]["data"]["type"] == "voice_in_trunks"
+        assert rels["voice_in_trunk"]["data"]["id"] == "trunk-1"
+        assert rels["voice_in_trunk_group"]["data"] is None
+
 
 class TestOrderSerialization:
     def test_excludes_read_only_fields(self):

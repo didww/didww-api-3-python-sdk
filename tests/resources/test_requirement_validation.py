@@ -17,7 +17,7 @@ class TestRequirementValidation:
         created = response.data
         assert created.id == "aea92b24-a044-4864-9740-89d3e15b65c7"
 
-    @my_vcr.use_cassette("requirement_validations/create_1.yaml")
+    @my_vcr.use_cassette("requirement_validations/create_error.yaml")
     def test_create_requirement_validation_failure(self, client):
         rv = RequirementValidation()
         rv.identity = Identity.build("5e9df058-50d2-4e34-b0d4-d1746b86f41a")
@@ -27,3 +27,23 @@ class TestRequirementValidation:
             client.requirement_validations().create(rv)
         assert exc_info.value.status_code == 422
         assert len(exc_info.value.errors) == 3
+
+    @my_vcr.use_cassette("requirement_validations/create_failed.yaml")
+    def test_create_requirement_validation_with_identity(self, client):
+        rv = RequirementValidation()
+        rv.identity = Identity.build("5e9df058-50d2-4e34-b0d4-d1746b86f41a")
+        rv.address = Address.build("d3414687-40f4-4346-a267-c2c65117d28c")
+        rv.requirement = Requirement.build("2efc3427-8ba6-4d50-875d-f2de4a068de8")
+        response = client.requirement_validations().create(rv)
+        created = response.data
+        assert created.id == "aea92b24-a044-4864-9740-89d3e15b65c7"
+
+    @my_vcr.use_cassette("requirement_validations/create_request_failed.yaml")
+    def test_create_requirement_validation_echo_response(self, client):
+        rv = RequirementValidation()
+        rv.identity = Identity.build("5e9df058-50d2-4e34-b0d4-d1746b86f41a")
+        rv.address = Address.build("d3414687-40f4-4346-a267-c2c65117d28c")
+        rv.requirement = Requirement.build("2efc3427-8ba6-4d50-875d-f2de4a068de8")
+        response = client.requirement_validations().create(rv)
+        created = response.data
+        assert created.id is None

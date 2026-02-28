@@ -27,6 +27,18 @@ class TestVoiceInTrunkGroup:
         assert created.capacity_limit == 1000
         assert len(created.voice_in_trunks) == 2
 
+    @my_vcr.use_cassette("voice_in_trunk_groups/update.yaml")
+    def test_update_voice_in_trunk_group(self, client):
+        group = VoiceInTrunkGroup()
+        group.id = "b2319703-ce6c-480d-bb53-614e7abcfc96"
+        group.name = "trunk group sample updated with 2 trunks"
+        group.capacity_limit = 500
+        response = client.voice_in_trunk_groups().update(group)
+        updated = response.data
+        assert updated.id == "b2319703-ce6c-480d-bb53-614e7abcfc96"
+        assert updated.name == "trunk group sample updated with 2 trunks"
+        assert updated.capacity_limit == 500
+
     @my_vcr.use_cassette("voice_in_trunk_groups/delete.yaml")
     def test_delete_voice_in_trunk_group(self, client):
         result = client.voice_in_trunk_groups().delete("b2319703-ce6c-480d-bb53-614e7abcfc96")
