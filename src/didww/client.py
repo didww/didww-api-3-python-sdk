@@ -6,6 +6,8 @@ from didww.exceptions import DidwwClientError
 
 
 class DidwwClient:
+    API_VERSION = "2022-05-10"
+
     def __init__(self, api_key, environment=Environment.SANDBOX, base_url=None, session=None):
         if not api_key:
             raise DidwwClientError("API key is required")
@@ -36,6 +38,7 @@ class DidwwClient:
             {
                 "Accept": "application/vnd.api+json",
                 "Content-Type": "application/vnd.api+json",
+                "X-DIDWW-API-Version": self.API_VERSION,
             }
         )
 
@@ -114,7 +117,11 @@ class DidwwClient:
         resp = self._session.post(
             url,
             files=multipart_fields,
-            headers={"Accept": "application/json", "Content-Type": None, "Api-Key": self.api_key},
+            headers={
+                "Accept": "application/json",
+                "Content-Type": None,
+                "Api-Key": self.api_key,
+            },
         )
         if resp.status_code >= 400:
             from didww.exceptions import DidwwApiError
@@ -137,7 +144,11 @@ class DidwwClient:
         """
         resp = self._session.get(
             url,
-            headers={"Accept": None, "Content-Type": None, "Api-Key": self.api_key},
+            headers={
+                "Accept": None,
+                "Content-Type": None,
+                "Api-Key": self.api_key,
+            },
             stream=True,
         )
         if resp.status_code >= 400:
