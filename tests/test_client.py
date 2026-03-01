@@ -63,6 +63,11 @@ def test_auth_headers_sent_for_regular_paths():
     assert client._auth_headers("voice_in_trunks") == {"Api-Key": "my-secret-key"}
 
 
+def test_default_api_version_header_set_on_session():
+    client = DidwwClient(api_key="my-secret-key")
+    assert client._session.headers["X-DIDWW-API-Version"] == "2022-05-10"
+
+
 def test_auth_headers_not_sent_for_public_keys():
     client = DidwwClient(api_key="my-secret-key")
     assert client._auth_headers("public_keys") == {}
@@ -104,6 +109,18 @@ def test_get_sends_api_key_header(monkeypatch):
     client.get("countries")
     _, kwargs = mock_get.call_args
     assert kwargs["headers"]["Api-Key"] == "my-secret-key"
+
+
+def test_session_merges_default_version_header_into_prepared_request():
+    client = DidwwClient(api_key="my-secret-key", base_url="http://test")
+    req = requests.Request(
+        "GET",
+        "http://test/countries",
+        headers=client._auth_headers("countries"),
+    )
+    prepared = client._session.prepare_request(req)
+    assert prepared.headers["Api-Key"] == "my-secret-key"
+    assert prepared.headers["X-DIDWW-API-Version"] == client.API_VERSION
 
 
 def test_get_omits_api_key_for_public_keys(monkeypatch):
