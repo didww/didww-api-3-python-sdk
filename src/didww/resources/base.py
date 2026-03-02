@@ -136,6 +136,56 @@ class ExclusiveRelationField(RelationField):
         instance._null_relationship(self.excludes)
 
 
+class _DirtyTrackingList(list):
+    """List that marks a parent attribute key dirty on mutation."""
+
+    def __init__(self, initial, key, mark_dirty):
+        super().__init__(initial)
+        self._key = key
+        self._mark_dirty = mark_dirty
+
+    def _touch(self):
+        self._mark_dirty(self._key)
+
+    def __setitem__(self, index, value):
+        super().__setitem__(index, value)
+        self._touch()
+
+    def __delitem__(self, index):
+        super().__delitem__(index)
+        self._touch()
+
+    def append(self, value):
+        super().append(value)
+        self._touch()
+
+    def extend(self, values):
+        super().extend(values)
+        self._touch()
+
+    def insert(self, index, value):
+        super().insert(index, value)
+        self._touch()
+
+    def remove(self, value):
+        super().remove(value)
+        self._touch()
+
+    def pop(self, index=-1):
+        result = super().pop(index)
+        self._touch()
+        return result
+
+    def clear(self):
+        super().clear()
+        self._touch()
+
+    def __iadd__(self, other):
+        result = super().__iadd__(other)
+        self._touch()
+        return result
+
+
 class DirtyTrackingDictionary(Dictionary):
     """Dictionary that marks keys as dirty when mutated."""
 
@@ -145,12 +195,17 @@ class DirtyTrackingDictionary(Dictionary):
 
     def set_tracker(self, mark_dirty):
         self._mark_dirty = mark_dirty
+        for key, value in list(self.items()):
+            if isinstance(value, list) and not isinstance(value, _DirtyTrackingList):
+                super().__setitem__(key, _DirtyTrackingList(value, key, mark_dirty))
 
     def _touch(self, key):
         if self._mark_dirty is not None:
             self._mark_dirty(key)
 
     def __setitem__(self, key, value):
+        if isinstance(value, list) and not isinstance(value, _DirtyTrackingList) and self._mark_dirty is not None:
+            value = _DirtyTrackingList(value, key, self._mark_dirty)
         super().__setitem__(key, value)
         self._touch(key)
 
@@ -322,6 +377,7 @@ class Repository(ReadOnlyRepository):
         doc = {"data": resource.to_jsonapi()}
         query = params.to_dict() if params else None
         body = self.client.post(self._path, doc, params=query)
+        resource._clear_dirty_state()
         response = JsonApiResponse.from_data(body)
         created = self._resource_class.from_response_content(response)
         return ApiResponse(data=created, meta=body.get("meta", {}))
@@ -344,6 +400,7 @@ class CreateOnlyRepository(ReadOnlyRepository):
         doc = {"data": resource.to_jsonapi()}
         query = params.to_dict() if params else None
         body = self.client.post(self._path, doc, params=query)
+        resource._clear_dirty_state()
         response = JsonApiResponse.from_data(body)
         created = self._resource_class.from_response_content(response)
         return ApiResponse(data=created, meta=body.get("meta", {}))

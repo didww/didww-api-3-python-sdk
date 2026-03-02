@@ -501,3 +501,50 @@ class TestDirtyTrackingRelationships:
         assert rels["did_group"]["data"]["type"] == "did_groups"
         assert rels["did_group"]["data"]["id"] == "dg-1"
         assert len(rels) == 1
+
+
+class TestMutableAttributeTracking:
+    """In-place mutations on mutable attribute values must mark the key dirty."""
+
+    def test_list_append_marks_dirty(self):
+        from didww.resources.voice_out_trunk import VoiceOutTrunk
+        trunk = VoiceOutTrunk.build("t1", allowed_sip_ips=["1.2.3.4"])
+        trunk.allowed_sip_ips.append("5.6.7.8")
+        doc = trunk.to_jsonapi(include_id=True, dirty_only=True)
+        assert doc["attributes"]["allowed_sip_ips"] == ["1.2.3.4", "5.6.7.8"]
+
+    def test_list_extend_marks_dirty(self):
+        from didww.resources.voice_out_trunk import VoiceOutTrunk
+        trunk = VoiceOutTrunk.build("t1", allowed_sip_ips=["1.2.3.4"])
+        trunk.allowed_sip_ips.extend(["5.6.7.8", "9.10.11.12"])
+        doc = trunk.to_jsonapi(include_id=True, dirty_only=True)
+        assert doc["attributes"]["allowed_sip_ips"] == ["1.2.3.4", "5.6.7.8", "9.10.11.12"]
+
+    def test_list_remove_marks_dirty(self):
+        from didww.resources.voice_out_trunk import VoiceOutTrunk
+        trunk = VoiceOutTrunk.build("t1", allowed_sip_ips=["1.2.3.4", "5.6.7.8"])
+        trunk.allowed_sip_ips.remove("1.2.3.4")
+        doc = trunk.to_jsonapi(include_id=True, dirty_only=True)
+        assert doc["attributes"]["allowed_sip_ips"] == ["5.6.7.8"]
+
+    def test_list_iadd_marks_dirty(self):
+        from didww.resources.voice_out_trunk import VoiceOutTrunk
+        trunk = VoiceOutTrunk.build("t1", allowed_sip_ips=["1.2.3.4"])
+        trunk.allowed_sip_ips += ["5.6.7.8"]
+        doc = trunk.to_jsonapi(include_id=True, dirty_only=True)
+        assert doc["attributes"]["allowed_sip_ips"] == ["1.2.3.4", "5.6.7.8"]
+
+    def test_loaded_list_append_marks_dirty(self):
+        """List loaded from API response is also tracked."""
+        from didww.resources.voice_out_trunk import VoiceOutTrunk
+        trunk = VoiceOutTrunk.from_jsonapi({
+            "id": "t1",
+            "type": "voice_out_trunks",
+            "attributes": {
+                "name": "test",
+                "allowed_sip_ips": ["1.2.3.4"],
+            },
+        })
+        trunk.allowed_sip_ips.append("5.6.7.8")
+        doc = trunk.to_jsonapi(include_id=True, dirty_only=True)
+        assert doc["attributes"]["allowed_sip_ips"] == ["1.2.3.4", "5.6.7.8"]
