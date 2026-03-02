@@ -77,7 +77,6 @@ class SafeAttributeField(AttributeField):
 
     def __set__(self, instance, value):
         instance.attributes[self.source] = value
-        instance._mark_attribute_dirty(self.source)
 
 
 class EnumAttributeField(SafeAttributeField):
@@ -98,7 +97,6 @@ class EnumAttributeField(SafeAttributeField):
             instance.attributes[self.source] = enum_value(value)
         else:
             instance.attributes[self.source] = value
-        instance._mark_attribute_dirty(self.source)
 
 
 class EnumListAttributeField(SafeAttributeField):
@@ -116,7 +114,6 @@ class EnumListAttributeField(SafeAttributeField):
 
     def __set__(self, instance, value):
         instance.attributes[self.source] = enum_value_list(value)
-        instance._mark_attribute_dirty(self.source)
 
 
 class RelationField(OrmRelationField):
@@ -227,6 +224,7 @@ class DidwwApiModel(ApiModel):
         obj.id = id
         for k, v in attributes.items():
             obj.attributes[k] = v
+        obj._clear_dirty_state()
         return obj
 
     @classmethod
@@ -341,6 +339,7 @@ class Repository(ReadOnlyRepository):
         doc = {"data": resource.to_jsonapi(include_id=True, dirty_only=True)}
         query = params.to_dict() if params else None
         body = self.client.patch(f"{self._path}/{resource.id}", doc, params=query)
+        resource._clear_dirty_state()
         response = JsonApiResponse.from_data(body)
         updated = self._resource_class.from_response_content(response)
         return ApiResponse(data=updated, meta=body.get("meta", {}))

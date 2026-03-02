@@ -6,6 +6,7 @@ from didww.query_params import QueryParams
 from didww.resources.did import Did
 from didww.resources.capacity_pool import CapacityPool
 from didww.resources.shared_capacity_group import SharedCapacityGroup
+from didww.resources.voice_in_trunk import VoiceInTrunk
 from didww.resources.voice_in_trunk_group import VoiceInTrunkGroup
 
 
@@ -49,40 +50,89 @@ class TestDid:
         assert dg.prefix == "4"
         assert dg.area_name == "Mobile"
 
+    @my_vcr.use_cassette("dids/show_with_address_verification_and_did_group.yaml")
+    def test_find_did_with_included_relationships_has_no_dirty_flags(self, client):
+        params = QueryParams().include("address_verification", "did_group")
+        response = client.dids().find("21d0b02c-b556-4d3e-acbf-504b78295dbe", params)
+        did = response.data
+        assert len(did._dirty_attrs) == 0
+        assert len(did._dirty_rels) == 0
+        assert len(did._null_rels) == 0
+        av = did.address_verification
+        assert len(av._dirty_attrs) == 0
+        assert len(av._dirty_rels) == 0
+        assert len(av._null_rels) == 0
+        dg = did.did_group
+        assert len(dg._dirty_attrs) == 0
+        assert len(dg._dirty_rels) == 0
+        assert len(dg._null_rels) == 0
+
     @my_vcr.use_cassette("dids/update_attributes.yaml")
-    def test_update_did_attributes(self, client):
-        did = Did()
-        did.id = "9df99644-f1a5-4a3c-99a4-559d758eb96b"
+    def test_update_did(self, client):
+        did = Did.build("9df99644-f1a5-4a3c-99a4-559d758eb96b")
         did.capacity_limit = 2
         did.description = "something"
-        did.terminated = True
-        did.billing_cycles_count = 0
-        did.dedicated_channels_count = 0
         response = client.dids().update(did)
         updated = response.data
         assert updated.id == "9df99644-f1a5-4a3c-99a4-559d758eb96b"
         assert updated.number == "16091609123456797"
+        assert updated.blocked is False
         assert updated.capacity_limit == 2
         assert updated.description == "something"
+        assert updated.terminated is False
+
+    @my_vcr.use_cassette("dids/update_terminated.yaml")
+    def test_update_did_terminated(self, client):
+        did = Did.build("9df99644-f1a5-4a3c-99a4-559d758eb96b")
+        did.terminated = True
+        response = client.dids().update(did)
+        updated = response.data
+        assert updated.id == "9df99644-f1a5-4a3c-99a4-559d758eb96b"
+        assert updated.blocked is True
         assert updated.terminated is True
         assert updated.billing_cycles_count == 0
 
+    @my_vcr.use_cassette("dids/update_clear_description.yaml")
+    def test_update_did_with_explicit_null_attribute(self, client):
+        did = Did.build("9df99644-f1a5-4a3c-99a4-559d758eb96b")
+        did.description = None
+        response = client.dids().update(did)
+        assert response.data.id == "9df99644-f1a5-4a3c-99a4-559d758eb96b"
+
+    @my_vcr.use_cassette("dids/update_built_single_attr.yaml")
+    def test_update_did_built_resource_sends_only_dirty_attributes(self, client):
+        did = Did.build("9df99644-f1a5-4a3c-99a4-559d758eb96b")
+        did.description = "a"
+        response = client.dids().update(did)
+        assert response.data.id == "9df99644-f1a5-4a3c-99a4-559d758eb96b"
+
+    @my_vcr.use_cassette("dids/update_set_voice_in_trunk.yaml")
+    def test_update_did_set_voice_in_trunk_clears_voice_in_trunk_group(self, client):
+        did = Did.build("9df99644-f1a5-4a3c-99a4-559d758eb96b")
+        did.voice_in_trunk = VoiceInTrunk.build("41b94706-325e-4704-a433-d65105758836")
+        response = client.dids().update(did)
+        assert response.data.id == "9df99644-f1a5-4a3c-99a4-559d758eb96b"
+
     @my_vcr.use_cassette("dids/update_voice_in_trunk_group.yaml")
-    def test_update_did_with_voice_in_trunk_group(self, client):
-        did = Did()
-        did.id = "9df99644-f1a5-4a3c-99a4-559d758eb96b"
-        group = VoiceInTrunkGroup()
-        group.id = "837c5764-a6c3-456f-aa37-71fc8f8ca07b"
+    def test_update_did_set_voice_in_trunk_group_clears_voice_in_trunk(self, client):
+        did = Did.build("9df99644-f1a5-4a3c-99a4-559d758eb96b")
+        group = VoiceInTrunkGroup.build("837c5764-a6c3-456f-aa37-71fc8f8ca07b")
         did.voice_in_trunk_group = group
         response = client.dids().update(did)
         updated = response.data
         assert updated.id == "9df99644-f1a5-4a3c-99a4-559d758eb96b"
         assert updated.number == "16091609123456797"
 
+    @my_vcr.use_cassette("dids/update_from_loaded.yaml")
+    def test_update_did_from_loaded_resource_sends_only_dirty_attributes(self, client):
+        did = client.dids().find("9df99644-f1a5-4a3c-99a4-559d758eb96b").data
+        did.description = "patched from loaded resource"
+        response = client.dids().update(did)
+        assert response.data.description == "something"
+
     @my_vcr.use_cassette("dids/update_shared_capacity_group.yaml")
     def test_update_did_shared_capacity_group(self, client):
-        did = Did()
-        did.id = "9df99644-f1a5-4a3c-99a4-559d758eb96b"
+        did = Did.build("9df99644-f1a5-4a3c-99a4-559d758eb96b")
         did.shared_capacity_group = SharedCapacityGroup.build("206881de-7a92-4415-aa32-b05458c79623")
         response = client.dids().update(did)
         updated = response.data
@@ -92,8 +142,7 @@ class TestDid:
 
     @my_vcr.use_cassette("dids/update_capacity_pool.yaml")
     def test_update_did_capacity_pool(self, client):
-        did = Did()
-        did.id = "9df99644-f1a5-4a3c-99a4-559d758eb96b"
+        did = Did.build("9df99644-f1a5-4a3c-99a4-559d758eb96b")
         did.capacity_pool = CapacityPool.build("f288d07c-e2fc-4ae6-9837-b18fb469c324")
         response = client.dids().update(did)
         updated = response.data
@@ -103,8 +152,7 @@ class TestDid:
 
     @my_vcr.use_cassette("dids/update_invalid_trunk_group.yaml")
     def test_update_did_invalid_trunk_group_error(self, client):
-        did = Did()
-        did.id = "unknown-id"
+        did = Did.build("unknown-id")
         did.voice_in_trunk_group = VoiceInTrunkGroup.build("invalid")
         with pytest.raises(DidwwApiError) as exc_info:
             client.dids().update(did)
