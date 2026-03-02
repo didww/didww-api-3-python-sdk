@@ -185,6 +185,19 @@ class _DirtyTrackingList(list):
         self._touch()
         return result
 
+    def __imul__(self, other):
+        result = super().__imul__(other)
+        self._touch()
+        return result
+
+    def sort(self, *args, **kwargs):
+        super().sort(*args, **kwargs)
+        self._touch()
+
+    def reverse(self):
+        super().reverse()
+        self._touch()
+
 
 class DirtyTrackingDictionary(Dictionary):
     """Dictionary that marks keys as dirty when mutated."""
@@ -196,16 +209,23 @@ class DirtyTrackingDictionary(Dictionary):
     def set_tracker(self, mark_dirty):
         self._mark_dirty = mark_dirty
         for key, value in list(self.items()):
-            if isinstance(value, list) and not isinstance(value, _DirtyTrackingList):
-                super().__setitem__(key, _DirtyTrackingList(value, key, mark_dirty))
+            wrapped = self._wrap_value(key, value)
+            if wrapped is not value:
+                super().__setitem__(key, wrapped)
 
     def _touch(self, key):
         if self._mark_dirty is not None:
             self._mark_dirty(key)
 
+    def _wrap_value(self, key, value):
+        if self._mark_dirty is None:
+            return value
+        if isinstance(value, list) and not isinstance(value, _DirtyTrackingList):
+            return _DirtyTrackingList(value, key, self._mark_dirty)
+        return value
+
     def __setitem__(self, key, value):
-        if isinstance(value, list) and not isinstance(value, _DirtyTrackingList) and self._mark_dirty is not None:
-            value = _DirtyTrackingList(value, key, self._mark_dirty)
+        value = self._wrap_value(key, value)
         super().__setitem__(key, value)
         self._touch(key)
 
