@@ -491,24 +491,43 @@ Bug reports and pull requests are welcome on GitHub at https://github.com/didww/
 
 ### Build and Release
 
-**Note:** don't forget to change **version** in `pyproject.toml`
+#### Preconditions
+- prepare venv
+- install build and twine packages
 
-prepare venv
 ```shell
 python3 -m pip install twine
 python3 -m pip install build
 ```
 
-build and check
+#### 1. Change version in `pyproject.toml` to the new version (e.g. `1.1.0`)
+
+#### 2. Build the package
 ```shell
 python3 -m build --sdist
 python3 -m build --wheel
+```
+
+#### 3. Check the package
+```shell
 twine check dist/*
 ```
 
-upload
+#### 4. Publish new version to PyPI
 ```shell
 twine upload dist/*
+```
+
+#### 5. Commit `pyproject.toml` and create tag
+```shell
+git add pyproject.toml
+git commit -m "1.1.0"
+git tag -a v1.1.0 -m "Release version 1.1.0"
+```
+
+#### 6. Push to GitHub
+```shell
+git push origin main --follow-tags
 ```
 
 ## License
