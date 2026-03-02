@@ -57,15 +57,12 @@ class TestDid:
         did = response.data
         assert len(did._dirty_attrs) == 0
         assert len(did._dirty_rels) == 0
-        assert len(did._null_rels) == 0
         av = did.address_verification
         assert len(av._dirty_attrs) == 0
         assert len(av._dirty_rels) == 0
-        assert len(av._null_rels) == 0
         dg = did.did_group
         assert len(dg._dirty_attrs) == 0
         assert len(dg._dirty_rels) == 0
-        assert len(dg._null_rels) == 0
 
     @my_vcr.use_cassette("dids/update_attributes.yaml")
     def test_update_did(self, client):

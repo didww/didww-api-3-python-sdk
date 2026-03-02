@@ -121,7 +121,6 @@ class RelationField(OrmRelationField):
 
     def __set__(self, instance, value):
         super().__set__(instance, value)
-        instance._clear_null_relationship(self.source)
         instance._mark_relationship_dirty(self.source)
 
 
@@ -198,7 +197,6 @@ class DidwwApiModel(ApiModel):
         super().__init__(raw_object=raw_object)
         self._dirty_attrs = set()
         self._dirty_rels = set()
-        self._null_rels = set()
         self._install_dirty_tracking()
         self._clear_dirty_state()
 
@@ -210,7 +208,6 @@ class DidwwApiModel(ApiModel):
     def _clear_dirty_state(self):
         self._dirty_attrs.clear()
         self._dirty_rels.clear()
-        self._null_rels.clear()
 
     def _mark_attribute_dirty(self, key):
         self._dirty_attrs.add(key)
@@ -247,19 +244,14 @@ class DidwwApiModel(ApiModel):
         rels = self.raw_object.relationships.as_data()
         if dirty_only:
             rels = {k: v for k, v in rels.items() if k in self._dirty_rels}
-        for key in self._null_rels:
-            rels[key] = {"data": None}
         if rels:
             doc["relationships"] = rels
         return doc
 
     def _null_relationship(self, key):
-        """Mark a relationship as explicitly null for serialization."""
-        self._null_rels.add(key)
+        """Write null data into the ORM relationship, like Java's field = null."""
+        self.raw_object.relationships[key] = {"data": None}
         self._mark_relationship_dirty(key)
-
-    def _clear_null_relationship(self, key):
-        self._null_rels.discard(key)
 
     def _relationship_id(self, key):
         """Get the ID from a to-one relationship without resolving it."""

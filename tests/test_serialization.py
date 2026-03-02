@@ -396,7 +396,6 @@ class TestDirtyTrackingAttributes:
         })
         assert len(did._dirty_attrs) == 0
         assert len(did._dirty_rels) == 0
-        assert len(did._null_rels) == 0
 
     def test_read_only_attrs_excluded_even_when_dirty(self):
         """Non-writable attributes must never appear in PATCH."""
