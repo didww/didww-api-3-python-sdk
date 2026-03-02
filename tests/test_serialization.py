@@ -407,6 +407,12 @@ class TestDirtyTrackingAttributes:
         assert "number" not in doc["attributes"]
         assert doc["attributes"] == {"capacity_limit": 20}
 
+    def test_build_with_kwargs_includes_attrs_in_dirty_patch(self):
+        """Attributes passed as kwargs to build() must be dirty."""
+        did = Did.build("abc", description="test", capacity_limit=5)
+        doc = did.to_jsonapi(include_id=True, dirty_only=True)
+        assert doc["attributes"] == {"description": "test", "capacity_limit": 5}
+
     def test_create_sends_all_non_null_writable_attrs(self):
         """CREATE (non-dirty) serialization sends all non-null writable attrs."""
         did = Did()

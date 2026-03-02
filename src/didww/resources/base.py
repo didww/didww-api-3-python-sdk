@@ -224,7 +224,6 @@ class DidwwApiModel(ApiModel):
         obj.id = id
         for k, v in attributes.items():
             obj.attributes[k] = v
-        obj._clear_dirty_state()
         return obj
 
     @classmethod
