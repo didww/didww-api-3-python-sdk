@@ -191,7 +191,7 @@ client.dids().update(did)
 did = Did.build("uuid")
 did.voice_in_trunk = VoiceInTrunk.build("trunk-uuid")
 client.dids().update(did)
-# PATCH body: {"voice_in_trunk": {"data": ...}, "voice_in_trunk_group": {"data": null}}
+# PATCH body: {"data": {"type": "dids", "id": "uuid", "attributes": {}, "relationships": {"voice_in_trunk": {"data": {"type": "voice_in_trunks", "id": "trunk-uuid"}}, "voice_in_trunk_group": {"data": null}}}}
 
 # Included resources also support dirty tracking
 params = QueryParams().include("voice_in_trunk")
