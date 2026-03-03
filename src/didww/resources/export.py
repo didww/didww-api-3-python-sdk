@@ -1,5 +1,5 @@
 from didww.enums import ExportStatus, ExportType, CallbackMethod
-from didww.resources.base import DidwwApiModel, SafeAttributeField, EnumAttributeField, Repository
+from didww.resources.base import DidwwApiModel, SafeAttributeField, EnumAttributeField, CreateOnlyRepository
 
 
 class Export(DidwwApiModel):
@@ -17,6 +17,6 @@ class Export(DidwwApiModel):
         type = "exports"
 
 
-class ExportRepository(Repository):
+class ExportRepository(CreateOnlyRepository):
     _resource_class = Export
     _path = "exports"
