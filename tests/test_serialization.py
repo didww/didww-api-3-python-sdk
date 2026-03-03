@@ -551,3 +551,15 @@ class TestMutableAttributeTracking:
         doc = trunk.to_jsonapi(include_id=True, dirty_only=True)
         assert doc["attributes"]["allowed_sip_ips"] == ["5.6.7.8", "1.2.3.4"]
 
+    def test_setdefault_wraps_list_for_mutation_tracking(self):
+        """setdefault with a list default must wrap it so in-place mutations are tracked after dirty clear."""
+        trunk = self._voice_out_trunk()
+        trunk.attributes.setdefault("allowed_sip_ips", ["1.2.3.4"])
+        # Clear dirty state to simulate a save/reload cycle
+        trunk._clear_dirty_state()
+        assert len(trunk._dirty_attrs) == 0
+        # Mutate the list in-place — only a wrapped list will re-mark the key dirty
+        trunk.allowed_sip_ips.append("5.6.7.8")
+        doc = trunk.to_jsonapi(include_id=True, dirty_only=True)
+        assert doc["attributes"]["allowed_sip_ips"] == ["1.2.3.4", "5.6.7.8"]
+

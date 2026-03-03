@@ -251,8 +251,8 @@ class DirtyTrackingDictionary(Dictionary):
 
     def setdefault(self, key, default=None):
         if key not in self:
-            self._touch(key)
-        return super().setdefault(key, default)
+            self[key] = default
+        return self[key]
 
     def update(self, *args, **kwargs):
         updates = dict(*args, **kwargs)
