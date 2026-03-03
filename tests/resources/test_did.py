@@ -125,7 +125,7 @@ class TestDid:
         did = client.dids().find("9df99644-f1a5-4a3c-99a4-559d758eb96b").data
         did.description = "patched from loaded resource"
         response = client.dids().update(did)
-        assert response.data.description == "something"
+        assert response.data.description == "patched from loaded resource"
 
     @my_vcr.use_cassette("dids/update_from_loaded_set_voice_in_trunk.yaml")
     def test_update_did_from_loaded_resource_sends_only_dirty_relationship(self, client):
