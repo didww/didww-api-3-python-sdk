@@ -192,6 +192,13 @@ did = Did.build("uuid")
 did.voice_in_trunk = VoiceInTrunk.build("trunk-uuid")
 client.dids().update(did)
 # PATCH body: {"voice_in_trunk": {"data": ...}, "voice_in_trunk_group": {"data": null}}
+
+# Included resources also support dirty tracking
+params = QueryParams().include("voice_in_trunk")
+did = client.dids().find("uuid", params).data
+trunk = did.voice_in_trunk
+trunk.description = "Updated via include"
+client.voice_in_trunks().update(trunk)
 ```
 
 ### Voice In Trunks
