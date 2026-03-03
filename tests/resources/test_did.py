@@ -127,6 +127,13 @@ class TestDid:
         response = client.dids().update(did)
         assert response.data.description == "something"
 
+    @my_vcr.use_cassette("dids/update_from_loaded_set_voice_in_trunk.yaml")
+    def test_update_did_from_loaded_resource_sends_only_dirty_relationship(self, client):
+        did = client.dids().find("9df99644-f1a5-4a3c-99a4-559d758eb96b").data
+        did.voice_in_trunk = VoiceInTrunk.build("41b94706-325e-4704-a433-d65105758836")
+        response = client.dids().update(did)
+        assert response.data.id == "9df99644-f1a5-4a3c-99a4-559d758eb96b"
+
     @my_vcr.use_cassette("dids/update_shared_capacity_group.yaml")
     def test_update_did_shared_capacity_group(self, client):
         did = Did.build("9df99644-f1a5-4a3c-99a4-559d758eb96b")
