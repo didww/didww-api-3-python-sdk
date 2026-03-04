@@ -3,8 +3,8 @@ from enum import Enum
 
 from jsonapi_requests.orm.api import OrmApi
 from jsonapi_requests.orm.api_model import ApiModel
-from jsonapi_requests.orm.fields import AttributeField, RelationField
-from jsonapi_requests.data import JsonApiResponse
+from jsonapi_requests.orm.fields import AttributeField, RelationField as OrmRelationField
+from jsonapi_requests.data import Dictionary, JsonApiResponse
 from didww.enums import enum_value, enum_value_list, to_enum, to_enum_list
 
 # Map of JSON:API types to module:class for lazy loading
@@ -75,6 +75,9 @@ class SafeAttributeField(AttributeField):
             return self
         return instance.attributes.get(self.source)
 
+    def __set__(self, instance, value):
+        instance.attributes[self.source] = value
+
 
 class EnumAttributeField(SafeAttributeField):
     """AttributeField that serializes/deserializes Enum values."""
@@ -92,8 +95,8 @@ class EnumAttributeField(SafeAttributeField):
     def __set__(self, instance, value):
         if isinstance(value, Enum):
             instance.attributes[self.source] = enum_value(value)
-            return
-        instance.attributes[self.source] = value
+        else:
+            instance.attributes[self.source] = value
 
 
 class EnumListAttributeField(SafeAttributeField):
@@ -113,6 +116,14 @@ class EnumListAttributeField(SafeAttributeField):
         instance.attributes[self.source] = enum_value_list(value)
 
 
+class RelationField(OrmRelationField):
+    """RelationField that tracks dirty relationship writes."""
+
+    def __set__(self, instance, value):
+        super().__set__(instance, value)
+        instance._mark_relationship_dirty(self.source)
+
+
 class ExclusiveRelationField(RelationField):
     """RelationField that nullifies another relationship when set."""
 
@@ -125,6 +136,130 @@ class ExclusiveRelationField(RelationField):
         instance._null_relationship(self.excludes)
 
 
+class _DirtyTrackingList(list):
+    """List that marks a parent attribute key dirty on mutation."""
+
+    def __init__(self, initial, key, mark_dirty):
+        super().__init__(initial)
+        self._key = key
+        self._mark_dirty = mark_dirty
+
+    def _touch(self):
+        self._mark_dirty(self._key)
+
+    def __setitem__(self, index, value):
+        super().__setitem__(index, value)
+        self._touch()
+
+    def __delitem__(self, index):
+        super().__delitem__(index)
+        self._touch()
+
+    def append(self, value):
+        super().append(value)
+        self._touch()
+
+    def extend(self, values):
+        super().extend(values)
+        self._touch()
+
+    def insert(self, index, value):
+        super().insert(index, value)
+        self._touch()
+
+    def remove(self, value):
+        super().remove(value)
+        self._touch()
+
+    def pop(self, index=-1):
+        result = super().pop(index)
+        self._touch()
+        return result
+
+    def clear(self):
+        super().clear()
+        self._touch()
+
+    def __iadd__(self, other):
+        result = super().__iadd__(other)
+        self._touch()
+        return result
+
+    def __imul__(self, other):
+        result = super().__imul__(other)
+        self._touch()
+        return result
+
+    def sort(self, *args, **kwargs):
+        super().sort(*args, **kwargs)
+        self._touch()
+
+    def reverse(self):
+        super().reverse()
+        self._touch()
+
+
+class DirtyTrackingDictionary(Dictionary):
+    """Dictionary that marks keys as dirty when mutated."""
+
+    def __init__(self, initial=None, mark_dirty=None):
+        super().__init__(initial or {})
+        self._mark_dirty = mark_dirty
+
+    def set_tracker(self, mark_dirty):
+        self._mark_dirty = mark_dirty
+        for key, value in list(self.items()):
+            wrapped = self._wrap_value(key, value)
+            if wrapped is not value:
+                super().__setitem__(key, wrapped)
+
+    def _touch(self, key):
+        if self._mark_dirty is not None:
+            self._mark_dirty(key)
+
+    def _wrap_value(self, key, value):
+        if self._mark_dirty is None:
+            return value
+        if isinstance(value, list) and not isinstance(value, _DirtyTrackingList):
+            return _DirtyTrackingList(value, key, self._mark_dirty)
+        return value
+
+    def __setitem__(self, key, value):
+        value = self._wrap_value(key, value)
+        super().__setitem__(key, value)
+        self._touch(key)
+
+    def __delitem__(self, key):
+        super().__delitem__(key)
+        self._touch(key)
+
+    def clear(self):
+        dirty_keys = list(self.keys())
+        super().clear()
+        for key in dirty_keys:
+            self._touch(key)
+
+    def pop(self, key, *args):
+        result = super().pop(key, *args)
+        self._touch(key)
+        return result
+
+    def popitem(self):
+        key, value = super().popitem()
+        self._touch(key)
+        return key, value
+
+    def setdefault(self, key, default=None):
+        if key not in self:
+            self[key] = default
+        return self[key]
+
+    def update(self, *args, **kwargs):
+        updates = dict(*args, **kwargs)
+        for key, value in updates.items():
+            self[key] = value
+
+
 class DidwwApiModel(ApiModel):
     """Base class for all DIDWW resources."""
 
@@ -132,6 +267,28 @@ class DidwwApiModel(ApiModel):
 
     class Meta:
         api = api
+
+    def __init__(self, raw_object=None):
+        super().__init__(raw_object=raw_object)
+        self._dirty_attrs = set()
+        self._dirty_rels = set()
+        self._install_dirty_tracking()
+        self._clear_dirty_state()
+
+    def _install_dirty_tracking(self):
+        attrs = DirtyTrackingDictionary(self.raw_object.attributes)
+        attrs.set_tracker(self._mark_attribute_dirty)
+        self.raw_object.attributes = attrs
+
+    def _clear_dirty_state(self):
+        self._dirty_attrs.clear()
+        self._dirty_rels.clear()
+
+    def _mark_attribute_dirty(self, key):
+        self._dirty_attrs.add(key)
+
+    def _mark_relationship_dirty(self, key):
+        self._dirty_rels.add(key)
 
     @classmethod
     def build(cls, id, **attributes):
@@ -147,29 +304,29 @@ class DidwwApiModel(ApiModel):
         response = JsonApiResponse.from_data({"data": data})
         return cls.from_response_content(response)
 
-    def to_jsonapi(self, include_id=False):
+    def to_jsonapi(self, include_id=False, dirty_only=False):
         """Serialize for create/update, respecting _writable_attrs."""
         attrs = dict(self.attributes)
-        attrs = {k: v for k, v in attrs.items() if v is not None}
+        if dirty_only:
+            attrs = {k: attrs.get(k) for k in self._dirty_attrs}
+        else:
+            attrs = {k: v for k, v in attrs.items() if v is not None}
         if self._writable_attrs is not None:
             attrs = {k: v for k, v in attrs.items() if k in self._writable_attrs}
         doc = {"type": self.type, "attributes": attrs}
         if include_id and self.id:
             doc["id"] = self.id
         rels = self.raw_object.relationships.as_data()
-        null_rels = getattr(self, "_null_rels", None)
-        if null_rels:
-            for key in null_rels:
-                rels[key] = {"data": None}
+        if dirty_only:
+            rels = {k: v for k, v in rels.items() if k in self._dirty_rels}
         if rels:
             doc["relationships"] = rels
         return doc
 
     def _null_relationship(self, key):
-        """Mark a relationship as explicitly null for serialization."""
-        if not hasattr(self, "_null_rels"):
-            self._null_rels = set()
-        self._null_rels.add(key)
+        """Write null data into the ORM relationship, like Java's field = null."""
+        self.raw_object.relationships[key] = {"data": None}
+        self._mark_relationship_dirty(key)
 
     def _relationship_id(self, key):
         """Get the ID from a to-one relationship without resolving it."""
@@ -240,14 +397,16 @@ class Repository(ReadOnlyRepository):
         doc = {"data": resource.to_jsonapi()}
         query = params.to_dict() if params else None
         body = self.client.post(self._path, doc, params=query)
+        resource._clear_dirty_state()
         response = JsonApiResponse.from_data(body)
         created = self._resource_class.from_response_content(response)
         return ApiResponse(data=created, meta=body.get("meta", {}))
 
     def update(self, resource, params=None):
-        doc = {"data": resource.to_jsonapi(include_id=True)}
+        doc = {"data": resource.to_jsonapi(include_id=True, dirty_only=True)}
         query = params.to_dict() if params else None
         body = self.client.patch(f"{self._path}/{resource.id}", doc, params=query)
+        resource._clear_dirty_state()
         response = JsonApiResponse.from_data(body)
         updated = self._resource_class.from_response_content(response)
         return ApiResponse(data=updated, meta=body.get("meta", {}))
@@ -261,6 +420,7 @@ class CreateOnlyRepository(ReadOnlyRepository):
         doc = {"data": resource.to_jsonapi()}
         query = params.to_dict() if params else None
         body = self.client.post(self._path, doc, params=query)
+        resource._clear_dirty_state()
         response = JsonApiResponse.from_data(body)
         created = self._resource_class.from_response_content(response)
         return ApiResponse(data=created, meta=body.get("meta", {}))

@@ -168,6 +168,39 @@ did.voice_in_trunk = VoiceInTrunk.build("trunk-uuid")
 client.dids().update(did)
 ```
 
+### Dirty Serialization
+
+The SDK tracks which attributes and relationships have been changed since a resource was loaded or built.
+When `update()` is called, only the modified fields are sent in the PATCH request.
+
+```python
+from didww.resources.did import Did
+from didww.resources.voice_in_trunk import VoiceInTrunk
+
+# Only "description" is sent in the PATCH body
+did = client.dids().find("uuid").data
+did.description = "Updated"
+client.dids().update(did)
+
+# Explicit None sends null to clear a field
+did = Did.build("uuid")
+did.description = None
+client.dids().update(did)
+
+# Exclusive relationships: setting voice_in_trunk automatically nullifies voice_in_trunk_group
+did = Did.build("uuid")
+did.voice_in_trunk = VoiceInTrunk.build("trunk-uuid")
+client.dids().update(did)
+# PATCH body: {"data": {"type": "dids", "id": "uuid", "attributes": {}, "relationships": {"voice_in_trunk": {"data": {"type": "voice_in_trunks", "id": "trunk-uuid"}}, "voice_in_trunk_group": {"data": null}}}}
+
+# Included resources also support dirty tracking
+params = QueryParams().include("voice_in_trunk")
+did = client.dids().find("uuid", params).data
+trunk = did.voice_in_trunk
+trunk.description = "Updated via include"
+client.voice_in_trunks().update(trunk)
+```
+
 ### Voice In Trunks
 
 ```python
