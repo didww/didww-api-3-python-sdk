@@ -1,6 +1,7 @@
 Python client for DIDWW API v3.
 
 ![Tests](https://github.com/didww/didww-api-3-python-sdk/actions/workflows/ci.yml/badge.svg)
+![Coverage](https://img.shields.io/endpoint?url=https://didww.github.io/didww-api-3-python-sdk/badge.json)
 ![Python](https://img.shields.io/badge/python-3.9%2B-blue)
 
 ## About DIDWW API v3

@@ -5,6 +5,11 @@ on:
   pull_request:
   workflow_dispatch:
 
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -68,3 +73,60 @@ jobs:
             echo "| Line | ${LINE_PERCENT}% |"
             echo "| Branch | ${BRANCH_PERCENT}% |"
           } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Generate badge.json
+        if: matrix.python-version == '3.13'
+        run: |
+          if [ ! -f coverage.xml ]; then
+            mkdir -p badge
+            echo '{"schemaVersion":1,"label":"coverage","message":"unknown","color":"lightgrey"}' > badge/badge.json
+            exit 0
+          fi
+          LINE_RATE=$(python3 -c "
+          import xml.etree.ElementTree as ET
+          tree = ET.parse('coverage.xml')
+          root = tree.getroot()
+          print(root.attrib.get('line-rate', '0'))
+          ")
+          PERCENT=$(python3 -c "print(f'{float(\"$LINE_RATE\") * 100:.1f}')")
+          PERCENT_CMP=$(python3 -c "print(float(\"$LINE_RATE\") * 100)")
+          if python3 -c "exit(0 if $PERCENT_CMP >= 90 else 1)"; then COLOR="brightgreen"
+          elif python3 -c "exit(0 if $PERCENT_CMP >= 75 else 1)"; then COLOR="green"
+          elif python3 -c "exit(0 if $PERCENT_CMP >= 60 else 1)"; then COLOR="yellow"
+          else COLOR="red"; fi
+          mkdir -p badge
+          echo "{\"schemaVersion\":1,\"label\":\"coverage\",\"message\":\"${PERCENT}%\",\"color\":\"${COLOR}\"}" > badge/badge.json
+
+      - name: Upload badge artifact
+        if: matrix.python-version == '3.13'
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-badge
+          path: badge
+
+  deploy-coverage:
+    needs: test
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Download coverage badge
+        uses: actions/download-artifact@v4
+        with:
+          name: coverage-badge
+          path: coverage
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: coverage
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
