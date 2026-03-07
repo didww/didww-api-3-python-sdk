@@ -8,13 +8,17 @@ interactions:
     uri: https://sandbox-api.didww.com/v3/exports/02bf6df4-3af9-416c-96be-16e5b7eeb651.csv.gz
   response:
     body:
-      string: \!\!binary |
-        H4sIAHOsrGkC/2WQz2rDMAzG730KHxtQOydrujSnjXiDHAZlSR/AOIIZEqtYCn39ZVkoy3awLH4f+vTHWMGH1g+oGrFR1PbSVgmYO60oBHT/+WvoFtbQGB2CqQ0YZPHBiqcAZoxzoraMjqdSz27xqoMXb4Xib1hRh/CBfKXACC31/VtEVC8DjeG7fWMSaDEOi/9aeEfBiJ2qPu3k1vNarUYWGjCqacQG+/6unskH4WST6bTYpdlOH5XOy0yXeQEABzg9ZY/zS/PTMc+A/bX8w547391ue0cD6NX+B11AU5+VRBvYunlmmS5Ho4Dea61X8efbfAH400CLjgEAAA==
+      string: !!binary |
+        H4sIAH+urGkC/2WQz2rDMAzG730KHxtQOydrujSnjXiDHAZlSR/AOIIZEqtYCn39ZVkoy3awLH4f
+        +vTHWMGH1g+oGrFR1PbSVgmYO60oBHT/+WvoFtbQGB2CqQ0YZPHBiqcAZoxzoraMjqdSz27xqoMX
+        b4Xib1hRh/CBfKXACC31/VtEVC8DjeG7fWMSaDEOi/9aeEfBiJ2qPu3k1vNarUYWGjCqacQG+/6u
+        nskH4WST6bTYpdlOH5XOy0yXeQEABzg9ZY/zS/PTMc+A/bX8w547391ue0cD6NX+B11AU5+VRBvY
+        unlmmS5Ho4Dea61X8efbfAH400CLjgEAAA==
     headers:
-      Content-Type:
-      - application/gzip
       Content-Disposition:
       - attachment; filename="02bf6df4-3af9-416c-96be-16e5b7eeb651.csv.gz"
+      Content-Type:
+      - application/gzip
     status:
       code: 200
       message: OK
