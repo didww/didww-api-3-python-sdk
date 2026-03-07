@@ -5,7 +5,7 @@ interactions:
       Api-Key:
       - test-api-key
     method: GET
-    uri: https://sandbox-api.didww.com/v3/exports/02bf6df4-3af9-416c-96be-16e5b7eeb651.csv
+    uri: https://sandbox-api.didww.com/v3/exports/02bf6df4-3af9-416c-96be-16e5b7eeb651.csv.gz
   response:
     body:
       string: "Date/Time Start (UTC),Date/Time Connect (UTC),Date/Time End (UTC),Source,DID,Destination,Duration\
@@ -17,7 +17,7 @@ interactions:
       Content-Type:
       - application/octet-stream
       Content-Disposition:
-      - attachment; filename="02bf6df4-3af9-416c-96be-16e5b7eeb651.csv"
+      - attachment; filename="02bf6df4-3af9-416c-96be-16e5b7eeb651.csv.gz"
     status:
       code: 200
       message: OK

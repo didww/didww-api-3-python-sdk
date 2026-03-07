@@ -124,7 +124,7 @@ class TestExportSerialization:
             "attributes": {
                 "status": "Completed",
                 "created_at": "2021-01-01T00:00:00Z",
-                "url": "https://example.com/export.csv",
+                "url": "https://example.com/export.csv.gz",
                 "export_type": "cdr_in",
                 "filters": {"year": "2021"},
                 "callback_url": "http://example.com",

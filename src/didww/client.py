@@ -166,6 +166,37 @@ class DidwwClient:
             for chunk in resp.iter_content(chunk_size=8192):
                 destination.write(chunk)
 
+    def download_and_decompress_export(self, url, destination):
+        """Download a gzip-compressed export (.csv.gz) and write decompressed CSV.
+
+        Args:
+            url: The full download URL from Export.url attribute.
+            destination: File path (str) or writable binary file-like object.
+        """
+        import gzip
+
+        resp = self._session.get(
+            url,
+            headers={
+                "Accept": None,
+                "Content-Type": None,
+                "Api-Key": self.api_key,
+            },
+        )
+        if resp.status_code >= 400:
+            from didww.exceptions import DidwwApiError
+
+            raise DidwwApiError(
+                [{"title": f"HTTP {resp.status_code}"}],
+                status_code=resp.status_code,
+            )
+        decompressed = gzip.decompress(resp.content)
+        if isinstance(destination, str):
+            with open(destination, "wb") as f:
+                f.write(decompressed)
+        else:
+            destination.write(decompressed)
+
     # --- Repository accessors ---
 
     def countries(self):

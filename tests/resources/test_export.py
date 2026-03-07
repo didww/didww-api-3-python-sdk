@@ -31,7 +31,7 @@ class TestExport:
 
     @my_vcr.use_cassette("exports/download.yaml")
     def test_download_export_to_path(self, client):
-        url = "https://sandbox-api.didww.com/v3/exports/02bf6df4-3af9-416c-96be-16e5b7eeb651.csv"
+        url = "https://sandbox-api.didww.com/v3/exports/02bf6df4-3af9-416c-96be-16e5b7eeb651.csv.gz"
         with tempfile.NamedTemporaryFile(suffix=".csv", delete=False) as f:
             dest = f.name
         try:
@@ -45,7 +45,7 @@ class TestExport:
 
     @my_vcr.use_cassette("exports/download.yaml")
     def test_download_export_to_file_object(self, client):
-        url = "https://sandbox-api.didww.com/v3/exports/02bf6df4-3af9-416c-96be-16e5b7eeb651.csv"
+        url = "https://sandbox-api.didww.com/v3/exports/02bf6df4-3af9-416c-96be-16e5b7eeb651.csv.gz"
         with tempfile.NamedTemporaryFile(suffix=".csv", delete=False) as f:
             dest = f.name
         try:
