@@ -1,8 +1,15 @@
+from importlib.metadata import PackageNotFoundError, version as _pkg_version
+
 import requests
 from requests.adapters import HTTPAdapter
 
 from didww.configuration import Environment
 from didww.exceptions import DidwwClientError
+
+try:
+    _SDK_VERSION = _pkg_version("didww")
+except PackageNotFoundError:
+    _SDK_VERSION = "0.0.0"
 
 
 class DidwwClient:
@@ -39,6 +46,7 @@ class DidwwClient:
                 "Accept": "application/vnd.api+json",
                 "Content-Type": "application/vnd.api+json",
                 "X-DIDWW-API-Version": self.API_VERSION,
+                "User-Agent": f"didww-python-sdk/{_SDK_VERSION}",
             }
         )
 
