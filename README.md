@@ -9,6 +9,8 @@ The DIDWW API provides a simple yet powerful interface that allows you to fully 
 
 The DIDWW API v3 is a fully compliant implementation of the [JSON API specification](http://jsonapi.org/format/).
 
+This SDK uses [jsonapi-requests](https://github.com/socialwifi/jsonapi-requests) for JSON:API serialization and deserialization.
+
 Read more https://doc.didww.com/api
 
 This SDK sends the `X-DIDWW-API-Version: 2022-05-10` header with every request.
