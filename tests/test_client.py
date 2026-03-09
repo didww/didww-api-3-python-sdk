@@ -5,6 +5,7 @@ from requests.adapters import HTTPAdapter
 import pytest
 from didww.client import DidwwClient
 from didww.configuration import Environment
+from didww.client import _SDK_VERSION
 from didww.exceptions import DidwwClientError
 
 
@@ -66,6 +67,12 @@ def test_auth_headers_sent_for_regular_paths():
 def test_default_api_version_header_set_on_session():
     client = DidwwClient(api_key="my-secret-key")
     assert client._session.headers["X-DIDWW-API-Version"] == DidwwClient.API_VERSION
+
+
+def test_user_agent_header_set_on_session():
+    client = DidwwClient(api_key="my-secret-key")
+    expected = f"didww-python-sdk/{_SDK_VERSION}"
+    assert client._session.headers["User-Agent"] == expected
 
 
 def test_auth_headers_not_sent_for_public_keys():
