@@ -15,10 +15,10 @@ interactions:
         nskH4WST6bTYpdlOH5XOy0yXeQEABzg9ZY/zS/PTMc+A/bX8w547391ue0cD6NX+B11AU5+VRBvY
         unlmmS5Ho4Dea61X8efbfAH400CLjgEAAA==
     headers:
-      Content-Type:
-      - application/octet-stream
       Content-Disposition:
       - attachment; filename="02bf6df4-3af9-416c-96be-16e5b7eeb651.csv.gz"
+      Content-Type:
+      - application/octet-stream
     status:
       code: 200
       message: OK
