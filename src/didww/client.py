@@ -135,12 +135,12 @@ class DidwwClient:
             raise DidwwClientError("Unexpected encrypted_files upload response")
         return body["ids"]
 
-    def download_export(self, url, destination):
-        """Download an export CSV file.
+    def download_export(self, url, file_path):
+        """Download an export file (.csv.gz).
 
         Args:
             url: The full download URL from Export.url attribute.
-            destination: File path (str) or writable file-like object.
+            file_path: Destination file path.
         """
         resp = self._session.get(
             url,
@@ -158,13 +158,30 @@ class DidwwClient:
                 [{"title": f"HTTP {resp.status_code}"}],
                 status_code=resp.status_code,
             )
-        if isinstance(destination, str):
-            with open(destination, "wb") as f:
-                for chunk in resp.iter_content(chunk_size=8192):
-                    f.write(chunk)
-        else:
+        with open(file_path, "wb") as f:
             for chunk in resp.iter_content(chunk_size=8192):
-                destination.write(chunk)
+                f.write(chunk)
+
+    def download_and_decompress_export(self, url, file_path):
+        """Download a gzip-compressed export (.csv.gz) and write decompressed CSV.
+
+        Args:
+            url: The full download URL from Export.url attribute.
+            file_path: Destination file path.
+        """
+        import gzip
+        import tempfile
+
+        tmp = tempfile.NamedTemporaryFile(suffix=".csv.gz", delete=False)
+        tmp.close()
+        try:
+            self.download_export(url, tmp.name)
+            with gzip.open(tmp.name, "rb") as gz, open(file_path, "wb") as out:
+                while chunk := gz.read(8192):
+                    out.write(chunk)
+        finally:
+            import os
+            os.unlink(tmp.name)
 
     # --- Repository accessors ---
 

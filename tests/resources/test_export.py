@@ -30,29 +30,29 @@ class TestExport:
         assert created.status == ExportStatus.PENDING
 
     @my_vcr.use_cassette("exports/download.yaml")
-    def test_download_export_to_path(self, client):
-        url = "https://sandbox-api.didww.com/v3/exports/02bf6df4-3af9-416c-96be-16e5b7eeb651.csv"
-        with tempfile.NamedTemporaryFile(suffix=".csv", delete=False) as f:
+    def test_download_export(self, client):
+        url = "https://sandbox-api.didww.com/v3/exports/02bf6df4-3af9-416c-96be-16e5b7eeb651.csv.gz"
+        with tempfile.NamedTemporaryFile(suffix=".csv.gz", delete=False) as f:
             dest = f.name
         try:
             client.download_export(url, dest)
+            with open(dest, "rb") as f:
+                magic = f.read(2)
+            # Verify gzip magic bytes
+            assert magic == b"\x1f\x8b"
+        finally:
+            os.unlink(dest)
+
+    @my_vcr.use_cassette("exports/download_decompress.yaml")
+    def test_download_and_decompress_export(self, client):
+        url = "https://sandbox-api.didww.com/v3/exports/02bf6df4-3af9-416c-96be-16e5b7eeb651.csv.gz"
+        with tempfile.NamedTemporaryFile(suffix=".csv", delete=False) as f:
+            dest = f.name
+        try:
+            client.download_and_decompress_export(url, dest)
             with open(dest, "r") as f:
                 content = f.read()
             assert "Date/Time Start (UTC)" in content
             assert "972397239159652" in content
-        finally:
-            os.unlink(dest)
-
-    @my_vcr.use_cassette("exports/download.yaml")
-    def test_download_export_to_file_object(self, client):
-        url = "https://sandbox-api.didww.com/v3/exports/02bf6df4-3af9-416c-96be-16e5b7eeb651.csv"
-        with tempfile.NamedTemporaryFile(suffix=".csv", delete=False) as f:
-            dest = f.name
-        try:
-            with open(dest, "wb") as f:
-                client.download_export(url, f)
-            with open(dest, "r") as f:
-                content = f.read()
-            assert "Date/Time Start (UTC)" in content
         finally:
             os.unlink(dest)
