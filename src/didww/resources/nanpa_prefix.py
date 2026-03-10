@@ -6,6 +6,7 @@ class NanpaPrefix(DidwwApiModel):
     nxx = SafeAttributeField("nxx")
 
     country = RelationField("country")
+    region = RelationField("region")
 
     class Meta:
         type = "nanpa_prefixes"
