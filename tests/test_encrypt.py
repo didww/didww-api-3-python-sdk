@@ -52,3 +52,19 @@ class TestEncrypt:
         enc1 = Encrypt.encrypt_with_keys(plaintext, [TEST_PUBLIC_KEY_A, TEST_PUBLIC_KEY_B])
         enc2 = Encrypt.encrypt_with_keys(plaintext, [TEST_PUBLIC_KEY_A, TEST_PUBLIC_KEY_B])
         assert enc1 != enc2  # Random AES key each time
+
+    def test_instance_encrypt(self):
+        keys = [TEST_PUBLIC_KEY_A, TEST_PUBLIC_KEY_B]
+        encryptor = Encrypt(keys)
+        plaintext = b"Hello, DIDWW!"
+        encrypted = encryptor.encrypt(plaintext)
+        assert encrypted != plaintext
+        assert len(encrypted) > len(plaintext)
+
+    def test_instance_fingerprint(self):
+        keys = [TEST_PUBLIC_KEY_A, TEST_PUBLIC_KEY_B]
+        encryptor = Encrypt(keys)
+        instance_fp = encryptor.fingerprint()
+        static_fp = Encrypt.calculate_fingerprint(keys)
+        assert instance_fp == static_fp
+        assert ":::" in instance_fp

@@ -10,6 +10,12 @@ class Encrypt:
     def __init__(self, public_keys):
         self._public_keys = public_keys
 
+    def encrypt(self, data: bytes) -> bytes:
+        return self.encrypt_with_keys(data, self._public_keys)
+
+    def fingerprint(self) -> str:
+        return self.calculate_fingerprint(self._public_keys)
+
     @staticmethod
     def encrypt_with_keys(binary_data, public_key_pems):
         aes_key = os.urandom(32)
