@@ -320,6 +320,7 @@ from didww.resources.capacity_pool import CapacityPool
 scg = SharedCapacityGroup()
 scg.name = "Shared Group"
 scg.shared_channels_count = 20
+scg.metered_channels_count = 5
 scg.capacity_pool = CapacityPool.build("pool-uuid")
 created = client.shared_capacity_groups().create(scg).data
 ```
