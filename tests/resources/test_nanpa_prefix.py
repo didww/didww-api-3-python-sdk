@@ -19,3 +19,19 @@ class TestNanpaPrefix:
         country = np.country
         assert country is not None
         assert country.name == "United States"
+
+    @my_vcr.use_cassette("nanpa_prefixes/show_with_region.yaml")
+    def test_find_nanpa_prefix_with_region(self, client):
+        params = QueryParams().include("country", "region")
+        response = client.nanpa_prefixes().find("6c16d51d-d376-4395-91c4-012321317e48", params)
+        np = response.data
+        assert np.id == "6c16d51d-d376-4395-91c4-012321317e48"
+        assert np.npa == "864"
+        assert np.nxx == "920"
+        country = np.country
+        assert country is not None
+        assert country.name == "United States"
+        region = np.region
+        assert region is not None
+        assert region.name == "South Carolina"
+        assert region.iso == "SC"
