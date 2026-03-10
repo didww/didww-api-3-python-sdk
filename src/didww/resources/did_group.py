@@ -14,12 +14,10 @@ class DidGroup(DidwwApiModel):
     city = RelationField("city")
     did_group_type = RelationField("did_group_type")
     stock_keeping_units = RelationField("stock_keeping_units")
+    requirement = RelationField("requirement")
 
     class Meta:
         type = "did_groups"
-
-    def requirement_id(self):
-        return self._relationship_id("requirement")
 
 
 class DidGroupRepository(ReadOnlyRepository):

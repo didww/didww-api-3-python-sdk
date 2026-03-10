@@ -31,3 +31,20 @@ class TestDidGroup:
         assert dgt.name == "Local"
         assert dg.region is None
         assert len(dg.stock_keeping_units) == 2
+
+    @my_vcr.use_cassette("did_groups/show_with_requirement.yaml")
+    def test_find_did_group_with_requirement(self, client):
+        params = QueryParams().include("country", "requirement")
+        response = client.did_groups().find("2187c36d-28fb-436f-8861-5a0f5b5a3ee1", params)
+        dg = response.data
+        assert dg.id == "2187c36d-28fb-436f-8861-5a0f5b5a3ee1"
+        assert dg.prefix == "241"
+        country = dg.country
+        assert country is not None
+        assert country.name == "Germany"
+        requirement = dg.requirement
+        assert requirement is not None
+        assert requirement.id == "c3d4e5f6-a1b2-7890-abcd-ef1234567890"
+        assert requirement.personal_proof_qty == 1
+        assert requirement.business_proof_qty == 1
+        assert requirement.service_description_required is False
