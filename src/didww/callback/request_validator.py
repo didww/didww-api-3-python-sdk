@@ -1,6 +1,5 @@
 import hashlib
 import hmac
-import re
 from urllib.parse import urlparse
 
 
@@ -27,8 +26,6 @@ class RequestValidator:
         ).hexdigest()
 
     def _normalize_url(self, url):
-        if not re.match(r'^[a-zA-Z]+://', url):
-            url = 'http://' + url  # NOSONAR
         parsed = urlparse(url)
         scheme = parsed.scheme
         host = parsed.hostname or ""
