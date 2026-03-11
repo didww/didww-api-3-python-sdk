@@ -21,10 +21,10 @@ include_params = QueryParams().include("voice_in_trunk", "voice_in_trunk_group")
 
 def print_did_assignment(did_id):
     result = client.dids().find(did_id, include_params).data
-    trunk_id = result._relationship_id("voice_in_trunk")
-    group_id = result._relationship_id("voice_in_trunk_group")
-    print(f"   trunk = {trunk_id or 'null'}")
-    print(f"   group = {group_id or 'null'}")
+    trunk = result.voice_in_trunk
+    group = result.voice_in_trunk_group
+    print(f"   trunk = {trunk.id if trunk else 'null'}")
+    print(f"   group = {group.id if group else 'null'}")
 
 
 # Get a DID
