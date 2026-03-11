@@ -40,7 +40,6 @@ class TestDidGroup:
         assert dg.id == "2187c36d-28fb-436f-8861-5a0f5b5a3ee1"
         assert dg.prefix == "241"
         assert dg.area_name == "Aachen"
-        assert dg.requirement_id() == "8da1e0b2-047c-4baf-9c57-57143f09b9ce"
         requirement = dg.requirement
         assert requirement is not None
         assert requirement.id == "8da1e0b2-047c-4baf-9c57-57143f09b9ce"

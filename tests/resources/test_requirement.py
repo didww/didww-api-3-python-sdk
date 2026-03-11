@@ -33,23 +33,13 @@ class TestRequirement:
         assert "Birth Date" in req.personal_mandatory_fields
         assert isinstance(req.business_mandatory_fields, list)
         assert "Company ID" in req.business_mandatory_fields
-        # relationship ID accessors
-        assert req.country_id() == "5b156dc2-327e-4665-bdc5-35cd8729b885"
-        assert req.did_group_type_id() == "994ea201-4a4d-4b27-ac4b-b5916ac969a3"
-        assert req.personal_permanent_document_id() == "fd38c86d-b69b-4ca8-b73c-286a3b93d107"
-        assert req.business_permanent_document_id() == "fd38c86d-b69b-4ca8-b73c-286a3b93d107"
-        assert req.personal_onetime_document_id() == "206ccec2-1166-461f-9f58-3a56823db548"
-        assert req.business_onetime_document_id() == "206ccec2-1166-461f-9f58-3a56823db548"
-        assert len(req.personal_proof_type_ids()) == 1
-        assert len(req.business_proof_type_ids()) == 7
-        assert len(req.address_proof_type_ids()) == 1
-        # included resource assertions
-        assert req.country is not None
-        assert req.did_group_type is not None
-        assert req.personal_permanent_document is not None
-        assert req.business_permanent_document is not None
-        assert req.personal_onetime_document is not None
-        assert req.business_onetime_document is not None
+        # included relationships
+        assert req.country.id == "5b156dc2-327e-4665-bdc5-35cd8729b885"
+        assert req.did_group_type.id == "994ea201-4a4d-4b27-ac4b-b5916ac969a3"
+        assert req.personal_permanent_document.id == "fd38c86d-b69b-4ca8-b73c-286a3b93d107"
+        assert req.business_permanent_document.id == "fd38c86d-b69b-4ca8-b73c-286a3b93d107"
+        assert req.personal_onetime_document.id == "206ccec2-1166-461f-9f58-3a56823db548"
+        assert req.business_onetime_document.id == "206ccec2-1166-461f-9f58-3a56823db548"
         assert len(req.personal_proof_types) == 1
         assert len(req.business_proof_types) == 7
         assert len(req.address_proof_types) == 1

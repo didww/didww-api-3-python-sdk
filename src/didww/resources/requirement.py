@@ -28,33 +28,6 @@ class Requirement(DidwwApiModel):
     class Meta:
         type = "requirements"
 
-    def country_id(self):
-        return self._relationship_id("country")
-
-    def did_group_type_id(self):
-        return self._relationship_id("did_group_type")
-
-    def personal_permanent_document_id(self):
-        return self._relationship_id("personal_permanent_document")
-
-    def business_permanent_document_id(self):
-        return self._relationship_id("business_permanent_document")
-
-    def personal_onetime_document_id(self):
-        return self._relationship_id("personal_onetime_document")
-
-    def business_onetime_document_id(self):
-        return self._relationship_id("business_onetime_document")
-
-    def personal_proof_type_ids(self):
-        return self._relationship_ids("personal_proof_types")
-
-    def business_proof_type_ids(self):
-        return self._relationship_ids("business_proof_types")
-
-    def address_proof_type_ids(self):
-        return self._relationship_ids("address_proof_types")
-
 
 class RequirementRepository(ReadOnlyRepository):
     _resource_class = Requirement
