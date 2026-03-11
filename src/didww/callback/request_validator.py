@@ -28,11 +28,18 @@ class RequestValidator:
     def _normalize_url(self, url):
         parsed = urlparse(url)
         scheme = parsed.scheme
-        host = parsed.hostname or ""
+        hostname = parsed.hostname or ""
+        # Wrap IPv6 addresses in brackets
+        if ":" in hostname:
+            host = f"[{hostname}]"
+        else:
+            host = hostname
         port = parsed.port
         if port is None:
             port = 443 if scheme == "https" else 80
-        path = parsed.path or ""
+        path = parsed.path or "/"
+        if not path:
+            path = "/"
         query = f"?{parsed.query}" if parsed.query else ""
         fragment = f"#{parsed.fragment}" if parsed.fragment else ""
 
