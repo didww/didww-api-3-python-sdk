@@ -27,6 +27,16 @@ class TestAddressVerification:
         assert av.reference == "SHB-485120"
         assert av.created_at == "2020-09-15T06:38:12.650Z"
 
+    @my_vcr.use_cassette("address_verifications/show_rejected.yaml")
+    def test_find_rejected_address_verification(self, client):
+        response = client.address_verifications().find("429e6d4e-2ee9-4953-aa98-0b3ac07f0f96")
+        av = response.data
+        assert av.id == "429e6d4e-2ee9-4953-aa98-0b3ac07f0f96"
+        assert av.status == AddressVerificationStatus.REJECTED
+        assert av.reject_reasons == ["Address cannot be validated", "Proof of address should be not older than of 6 months"]
+        assert av.reference == "ODW-879912"
+        assert av.created_at == "2020-10-28T08:29:29.960Z"
+
     @my_vcr.use_cassette("address_verifications/show_with_includes.yaml")
     def test_find_address_verification_with_includes(self, client):
         params = QueryParams().include(
