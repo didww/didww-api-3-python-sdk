@@ -3,7 +3,7 @@ from didww.resources.base import DidwwApiModel, SafeAttributeField, EnumAttribut
 
 
 class _SplitSemicolonField(SafeAttributeField):
-    """Splits a semicolon-separated string into a list."""
+    """Splits a '; '-delimited (semicolon + space) string into a list."""
 
     def __get__(self, instance, type=None):
         value = super().__get__(instance, type)
