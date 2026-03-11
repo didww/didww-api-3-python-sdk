@@ -9,30 +9,30 @@ interactions:
       Content-Type:
       - application/vnd.api+json
     method: GET
-    uri: https://sandbox-api.didww.com/v3/nanpa_prefixes/6c16d51d-d376-4395-91c4-012321317e48
+    uri: https://sandbox-api.didww.com/v3/nanpa_prefixes/1e622e21-c740-4d3f-a615-2a7ef4991922
   response:
     body:
-      string: "{\n  \"data\": {\n    \"id\": \"6c16d51d-d376-4395-91c4-012321317e48\"\
+      string: "{\n  \"data\": {\n    \"id\": \"1e622e21-c740-4d3f-a615-2a7ef4991922\"\
         ,\n    \"type\": \"nanpa_prefixes\",\n    \"attributes\": {\n      \"npa\"\
-        : \"864\",\n      \"nxx\": \"920\"\n    },\n    \"relationships\": {\n   \
-        \   \"country\": {\n        \"links\": {\n          \"self\": \"https://sandbox-api.didww.com/v3/nanpa_prefixes/6c16d51d-d376-4395-91c4-012321317e48/relationships/country\"\
-        ,\n          \"related\": \"https://sandbox-api.didww.com/v3/nanpa_prefixes/6c16d51d-d376-4395-91c4-012321317e48/country\"\
+        : \"201\",\n      \"nxx\": \"221\"\n    },\n    \"relationships\": {\n   \
+        \   \"country\": {\n        \"links\": {\n          \"self\": \"https://sandbox-api.didww.com/v3/nanpa_prefixes/1e622e21-c740-4d3f-a615-2a7ef4991922/relationships/country\"\
+        ,\n          \"related\": \"https://sandbox-api.didww.com/v3/nanpa_prefixes/1e622e21-c740-4d3f-a615-2a7ef4991922/country\"\
         \n        },\n        \"data\": {\n          \"type\": \"countries\",\n  \
         \        \"id\": \"e5b6999c-aba0-4ae4-b9f9-3dcf744a0ed1\"\n        }\n   \
         \   },\n      \"region\": {\n        \"links\": {\n          \"self\": \"\
-        https://sandbox-api.didww.com/v3/nanpa_prefixes/6c16d51d-d376-4395-91c4-012321317e48/relationships/region\"\
-        ,\n          \"related\": \"https://sandbox-api.didww.com/v3/nanpa_prefixes/6c16d51d-d376-4395-91c4-012321317e48/region\"\
+        https://sandbox-api.didww.com/v3/nanpa_prefixes/1e622e21-c740-4d3f-a615-2a7ef4991922/relationships/region\"\
+        ,\n          \"related\": \"https://sandbox-api.didww.com/v3/nanpa_prefixes/1e622e21-c740-4d3f-a615-2a7ef4991922/region\"\
         \n        },\n        \"data\": {\n          \"type\": \"regions\",\n     \
-        \     \"id\": \"a1b2c3d4-e5f6-7890-abcd-ef1234567890\"\n        }\n      }\n\
+        \     \"id\": \"346e64c8-18c2-4a12-b1e2-20e090043fca\"\n        }\n      }\n\
         \    }\n  },\n  \"included\": [\n    {\n      \"id\": \"e5b6999c-aba0-4ae4-b9f9-3dcf744a0ed1\"\
         ,\n      \"type\": \"countries\",\n      \"attributes\": {\n        \"name\"\
         : \"United States\",\n        \"prefix\": \"1\",\n        \"iso\": \"US\"\n\
-        \      }\n    },\n    {\n      \"id\": \"a1b2c3d4-e5f6-7890-abcd-ef1234567890\"\
+        \      }\n    },\n    {\n      \"id\": \"346e64c8-18c2-4a12-b1e2-20e090043fca\"\
         ,\n      \"type\": \"regions\",\n      \"attributes\": {\n        \"name\"\
-        : \"South Carolina\",\n        \"iso\": \"SC\"\n      },\n      \"relationships\"\
+        : \"New Jersey\",\n        \"iso\": \"US-NJ\"\n      },\n      \"relationships\"\
         : {\n        \"country\": {\n          \"links\": {\n            \"self\"\
-        : \"https://sandbox-api.didww.com/v3/regions/a1b2c3d4-e5f6-7890-abcd-ef1234567890/relationships/country\"\
-        ,\n            \"related\": \"https://sandbox-api.didww.com/v3/regions/a1b2c3d4-e5f6-7890-abcd-ef1234567890/country\"\
+        : \"https://sandbox-api.didww.com/v3/regions/346e64c8-18c2-4a12-b1e2-20e090043fca/relationships/country\"\
+        ,\n            \"related\": \"https://sandbox-api.didww.com/v3/regions/346e64c8-18c2-4a12-b1e2-20e090043fca/country\"\
         \n          }\n        }\n      }\n    }\n  ],\n  \"meta\": {\n    \"api_version\"\
         : \"2022-05-09\"\n  }\n}"
     headers:
