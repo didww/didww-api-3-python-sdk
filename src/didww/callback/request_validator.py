@@ -37,9 +37,7 @@ class RequestValidator:
         port = parsed.port
         if port is None:
             port = 443 if scheme == "https" else 80
-        path = parsed.path or "/"
-        if not path:
-            path = "/"
+        path = parsed.path
         query = f"?{parsed.query}" if parsed.query else ""
         fragment = f"#{parsed.fragment}" if parsed.fragment else ""
 
