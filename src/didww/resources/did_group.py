@@ -16,6 +16,9 @@ class DidGroup(DidwwApiModel):
     stock_keeping_units = RelationField("stock_keeping_units")
     requirement = RelationField("requirement")
 
+    def requirement_id(self):
+        return self._relationship_id("requirement")
+
     class Meta:
         type = "did_groups"
 
