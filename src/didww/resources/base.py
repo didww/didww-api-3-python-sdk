@@ -328,23 +328,6 @@ class DidwwApiModel(ApiModel):
         self.raw_object.relationships[key] = {"data": None}
         self._mark_relationship_dirty(key)
 
-    def _relationship_id(self, key):
-        """Get the ID from a to-one relationship without resolving it."""
-        try:
-            rel = self.relationships[key]
-            if rel.data and rel.data.id is not None:
-                return rel.data.id
-        except (KeyError, AttributeError):
-            pass
-        return None
-
-    def _relationship_ids(self, key):
-        """Get IDs from a to-many relationship without resolving them."""
-        try:
-            rel = self.relationships[key]
-            return [item.id for item in rel.data if item.id is not None]
-        except (KeyError, AttributeError, TypeError):
-            return []
 
 
 class ApiResponse:

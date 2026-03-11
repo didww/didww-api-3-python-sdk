@@ -36,20 +36,19 @@ interactions:
         \      \"links\": {\n          \"self\": \"https://sandbox-api.didww.com/v3/did_groups/2187c36d-28fb-436f-8861-5a0f5b5a3ee1/relationships/requirement\"\
         ,\n          \"related\": \"https://sandbox-api.didww.com/v3/did_groups/2187c36d-28fb-436f-8861-5a0f5b5a3ee1/requirement\"\
         \n        },\n        \"data\": {\n          \"type\": \"requirements\",\n\
-        \          \"id\": \"c3d4e5f6-a1b2-7890-abcd-ef1234567890\"\n        }\n  \
+        \          \"id\": \"8da1e0b2-047c-4baf-9c57-57143f09b9ce\"\n        }\n  \
         \    }\n    }\n  },\n  \"included\": [\n    {\n      \"id\": \"dfd1a0a0-bd53-4f7a-9c8e-d2fc5dd1bf7e\"\
         ,\n      \"type\": \"countries\",\n      \"attributes\": {\n        \"name\"\
         : \"Germany\",\n        \"prefix\": \"49\",\n        \"iso\": \"DE\"\n   \
-        \   }\n    },\n    {\n      \"id\": \"c3d4e5f6-a1b2-7890-abcd-ef1234567890\"\
+        \   }\n    },\n    {\n      \"id\": \"8da1e0b2-047c-4baf-9c57-57143f09b9ce\"\
         ,\n      \"type\": \"requirements\",\n      \"attributes\": {\n        \"\
-        identity_type\": \"personal_or_business\",\n        \"personal_area_level\"\
-        : \"city\",\n        \"business_area_level\": \"city\",\n        \"address_area_level\"\
-        : \"city\",\n        \"personal_proof_qty\": 1,\n        \"business_proof_qty\"\
-        : 1,\n        \"address_proof_qty\": 1,\n        \"personal_mandatory_fields\"\
-        : [\"first_name\", \"last_name\"],\n        \"business_mandatory_fields\"\
-        : [\"company_name\"],\n        \"service_description_required\": false,\n\
-        \        \"restriction_message\": null\n      }\n    }\n  ],\n  \"meta\":\
-        \ {\n    \"api_version\": \"2022-05-09\"\n  }\n}"
+        identity_type\": \"Any\",\n        \"personal_area_level\": \"WorldWide\"\
+        ,\n        \"business_area_level\": \"WorldWide\",\n        \"address_area_level\"\
+        : \"WorldWide\",\n        \"personal_proof_qty\": 0,\n        \"business_proof_qty\"\
+        : 0,\n        \"address_proof_qty\": 0,\n        \"personal_mandatory_fields\"\
+        : [],\n        \"business_mandatory_fields\": [],\n        \"service_description_required\"\
+        : false,\n        \"restriction_message\": null\n      }\n    }\n  ],\n  \"\
+        meta\": {\n    \"api_version\": \"2022-05-09\"\n  }\n}"
     headers:
       Content-Type:
       - application/vnd.api+json

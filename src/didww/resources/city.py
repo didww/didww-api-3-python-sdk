@@ -11,9 +11,6 @@ class City(DidwwApiModel):
     class Meta:
         type = "cities"
 
-    def area_id(self):
-        return self._relationship_id("area")
-
 
 class CityRepository(ReadOnlyRepository):
     _resource_class = City
