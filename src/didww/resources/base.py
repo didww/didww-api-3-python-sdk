@@ -1,3 +1,4 @@
+import functools
 import importlib
 from enum import Enum
 
@@ -138,11 +139,11 @@ class ExclusiveRelationField(RelationField):
 
 def _touching(fn):
     """Decorator that calls self._mark_dirty(self._key) after the wrapped list method."""
+    @functools.wraps(fn)
     def wrapper(self, *args, **kwargs):
         result = fn(self, *args, **kwargs)
         self._mark_dirty(self._key)
         return result
-    wrapper.__name__ = fn.__name__
     return wrapper
 
 
