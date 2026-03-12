@@ -1,3 +1,4 @@
+import functools
 import importlib
 from enum import Enum
 
@@ -136,6 +137,16 @@ class ExclusiveRelationField(RelationField):
         instance._null_relationship(self.excludes)
 
 
+def _touching(fn):
+    """Decorator that calls self._mark_dirty(self._key) after the wrapped list method."""
+    @functools.wraps(fn)
+    def wrapper(self, *args, **kwargs):
+        result = fn(self, *args, **kwargs)
+        self._mark_dirty(self._key)
+        return result
+    return wrapper
+
+
 class _DirtyTrackingList(list):
     """List that marks a parent attribute key dirty on mutation."""
 
@@ -144,59 +155,18 @@ class _DirtyTrackingList(list):
         self._key = key
         self._mark_dirty = mark_dirty
 
-    def _touch(self):
-        self._mark_dirty(self._key)
-
-    def __setitem__(self, index, value):
-        super().__setitem__(index, value)
-        self._touch()
-
-    def __delitem__(self, index):
-        super().__delitem__(index)
-        self._touch()
-
-    def append(self, value):
-        super().append(value)
-        self._touch()
-
-    def extend(self, values):
-        super().extend(values)
-        self._touch()
-
-    def insert(self, index, value):
-        super().insert(index, value)
-        self._touch()
-
-    def remove(self, value):
-        super().remove(value)
-        self._touch()
-
-    def pop(self, index=-1):
-        result = super().pop(index)
-        self._touch()
-        return result
-
-    def clear(self):
-        super().clear()
-        self._touch()
-
-    def __iadd__(self, other):
-        result = super().__iadd__(other)
-        self._touch()
-        return result
-
-    def __imul__(self, other):
-        result = super().__imul__(other)
-        self._touch()
-        return result
-
-    def sort(self, *args, **kwargs):
-        super().sort(*args, **kwargs)
-        self._touch()
-
-    def reverse(self):
-        super().reverse()
-        self._touch()
+    __setitem__ = _touching(list.__setitem__)
+    __delitem__ = _touching(list.__delitem__)
+    __iadd__    = _touching(list.__iadd__)
+    __imul__    = _touching(list.__imul__)
+    append  = _touching(list.append)
+    extend  = _touching(list.extend)
+    insert  = _touching(list.insert)
+    remove  = _touching(list.remove)
+    pop     = _touching(list.pop)
+    clear   = _touching(list.clear)
+    sort    = _touching(list.sort)
+    reverse = _touching(list.reverse)
 
 
 class DirtyTrackingDictionary(Dictionary):
