@@ -1,12 +1,12 @@
 from didww.exceptions import DidwwApiError
-from didww.resources.base import DidwwApiModel, SafeAttributeField, RelationField, Repository
+from didww.resources.base import DidwwApiModel, DatetimeAttributeField, SafeAttributeField, RelationField, Repository
 
 
 class DidReservation(DidwwApiModel):
     _writable_attrs = {"description"}
 
-    expire_at = SafeAttributeField("expire_at")
-    created_at = SafeAttributeField("created_at")
+    expire_at = DatetimeAttributeField("expire_at")
+    created_at = DatetimeAttributeField("created_at")
     description = SafeAttributeField("description")
 
     available_did = RelationField("available_did")

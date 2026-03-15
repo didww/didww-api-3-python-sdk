@@ -1,4 +1,4 @@
-from didww.resources.base import DidwwApiModel, SafeAttributeField, RelationField, Repository
+from didww.resources.base import DidwwApiModel, DatetimeAttributeField, SafeAttributeField, RelationField, Repository
 
 
 class SharedCapacityGroup(DidwwApiModel):
@@ -7,7 +7,7 @@ class SharedCapacityGroup(DidwwApiModel):
     name = SafeAttributeField("name")
     shared_channels_count = SafeAttributeField("shared_channels_count")
     metered_channels_count = SafeAttributeField("metered_channels_count")
-    created_at = SafeAttributeField("created_at")
+    created_at = DatetimeAttributeField("created_at")
 
     capacity_pool = RelationField("capacity_pool")
     dids = RelationField("dids")

@@ -1,11 +1,11 @@
-from didww.resources.base import DidwwApiModel, SafeAttributeField, RelationField, CreateOnlyRepository
+from didww.resources.base import DidwwApiModel, DatetimeAttributeField, SafeAttributeField, RelationField, CreateOnlyRepository
 
 
 class Proof(DidwwApiModel):
     _writable_attrs = set()
 
-    created_at = SafeAttributeField("created_at")
-    expires_at = SafeAttributeField("expires_at")
+    created_at = DatetimeAttributeField("created_at")
+    expires_at = DatetimeAttributeField("expires_at")
 
     proof_type = RelationField("proof_type")
     entity = RelationField("entity")

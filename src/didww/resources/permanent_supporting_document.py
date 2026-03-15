@@ -1,10 +1,10 @@
-from didww.resources.base import DidwwApiModel, SafeAttributeField, RelationField, CreateOnlyRepository
+from didww.resources.base import DidwwApiModel, DatetimeAttributeField, SafeAttributeField, RelationField, CreateOnlyRepository
 
 
 class PermanentSupportingDocument(DidwwApiModel):
     _writable_attrs = set()
 
-    created_at = SafeAttributeField("created_at")
+    created_at = DatetimeAttributeField("created_at")
 
     identity = RelationField("identity")
     template = RelationField("template")

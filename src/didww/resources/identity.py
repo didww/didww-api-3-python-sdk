@@ -1,5 +1,5 @@
 from didww.enums import IdentityType
-from didww.resources.base import DidwwApiModel, SafeAttributeField, EnumAttributeField, RelationField, Repository
+from didww.resources.base import DidwwApiModel, DatetimeAttributeField, SafeAttributeField, EnumAttributeField, RelationField, Repository
 
 
 class Identity(DidwwApiModel):
@@ -22,7 +22,7 @@ class Identity(DidwwApiModel):
     identity_type = EnumAttributeField("identity_type", IdentityType)
     contact_email = SafeAttributeField("contact_email")
     external_reference_id = SafeAttributeField("external_reference_id")
-    created_at = SafeAttributeField("created_at")
+    created_at = DatetimeAttributeField("created_at")
     verified = SafeAttributeField("verified")
 
     country = RelationField("country")

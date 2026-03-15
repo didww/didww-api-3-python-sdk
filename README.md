@@ -389,6 +389,26 @@ params = (
 regions = client.regions().list(params).data
 ```
 
+## Date and Datetime Fields
+
+The SDK distinguishes between date-only and datetime fields:
+
+- **Datetime fields** are deserialized as `datetime.datetime` with `timezone.utc`:
+  - All `created_at` fields — present on most resources
+  - Expiry fields: `Did.expires_at`, `DidReservation.expire_at`, `Proof.expires_at`, `EncryptedFile.expire_at`
+- **Date-only fields** (`Identity.birth_date`, `CapacityPool.renew_date`, `DidOrderItem.billed_from`/`billed_to`) remain as `string` in `"YYYY-MM-DD"` format.
+
+```python
+from datetime import timezone
+
+did = client.dids().find("uuid").data
+print(did.created_at)   # datetime(2024, 1, 15, 10, 0, 0, tzinfo=timezone.utc)
+print(did.expires_at)   # None or datetime(...)
+
+identity = client.identities().find("uuid").data
+print(identity.birth_date)  # "1990-05-20"
+```
+
 ## Enums
 
 The SDK provides enum classes aligned with the Java SDK (for example `CallbackMethod`, `IdentityType`, `OrderStatus`, `ExportType`, `CliFormat`, `OnCliMismatchAction`, `MediaEncryptionMode`, `TransportProtocol`, `Codec`, and more).

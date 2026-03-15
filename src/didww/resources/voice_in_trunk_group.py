@@ -1,4 +1,4 @@
-from didww.resources.base import DidwwApiModel, SafeAttributeField, RelationField, Repository
+from didww.resources.base import DidwwApiModel, DatetimeAttributeField, SafeAttributeField, RelationField, Repository
 
 
 class VoiceInTrunkGroup(DidwwApiModel):
@@ -6,7 +6,7 @@ class VoiceInTrunkGroup(DidwwApiModel):
 
     name = SafeAttributeField("name")
     capacity_limit = SafeAttributeField("capacity_limit")
-    created_at = SafeAttributeField("created_at")
+    created_at = DatetimeAttributeField("created_at")
 
     voice_in_trunks = RelationField("voice_in_trunks")
 

@@ -4,7 +4,7 @@ from didww.enums import (
     OnCliMismatchAction,
     VoiceOutTrunkStatus,
 )
-from didww.resources.base import DidwwApiModel, SafeAttributeField, EnumAttributeField, RelationField, Repository
+from didww.resources.base import DidwwApiModel, DatetimeAttributeField, SafeAttributeField, EnumAttributeField, RelationField, Repository
 
 
 class VoiceOutTrunk(DidwwApiModel):
@@ -32,7 +32,7 @@ class VoiceOutTrunk(DidwwApiModel):
     callback_url = SafeAttributeField("callback_url")
     username = SafeAttributeField("username")
     password = SafeAttributeField("password")
-    created_at = SafeAttributeField("created_at")
+    created_at = DatetimeAttributeField("created_at")
 
     default_did = RelationField("default_did")
     dids = RelationField("dids")

@@ -1,5 +1,5 @@
 from didww.enums import AddressVerificationStatus, CallbackMethod
-from didww.resources.base import DidwwApiModel, SafeAttributeField, EnumAttributeField, RelationField, CreateOnlyRepository
+from didww.resources.base import DidwwApiModel, DatetimeAttributeField, SafeAttributeField, EnumAttributeField, RelationField, CreateOnlyRepository
 
 
 class _SplitSemicolonField(SafeAttributeField):
@@ -21,7 +21,7 @@ class AddressVerification(DidwwApiModel):
     service_description = SafeAttributeField("service_description")
     reject_reasons = _SplitSemicolonField("reject_reasons")
     reference = SafeAttributeField("reference")
-    created_at = SafeAttributeField("created_at")
+    created_at = DatetimeAttributeField("created_at")
 
     address = RelationField("address")
     dids = RelationField("dids")
