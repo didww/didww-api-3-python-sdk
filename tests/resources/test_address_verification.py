@@ -1,3 +1,5 @@
+from datetime import datetime, timezone
+
 from tests.conftest import my_vcr
 from didww.enums import AddressVerificationStatus, CallbackMethod, IdentityType
 from didww.query_params import QueryParams
@@ -25,7 +27,7 @@ class TestAddressVerification:
         assert av.id == "c8e004b0-87ec-4987-b4fb-ee89db099f0e"
         assert av.status == AddressVerificationStatus.APPROVED
         assert av.reference == "SHB-485120"
-        assert av.created_at == "2020-09-15T06:38:12.650Z"
+        assert av.created_at == datetime(2020, 9, 15, 6, 38, 12, 650000, tzinfo=timezone.utc)
 
     @my_vcr.use_cassette("address_verifications/show_rejected.yaml")
     def test_find_rejected_address_verification(self, client):
@@ -35,7 +37,7 @@ class TestAddressVerification:
         assert av.status == AddressVerificationStatus.REJECTED
         assert av.reject_reasons == ["Address cannot be validated", "Proof of address should be not older than of 6 months"]
         assert av.reference == "ODW-879912"
-        assert av.created_at == "2020-10-28T08:29:29.960Z"
+        assert av.created_at == datetime(2020, 10, 28, 8, 29, 29, 960000, tzinfo=timezone.utc)
 
     @my_vcr.use_cassette("address_verifications/show_with_includes.yaml")
     def test_find_address_verification_with_includes(self, client):

@@ -1,4 +1,4 @@
-from didww.resources.base import DidwwApiModel, SafeAttributeField, RelationField, ExclusiveRelationField, Repository
+from didww.resources.base import DidwwApiModel, DatetimeAttributeField, SafeAttributeField, RelationField, ExclusiveRelationField, Repository
 
 class Did(DidwwApiModel):
     _writable_attrs = {
@@ -12,8 +12,8 @@ class Did(DidwwApiModel):
     description = SafeAttributeField("description")
     terminated = SafeAttributeField("terminated")
     awaiting_registration = SafeAttributeField("awaiting_registration")
-    created_at = SafeAttributeField("created_at")
-    expires_at = SafeAttributeField("expires_at")
+    created_at = DatetimeAttributeField("created_at")
+    expires_at = DatetimeAttributeField("expires_at")
     channels_included_count = SafeAttributeField("channels_included_count")
     billing_cycles_count = SafeAttributeField("billing_cycles_count")
     dedicated_channels_count = SafeAttributeField("dedicated_channels_count")

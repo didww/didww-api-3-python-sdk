@@ -1,4 +1,4 @@
-from didww.resources.base import DidwwApiModel, SafeAttributeField, RelationField, Repository
+from didww.resources.base import DidwwApiModel, DatetimeAttributeField, SafeAttributeField, RelationField, Repository
 
 
 class Address(DidwwApiModel):
@@ -8,7 +8,7 @@ class Address(DidwwApiModel):
     postal_code = SafeAttributeField("postal_code")
     address = SafeAttributeField("address")
     description = SafeAttributeField("description")
-    created_at = SafeAttributeField("created_at")
+    created_at = DatetimeAttributeField("created_at")
     verified = SafeAttributeField("verified")
 
     country = RelationField("country")

@@ -1,5 +1,6 @@
 import functools
 import importlib
+from datetime import datetime, timezone
 from enum import Enum
 
 from jsonapi_requests.orm.api import OrmApi
@@ -78,6 +79,24 @@ class SafeAttributeField(AttributeField):
 
     def __set__(self, instance, value):
         instance.attributes[self.source] = value
+
+
+class DatetimeAttributeField(SafeAttributeField):
+    """AttributeField that parses ISO 8601 datetime strings to datetime objects.
+
+    No custom setter is defined because all current datetime fields are read-only
+    (e.g. created_at). The inherited setter stores values as-is. If a writable
+    datetime field is added in the future, a setter that converts datetime back
+    to an ISO 8601 string should be implemented here.
+    """
+
+    def __get__(self, instance, type=None):
+        raw = super().__get__(instance, type)
+        if instance is None:
+            return self
+        if raw is None:
+            return None
+        return datetime.fromisoformat(raw.replace("Z", "+00:00"))  # "Z" not supported by fromisoformat before Python 3.11
 
 
 class EnumAttributeField(SafeAttributeField):

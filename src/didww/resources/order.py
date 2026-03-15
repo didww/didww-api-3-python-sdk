@@ -1,5 +1,5 @@
 from didww.enums import CallbackMethod, OrderStatus
-from didww.resources.base import DidwwApiModel, SafeAttributeField, EnumAttributeField, Repository
+from didww.resources.base import DidwwApiModel, DatetimeAttributeField, SafeAttributeField, EnumAttributeField, Repository
 from didww.resources.order_item.base import OrderItem
 
 # Import to register types
@@ -15,7 +15,7 @@ class Order(DidwwApiModel):
 
     amount = SafeAttributeField("amount")
     status = EnumAttributeField("status", OrderStatus)
-    created_at = SafeAttributeField("created_at")
+    created_at = DatetimeAttributeField("created_at")
     description = SafeAttributeField("description")
     reference = SafeAttributeField("reference")
     callback_url = SafeAttributeField("callback_url")

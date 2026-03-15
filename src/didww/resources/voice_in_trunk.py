@@ -1,5 +1,5 @@
 from didww.enums import CliFormat
-from didww.resources.base import DidwwApiModel, SafeAttributeField, EnumAttributeField, RelationField, Repository
+from didww.resources.base import DidwwApiModel, DatetimeAttributeField, SafeAttributeField, EnumAttributeField, RelationField, Repository
 from didww.resources.configuration.base import TrunkConfiguration
 
 # Import to register types
@@ -21,7 +21,7 @@ class VoiceInTrunk(DidwwApiModel):
     cli_prefix = SafeAttributeField("cli_prefix")
     description = SafeAttributeField("description")
     ringing_timeout = SafeAttributeField("ringing_timeout")
-    created_at = SafeAttributeField("created_at")
+    created_at = DatetimeAttributeField("created_at")
 
     pop = RelationField("pop")
     voice_in_trunk_group = RelationField("voice_in_trunk_group")
