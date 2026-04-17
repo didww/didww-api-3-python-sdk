@@ -49,6 +49,7 @@ class TestVoiceOutTrunk:
         assert auth.password == "z0hshvbcy7"
         assert trunk.external_reference_id == "crm-vot-0001"
         assert trunk.emergency_enable_all is False
+        assert trunk.rtp_timeout == 30
         assert len(trunk.dids) == 2
         assert trunk.default_did is not None
         assert trunk.default_did.number == "37061498222"
