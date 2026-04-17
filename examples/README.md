@@ -40,9 +40,16 @@ DIDWW_API_KEY=your_api_key python examples/balance.py
 | [`voice_out_trunks.py`](voice_out_trunks.py) | Creates, lists, updates, and deletes a voice out trunk. Requires account configuration. |
 | [`did_trunk_assignment.py`](did_trunk_assignment.py) | Demonstrates exclusive DID trunk/trunk group assignment and re-assignment. |
 | [`did_reservations.py`](did_reservations.py) | Creates, lists, finds, and deletes a DID reservation. |
-| [`exports.py`](exports.py) | Creates a CDR export and lists all exports. |
+| [`exports.py`](exports.py) | Creates a CDR export with from/to filters and lists all exports. |
 | [`capacity_pools.py`](capacity_pools.py) | Lists capacity pools with included shared capacity groups and qty-based pricings. |
 | [`shared_capacity_groups.py`](shared_capacity_groups.py) | Creates and deletes a shared capacity group. |
+| [`did_history.py`](did_history.py) | Lists DID ownership history events (2026-04-16). |
+| [`emergency_requirements.py`](emergency_requirements.py) | Lists emergency requirements with country includes (2026-04-16). |
+| [`emergency_calling_services.py`](emergency_calling_services.py) | Lists emergency calling services (2026-04-16). |
+| [`emergency_verifications.py`](emergency_verifications.py) | Lists emergency verifications with address and DIDs (2026-04-16). |
+| [`emergency_requirement_validations.py`](emergency_requirement_validations.py) | Validates emergency requirements (2026-04-16). |
+| [`address_verifications.py`](address_verifications.py) | Lists address verifications with includes (2026-04-16). |
+| [`orders_emergency.py`](orders_emergency.py) | Creates an order with emergency order items (2026-04-16). |
 
 ## Upload file example
 
