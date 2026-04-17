@@ -315,7 +315,7 @@ class TestVoiceOutTrunkSerialization:
                         "allowed_sip_ips": ["1.2.3.4"],
                         "tech_prefix": "",
                         "username": "user123",
-                        "password": "pass456",
+                        "password": "pass456",  # NOSONAR
                     },
                 },
             },

@@ -63,7 +63,7 @@ class TestVoiceInTrunk:
         assert config.transport_protocol_id == TransportProtocol.UDP
         assert config.auth_enabled is True
         assert config.auth_user == "auth_user"
-        assert config.auth_password == "auth_password"
+        assert config.auth_password == "auth_password"  # NOSONAR
         assert config.auth_from_user == ""
         assert config.auth_from_domain == ""
         assert config.resolve_ruri is True

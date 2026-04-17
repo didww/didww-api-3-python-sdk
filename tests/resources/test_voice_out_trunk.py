@@ -46,7 +46,7 @@ class TestVoiceOutTrunk:
         assert isinstance(auth, CredentialsAndIpAuthenticationMethod)
         assert auth.allowed_sip_ips == ["10.11.12.13/32"]
         assert auth.username == "dpjgwbbac9"
-        assert auth.password == "z0hshvbcy7"
+        assert auth.password == "z0hshvbcy7"  # NOSONAR
         assert trunk.external_reference_id == "crm-vot-0001"
         assert trunk.emergency_enable_all is False
         assert trunk.rtp_timeout == 30
@@ -184,11 +184,11 @@ class TestAuthenticationMethodPolymorphism:
         assert auth.tech_prefix == "123"
 
     def test_from_jsonapi_credentials_and_ip(self):
-        data = {"type": "credentials_and_ip", "attributes": {"allowed_sip_ips": ["1.2.3.4/32"], "tech_prefix": "", "username": "user", "password": "pass"}}
+        data = {"type": "credentials_and_ip", "attributes": {"allowed_sip_ips": ["1.2.3.4/32"], "tech_prefix": "", "username": "user", "password": "pass"}}  # NOSONAR
         auth = AuthenticationMethod.from_jsonapi(data)
         assert isinstance(auth, CredentialsAndIpAuthenticationMethod)
         assert auth.username == "user"
-        assert auth.password == "pass"
+        assert auth.password == "pass"  # NOSONAR
 
     def test_from_jsonapi_unknown_type_returns_generic(self):
         data = {"type": "future_auth", "attributes": {"some_field": "val"}}
@@ -208,7 +208,7 @@ class TestAuthenticationMethodPolymorphism:
 
     def test_type_property_on_credentials_and_ip(self):
         auth = CredentialsAndIpAuthenticationMethod(
-            allowed_sip_ips=["203.0.113.0/24"], username="u", password="p",
+            allowed_sip_ips=["203.0.113.0/24"], username="u", password="p",  # NOSONAR
         )
         assert auth.type == "credentials_and_ip"
 
