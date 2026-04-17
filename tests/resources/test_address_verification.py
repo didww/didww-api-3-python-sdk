@@ -99,6 +99,28 @@ class TestAddressVerification:
         assert created.address is not None
         assert created.address.city_name == "Chicago"
 
+class TestAddressVerificationStatusHelpers:
+    def test_is_pending(self):
+        av = AddressVerification()
+        av.status = AddressVerificationStatus.PENDING
+        assert av.is_pending is True
+        assert av.is_approved is False
+        assert av.is_rejected is False
+
+    def test_is_approved(self):
+        av = AddressVerification()
+        av.status = AddressVerificationStatus.APPROVED
+        assert av.is_approved is True
+        assert av.is_pending is False
+        assert av.is_rejected is False
+
+    def test_is_rejected(self):
+        av = AddressVerification()
+        av.status = AddressVerificationStatus.REJECTED
+        assert av.is_rejected is True
+        assert av.is_pending is False
+        assert av.is_approved is False
+
 
 class TestAddressVerificationUpdate:
     def test_patch_external_reference_id_request_body(self):

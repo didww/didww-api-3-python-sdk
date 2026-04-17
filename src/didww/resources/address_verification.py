@@ -21,6 +21,18 @@ class AddressVerification(DidwwApiModel):
     class Meta:
         type = "address_verifications"
 
+    @property
+    def is_pending(self):
+        return self.status == AddressVerificationStatus.PENDING
+
+    @property
+    def is_approved(self):
+        return self.status == AddressVerificationStatus.APPROVED
+
+    @property
+    def is_rejected(self):
+        return self.status == AddressVerificationStatus.REJECTED
+
 
 class AddressVerificationRepository(Repository):
     _resource_class = AddressVerification
