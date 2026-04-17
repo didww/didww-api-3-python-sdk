@@ -12,7 +12,7 @@ class TestAddressRequirementValidation:
     def test_create_address_requirement_validation_success(self, client):
         rv = AddressRequirementValidation()
         rv.address = Address.build("d3414687-40f4-4346-a267-c2c65117d28c")
-        rv.requirement = AddressRequirement.build("aea92b24-a044-4864-9740-89d3e15b65c7")
+        rv.address_requirement = AddressRequirement.build("aea92b24-a044-4864-9740-89d3e15b65c7")
         response = client.address_requirement_validations().create(rv)
         created = response.data
         assert created.id == "aea92b24-a044-4864-9740-89d3e15b65c7"
@@ -22,7 +22,7 @@ class TestAddressRequirementValidation:
         rv = AddressRequirementValidation()
         rv.identity = Identity.build("5e9df058-50d2-4e34-b0d4-d1746b86f41a")
         rv.address = Address.build("d3414687-40f4-4346-a267-c2c65117d28c")
-        rv.requirement = AddressRequirement.build("2efc3427-8ba6-4d50-875d-f2de4a068de8")
+        rv.address_requirement = AddressRequirement.build("2efc3427-8ba6-4d50-875d-f2de4a068de8")
         with pytest.raises(DidwwApiError) as exc_info:
             client.address_requirement_validations().create(rv)
         assert exc_info.value.status_code == 422
@@ -33,7 +33,7 @@ class TestAddressRequirementValidation:
         rv = AddressRequirementValidation()
         rv.identity = Identity.build("5e9df058-50d2-4e34-b0d4-d1746b86f41a")
         rv.address = Address.build("d3414687-40f4-4346-a267-c2c65117d28c")
-        rv.requirement = AddressRequirement.build("2efc3427-8ba6-4d50-875d-f2de4a068de8")
+        rv.address_requirement = AddressRequirement.build("2efc3427-8ba6-4d50-875d-f2de4a068de8")
         response = client.address_requirement_validations().create(rv)
         created = response.data
         assert created.id == "aea92b24-a044-4864-9740-89d3e15b65c7"
@@ -43,7 +43,7 @@ class TestAddressRequirementValidation:
         rv = AddressRequirementValidation()
         rv.identity = Identity.build("5e9df058-50d2-4e34-b0d4-d1746b86f41a")
         rv.address = Address.build("d3414687-40f4-4346-a267-c2c65117d28c")
-        rv.requirement = AddressRequirement.build("2efc3427-8ba6-4d50-875d-f2de4a068de8")
+        rv.address_requirement = AddressRequirement.build("2efc3427-8ba6-4d50-875d-f2de4a068de8")
         response = client.address_requirement_validations().create(rv)
         created = response.data
         assert created.id is None

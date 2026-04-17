@@ -4,7 +4,7 @@ from didww.resources.base import DidwwApiModel, RelationField, CreateOnlyReposit
 class AddressRequirementValidation(DidwwApiModel):
     _writable_attrs = set()
 
-    requirement = RelationField("requirement")
+    address_requirement = RelationField("address_requirement")
     identity = RelationField("identity")
     address = RelationField("address")
 
