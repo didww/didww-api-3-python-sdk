@@ -5,6 +5,26 @@ from didww.resources.identity import Identity
 from didww.resources.country import Country
 
 
+class TestIdentityRelationships:
+    def test_birth_country_relationship(self):
+        identity = Identity()
+        assert hasattr(identity, 'birth_country')
+
+    @my_vcr.use_cassette("identities/show_with_birth_country.yaml")
+    def test_birth_country_included(self, client):
+        from didww.query_params import QueryParams
+        params = QueryParams().include("country", "birth_country")
+        response = client.identities().find("5e9df058-50d2-4e34-b0d4-d1746b86f41a", params)
+        identity = response.data
+        assert identity.birth_country is not None
+        assert identity.birth_country.name == "Canada"
+        assert identity.birth_country.iso == "CA"
+        assert identity.birth_country.prefix == "1"
+        assert identity.country is not None
+        assert identity.country.name == "United States"
+        assert identity.country.iso == "US"
+
+
 class TestIdentity:
     @my_vcr.use_cassette("identities/list.yaml")
     def test_list_identities(self, client):
