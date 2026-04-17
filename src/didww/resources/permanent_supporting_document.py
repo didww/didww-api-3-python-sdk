@@ -2,9 +2,10 @@ from didww.resources.base import DidwwApiModel, DatetimeAttributeField, SafeAttr
 
 
 class PermanentSupportingDocument(DidwwApiModel):
-    _writable_attrs = set()
+    _writable_attrs = {"external_reference_id"}
 
     created_at = DatetimeAttributeField("created_at")
+    external_reference_id = SafeAttributeField("external_reference_id")
 
     identity = RelationField("identity")
     template = RelationField("template")

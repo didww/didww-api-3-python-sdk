@@ -7,6 +7,13 @@ from didww.resources.encrypted_file import EncryptedFile
 
 
 class TestPermanentSupportingDocument:
+    @my_vcr.use_cassette("permanent_supporting_documents/show.yaml")
+    def test_find_permanent_supporting_document(self, client):
+        response = client.permanent_supporting_documents().find("19510da3-c07e-4fa9-a696-6b9ab89cc172")
+        doc = response.data
+        assert doc.id == "19510da3-c07e-4fa9-a696-6b9ab89cc172"
+        assert doc.external_reference_id == "crm-psd-0001"
+
     @my_vcr.use_cassette("permanent_supporting_documents/create.yaml")
     def test_create_permanent_supporting_document(self, client):
         doc = PermanentSupportingDocument()
