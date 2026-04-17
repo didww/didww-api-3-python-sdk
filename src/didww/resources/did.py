@@ -26,6 +26,7 @@ class Did(DidwwApiModel):
     shared_capacity_group = RelationField("shared_capacity_group")
     address_verification = RelationField("address_verification")
     emergency_calling_service = RelationField("emergency_calling_service")
+    emergency_verification = RelationField("emergency_verification")
 
     class Meta:
         type = "dids"

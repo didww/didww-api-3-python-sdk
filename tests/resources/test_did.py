@@ -15,6 +15,10 @@ class TestDidRelationships:
         did = Did()
         assert hasattr(did, 'emergency_calling_service')
 
+    def test_emergency_verification_relationship(self):
+        did = Did()
+        assert hasattr(did, 'emergency_verification')
+
 
 class TestDid:
     @my_vcr.use_cassette("dids/list.yaml")
