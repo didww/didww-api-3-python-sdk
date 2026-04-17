@@ -13,6 +13,7 @@ class EmergencyCallingService(DidwwApiModel):
     country = RelationField("country")
     did_group_type = RelationField("did_group_type")
     order = RelationField("order")
+    address = RelationField("address")
     emergency_requirement = RelationField("emergency_requirement")
     emergency_verification = RelationField("emergency_verification")
     dids = RelationField("dids")

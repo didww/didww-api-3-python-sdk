@@ -38,6 +38,16 @@ class TestEmergencyCallingService:
         assert ecs.emergency_verification.id == "ev-001"
         assert ecs.emergency_verification.reference == "EVR-001"
 
+    @my_vcr.use_cassette("emergency_calling_services/show_with_address.yaml")
+    def test_find_emergency_calling_service_with_address(self, client):
+        from didww.query_params import QueryParams
+        params = QueryParams().include("address")
+        response = client.emergency_calling_services().find("ecs-001", params)
+        ecs = response.data
+        assert ecs.id == "ecs-001"
+        assert ecs.address is not None
+        assert ecs.address.city_name == "Berlin"
+
     @my_vcr.use_cassette("emergency_calling_services/delete.yaml")
     def test_delete_emergency_calling_service(self, client):
         result = client.emergency_calling_services().delete("ecs-001")
