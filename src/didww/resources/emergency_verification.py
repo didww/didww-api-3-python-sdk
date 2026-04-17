@@ -2,6 +2,19 @@ from didww.resources.base import DidwwApiModel, DatetimeAttributeField, SafeAttr
 
 
 class EmergencyVerification(DidwwApiModel):
+    """Emergency Verification resource.
+
+    Attributes:
+        reference (str): Verification reference code.
+        status (str): One of "pending", "approved", "rejected".
+        reject_reasons (list[str] | None): List of reject reason codes when status is "rejected".
+        reject_comment (str | None): Optional free-form comment accompanying a rejection.
+        callback_url (str): Valid URI for callbacks.
+        callback_method (str): GET or POST.
+        external_reference_id (str | None): Customer-supplied reference. Max 100 characters.
+        created_at (datetime): Timestamp when the resource was created.
+    """
+
     _writable_attrs = {"callback_url", "callback_method", "external_reference_id"}
 
     reference = SafeAttributeField("reference")

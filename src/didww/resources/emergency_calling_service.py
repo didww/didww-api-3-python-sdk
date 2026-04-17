@@ -2,6 +2,19 @@ from didww.resources.base import DidwwApiModel, DatetimeAttributeField, SafeAttr
 
 
 class EmergencyCallingService(DidwwApiModel):
+    """Emergency Calling Service subscription resource.
+
+    Attributes:
+        name (str): Human-readable name for the calling service subscription.
+        reference (str): Server-assigned reference code.
+        status (str): One of "active", "canceled", "changes required",
+            "in process", "new", "pending update".
+        activated_at (datetime): Timestamp when the service became active. None while pending.
+        canceled_at (datetime): Timestamp when the service was canceled. None when active.
+        created_at (datetime): Timestamp when the resource was created.
+        renew_date (datetime): Next renewal date. None when canceled.
+    """
+
     name = SafeAttributeField("name")
     reference = SafeAttributeField("reference")
     status = SafeAttributeField("status")
