@@ -18,6 +18,7 @@ class TestExport:
         assert export.id == "da15f006-5da4-45ca-b0df-735baeadf423"
         assert export.status == ExportStatus.COMPLETED
         assert export.export_type == ExportType.CDR_IN
+        assert export.external_reference_id == "monthly-cdr-2026-04"
 
     @my_vcr.use_cassette("exports/create.yaml")
     def test_create_export(self, client):
