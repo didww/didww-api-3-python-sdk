@@ -42,7 +42,7 @@ interactions:
         \       \"id\": \"afcb54cd-1e36-472a-9f5b-07328d0d187f\"\n          }\n  \
         \      ]\n      }\n    },\n    \"meta\": {\n      \"needs_registration\":\
         \ true,\n      \"is_available\": true,\n      \"restrictions\": \"German Geographic\
-        \ Registration:\\r\\n\\r\\nGerman Local DID registration requirements:\\r\\\
+        \ Registration:\\r\\n\\r\\nGerman Local DID registration address_requirements:\\r\\\
         n1. Name, business name and contact phone number.\\r\\n2. Passport or ID copy.**\\\
         r\\n3. Current address in Germany, must be from the same city in Germany as\
         \ the DID ordered (street, building number, postal code, city).\\r\\n4. Proof\

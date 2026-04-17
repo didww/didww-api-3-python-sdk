@@ -32,7 +32,7 @@ interactions:
         \n        },\n        \"data\": null\n      },\n      \"stock_keeping_units\"\
         : {\n        \"links\": {\n          \"self\": \"https://sandbox-api.didww.com/v3/did_groups/2187c36d-28fb-436f-8861-5a0f5b5a3ee1/relationships/stock_keeping_units\"\
         ,\n          \"related\": \"https://sandbox-api.didww.com/v3/did_groups/2187c36d-28fb-436f-8861-5a0f5b5a3ee1/stock_keeping_units\"\
-        \n        },\n        \"data\": []\n      },\n      \"requirement\": {\n  \
+        \n        },\n        \"data\": []\n      },\n      \"address_requirement\": {\n  \
         \      \"links\": {\n          \"self\": \"https://sandbox-api.didww.com/v3/did_groups/2187c36d-28fb-436f-8861-5a0f5b5a3ee1/relationships/requirement\"\
         ,\n          \"related\": \"https://sandbox-api.didww.com/v3/did_groups/2187c36d-28fb-436f-8861-5a0f5b5a3ee1/requirement\"\
         \n        },\n        \"data\": {\n          \"type\": \"address_requirements\",\n\

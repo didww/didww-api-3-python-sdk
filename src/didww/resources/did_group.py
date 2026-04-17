@@ -14,7 +14,7 @@ class DidGroup(DidwwApiModel):
     city = RelationField("city")
     did_group_type = RelationField("did_group_type")
     stock_keeping_units = RelationField("stock_keeping_units")
-    requirement = RelationField("requirement")
+    address_requirement = RelationField("address_requirement")
 
     class Meta:
         type = "did_groups"

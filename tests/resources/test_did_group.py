@@ -32,17 +32,17 @@ class TestDidGroup:
         assert dg.region is None
         assert len(dg.stock_keeping_units) == 2
 
-    @my_vcr.use_cassette("did_groups/show_with_requirement.yaml")
-    def test_find_did_group_with_requirement(self, client):
-        params = QueryParams().include("requirement")
+    @my_vcr.use_cassette("did_groups/show_with_address_requirement.yaml")
+    def test_find_did_group_with_address_requirement(self, client):
+        params = QueryParams().include("address_requirement")
         response = client.did_groups().find("2187c36d-28fb-436f-8861-5a0f5b5a3ee1", params)
         dg = response.data
         assert dg.id == "2187c36d-28fb-436f-8861-5a0f5b5a3ee1"
         assert dg.prefix == "241"
         assert dg.area_name == "Aachen"
-        requirement = dg.requirement
-        assert requirement is not None
-        assert requirement.id == "8da1e0b2-047c-4baf-9c57-57143f09b9ce"
-        assert requirement.identity_type == IdentityType.ANY
-        assert requirement.personal_area_level == AreaLevel.WORLDWIDE
-        assert requirement.service_description_required is False
+        address_requirement = dg.address_requirement
+        assert address_requirement is not None
+        assert address_requirement.id == "8da1e0b2-047c-4baf-9c57-57143f09b9ce"
+        assert address_requirement.identity_type == IdentityType.ANY
+        assert address_requirement.personal_area_level == AreaLevel.WORLDWIDE
+        assert address_requirement.service_description_required is False
