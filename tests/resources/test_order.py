@@ -5,6 +5,57 @@ from didww.resources.order_item.did_order_item import DidOrderItem
 from didww.resources.order_item.capacity_order_item import CapacityOrderItem
 from didww.resources.order_item.available_did_order_item import AvailableDidOrderItem
 from didww.resources.order_item.reservation_did_order_item import ReservationDidOrderItem
+from didww.resources.order_item.emergency_order_item import EmergencyOrderItem
+from didww.resources.order_item.base import OrderItem
+
+
+class TestEmergencyOrderItem:
+    def test_type(self):
+        assert EmergencyOrderItem._type == "emergency_order_items"
+
+    def test_input_properties(self):
+        item = EmergencyOrderItem()
+        item.qty = 1
+        item.emergency_calling_service_id = "b6d9d793-578d-42d3-bc33-73dd8155e615"
+        assert item.qty == 1
+        assert item.emergency_calling_service_id == "b6d9d793-578d-42d3-bc33-73dd8155e615"
+
+    def test_returned_properties(self):
+        item = EmergencyOrderItem(attributes={
+            "nrc": "5.0",
+            "mrc": "25.0",
+            "prorated_mrc": False,
+            "billed_from": "2026-04-16",
+            "billed_to": "2026-05-15",
+        })
+        assert item.nrc == "5.0"
+        assert item.mrc == "25.0"
+        assert item.prorated_mrc is False
+        assert item.billed_from == "2026-04-16"
+        assert item.billed_to == "2026-05-15"
+
+    def test_serialization(self):
+        item = EmergencyOrderItem()
+        item.qty = 1
+        item.emergency_calling_service_id = "b6d9d793-578d-42d3-bc33-73dd8155e615"
+        data = item.to_jsonapi()
+        assert data == {
+            "type": "emergency_order_items",
+            "attributes": {
+                "qty": 1,
+                "emergency_calling_service_id": "b6d9d793-578d-42d3-bc33-73dd8155e615",
+            },
+        }
+
+    def test_deserialization(self):
+        data = {
+            "type": "emergency_order_items",
+            "attributes": {"qty": 1, "emergency_calling_service_id": "abc-123"},
+        }
+        item = OrderItem.from_jsonapi(data)
+        assert isinstance(item, EmergencyOrderItem)
+        assert item.qty == 1
+        assert item.emergency_calling_service_id == "abc-123"
 
 
 class TestOrder:

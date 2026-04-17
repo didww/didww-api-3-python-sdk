@@ -8,6 +8,7 @@ import didww.resources.order_item.capacity_order_item  # noqa: F401
 import didww.resources.order_item.available_did_order_item  # noqa: F401
 import didww.resources.order_item.reservation_did_order_item  # noqa: F401
 import didww.resources.order_item.generic_order_item  # noqa: F401
+import didww.resources.order_item.emergency_order_item  # noqa: F401
 
 
 class Order(DidwwApiModel):
