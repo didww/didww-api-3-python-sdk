@@ -276,6 +276,22 @@ class DidwwClient:
         from didww.resources.did_history import DidHistoryRepository
         return DidHistoryRepository(self)
 
+    def emergency_requirements(self):
+        from didww.resources.emergency_requirement import EmergencyRequirementRepository
+        return EmergencyRequirementRepository(self)
+
+    def emergency_requirement_validations(self):
+        from didww.resources.emergency_requirement_validation import EmergencyRequirementValidationRepository
+        return EmergencyRequirementValidationRepository(self)
+
+    def emergency_calling_services(self):
+        from didww.resources.emergency_calling_service import EmergencyCallingServiceRepository
+        return EmergencyCallingServiceRepository(self)
+
+    def emergency_verifications(self):
+        from didww.resources.emergency_verification import EmergencyVerificationRepository
+        return EmergencyVerificationRepository(self)
+
     def dids(self):
         from didww.resources.did import DidRepository
         return DidRepository(self)
