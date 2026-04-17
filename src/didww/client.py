@@ -13,7 +13,7 @@ except PackageNotFoundError:
 
 
 class DidwwClient:
-    API_VERSION = "2022-05-10"
+    API_VERSION = "2026-04-16"
 
     def __init__(self, api_key, environment=Environment.SANDBOX, base_url=None, session=None):
         if not api_key:
