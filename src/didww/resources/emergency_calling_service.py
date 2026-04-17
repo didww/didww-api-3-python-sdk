@@ -1,4 +1,5 @@
-from didww.resources.base import DidwwApiModel, DatetimeAttributeField, SafeAttributeField, RelationField, ReadOnlyRepository
+from didww.enums import EmergencyCallingServiceStatus
+from didww.resources.base import DidwwApiModel, DatetimeAttributeField, SafeAttributeField, EnumAttributeField, RelationField, ReadOnlyRepository
 
 
 class EmergencyCallingService(DidwwApiModel):
@@ -7,8 +8,8 @@ class EmergencyCallingService(DidwwApiModel):
     Attributes:
         name (str): Human-readable name for the calling service subscription.
         reference (str): Server-assigned reference code.
-        status (str): One of "active", "canceled", "changes required",
-            "in process", "new", "pending update".
+        status (EmergencyCallingServiceStatus): One of active, canceled,
+            changes_required, in_process, new, pending_update.
         activated_at (datetime): Timestamp when the service became active. None while pending.
         canceled_at (datetime): Timestamp when the service was canceled. None when active.
         created_at (datetime): Timestamp when the resource was created.
@@ -17,7 +18,7 @@ class EmergencyCallingService(DidwwApiModel):
 
     name = SafeAttributeField("name")
     reference = SafeAttributeField("reference")
-    status = SafeAttributeField("status")
+    status = EnumAttributeField("status", EmergencyCallingServiceStatus)
     activated_at = DatetimeAttributeField("activated_at")
     canceled_at = DatetimeAttributeField("canceled_at")
     created_at = DatetimeAttributeField("created_at")
@@ -31,39 +32,32 @@ class EmergencyCallingService(DidwwApiModel):
     emergency_verification = RelationField("emergency_verification")
     dids = RelationField("dids")
 
-    STATUS_ACTIVE = "active"
-    STATUS_CANCELED = "canceled"
-    STATUS_CHANGES_REQUIRED = "changes required"
-    STATUS_IN_PROCESS = "in process"
-    STATUS_NEW = "new"
-    STATUS_PENDING_UPDATE = "pending update"
-
     class Meta:
         type = "emergency_calling_services"
 
     @property
     def is_active(self):
-        return self.status == self.STATUS_ACTIVE
+        return self.status == EmergencyCallingServiceStatus.ACTIVE
 
     @property
     def is_canceled(self):
-        return self.status == self.STATUS_CANCELED
+        return self.status == EmergencyCallingServiceStatus.CANCELED
 
     @property
     def is_changes_required(self):
-        return self.status == self.STATUS_CHANGES_REQUIRED
+        return self.status == EmergencyCallingServiceStatus.CHANGES_REQUIRED
 
     @property
     def is_in_process(self):
-        return self.status == self.STATUS_IN_PROCESS
+        return self.status == EmergencyCallingServiceStatus.IN_PROCESS
 
     @property
     def is_new(self):
-        return self.status == self.STATUS_NEW
+        return self.status == EmergencyCallingServiceStatus.NEW
 
     @property
     def is_pending_update(self):
-        return self.status == self.STATUS_PENDING_UPDATE
+        return self.status == EmergencyCallingServiceStatus.PENDING_UPDATE
 
 
 class EmergencyCallingServiceRepository(ReadOnlyRepository):

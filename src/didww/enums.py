@@ -81,6 +81,15 @@ class DefaultDstAction(str, Enum):
     REJECT_ALL = "reject_all"
 
 
+class EmergencyCallingServiceStatus(str, Enum):
+    ACTIVE = "active"
+    CANCELED = "canceled"
+    CHANGES_REQUIRED = "changes required"
+    IN_PROCESS = "in process"
+    NEW = "new"
+    PENDING_UPDATE = "pending update"
+
+
 class VoiceOutTrunkStatus(str, Enum):
     ACTIVE = "active"
     BLOCKED = "blocked"

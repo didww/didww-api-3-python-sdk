@@ -1,28 +1,34 @@
 from datetime import datetime, timezone
 
 from tests.conftest import my_vcr
+from didww.enums import EmergencyCallingServiceStatus
 from didww.resources.emergency_calling_service import EmergencyCallingService
 
 
 class TestEmergencyCallingServiceStatusHelpers:
     def test_is_active(self):
         ecs = EmergencyCallingService()
-        ecs.status = "active"
+        ecs.status = EmergencyCallingServiceStatus.ACTIVE
         assert ecs.is_active is True
         assert ecs.is_canceled is False
 
     def test_all_predicates(self):
         ecs = EmergencyCallingService()
-        ecs.status = "canceled"
+        ecs.status = EmergencyCallingServiceStatus.CANCELED
         assert ecs.is_canceled is True
-        ecs.status = "changes required"
+        ecs.status = EmergencyCallingServiceStatus.CHANGES_REQUIRED
         assert ecs.is_changes_required is True
-        ecs.status = "in process"
+        ecs.status = EmergencyCallingServiceStatus.IN_PROCESS
         assert ecs.is_in_process is True
-        ecs.status = "new"
+        ecs.status = EmergencyCallingServiceStatus.NEW
         assert ecs.is_new is True
-        ecs.status = "pending update"
+        ecs.status = EmergencyCallingServiceStatus.PENDING_UPDATE
         assert ecs.is_pending_update is True
+
+    def test_status_enum_from_string(self):
+        ecs = EmergencyCallingService()
+        ecs.status = "active"
+        assert ecs.status == EmergencyCallingServiceStatus.ACTIVE
 
 
 class TestEmergencyCallingService:
