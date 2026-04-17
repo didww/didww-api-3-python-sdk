@@ -1,6 +1,6 @@
 interactions:
 - request:
-    body: '{"data":{"type":"address_verifications","attributes":{"callback_url":"http://example.com","callback_method":"GET"},"relationships":{"address":{"data":{"type":"addresses","id":"d3414687-40f4-4346-a267-c2c65117d28c"}},"dids":{"data":[{"type":"dids","id":"a9d64c02-4486-4acb-a9a1-be4c81ff0659"}]}}}}'
+    body: '{"data":{"type":"address_verifications","attributes":{"callback_url":"http://example.com","callback_method":"get"},"relationships":{"address":{"data":{"type":"addresses","id":"d3414687-40f4-4346-a267-c2c65117d28c"}},"dids":{"data":[{"type":"dids","id":"a9d64c02-4486-4acb-a9a1-be4c81ff0659"}]}}}}'
     headers:
       Accept:
       - application/vnd.api+json
@@ -15,7 +15,7 @@ interactions:
       string: "{\n  \"data\": {\n    \"id\": \"78182ef2-8377-41cd-89e1-26e8266c9c94\"\
         ,\n    \"type\": \"address_verifications\",\n    \"attributes\": {\n     \
         \ \"service_description\": null,\n      \"callback_url\": \"http://example.com\"\
-        ,\n      \"callback_method\": \"GET\",\n      \"status\": \"Pending\",\n \
+        ,\n      \"callback_method\": \"get\",\n      \"status\": \"pending\",\n \
         \     \"reject_reasons\": null,\n      \"created_at\": \"2021-04-01T15:01:32.668Z\"\
         \n    },\n    \"relationships\": {\n      \"dids\": {\n        \"links\":\
         \ {\n          \"self\": \"https://sandbox-api.didww.com/v3/address_verifications/78182ef2-8377-41cd-89e1-26e8266c9c94/relationships/dids\"\

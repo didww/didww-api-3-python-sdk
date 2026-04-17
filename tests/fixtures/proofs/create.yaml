@@ -26,7 +26,7 @@ interactions:
         \n        }\n      }\n    }\n  },\n  \"included\": [\n    {\n      \"id\"\
         : \"19cd7b22-559b-41d4-99c9-7ad7ad63d5d1\",\n      \"type\": \"proof_types\"\
         ,\n      \"attributes\": {\n        \"name\": \"Drivers License\",\n     \
-        \   \"entity_type\": \"Personal\"\n      }\n    }\n  ],\n  \"meta\": {\n \
+        \   \"entity_type\": \"personal\"\n      }\n    }\n  ],\n  \"meta\": {\n \
         \   \"api_version\": \"2021-04-19\"\n  }\n}"
     headers:
       Content-Type:

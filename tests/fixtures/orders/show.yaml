@@ -14,7 +14,7 @@ interactions:
     body:
       string: "{\n  \"data\": {\n    \"id\": \"9df11dac-9d83-448c-8866-19c998be33db\"\
         ,\n    \"type\": \"orders\",\n    \"attributes\": {\n      \"amount\": \"\
-        25.07\",\n      \"status\": \"Completed\",\n      \"created_at\": \"2018-08-17T09:48:48.440Z\"\
+        25.07\",\n      \"status\": \"completed\",\n      \"created_at\": \"2018-08-17T09:48:48.440Z\"\
         ,\n      \"description\": \"Payment processing fee\",\n      \"reference\"\
         : \"SPT-474057\",\n      \"items\": [\n        {\n          \"type\": \"generic_order_items\"\
         ,\n          \"attributes\": {\n            \"qty\": 1,\n            \"nrc\"\

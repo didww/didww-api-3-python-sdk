@@ -12,8 +12,8 @@ class TestEmergencyRequirement:
         response = client.emergency_requirements().find("er-001")
         er = response.data
         assert er.id == "er-001"
-        assert er.identity_type == "Personal"
-        assert er.address_area_level == "City"
+        assert er.identity_type == "personal"
+        assert er.address_area_level == "city"
         assert er.estimate_setup_time == 5
         assert er.address_mandatory_fields == ["city_name", "address"]
         assert er.personal_mandatory_fields == ["first_name", "last_name"]

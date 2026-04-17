@@ -14,8 +14,8 @@ interactions:
     body:
       string: "{\n  \"data\": {\n    \"id\": \"25d12afe-1ec6-4fe3-9621-b250dd1fb959\"\
         ,\n    \"type\": \"address_requirements\",\n    \"attributes\": {\n      \"identity_type\"\
-        : \"Any\",\n      \"personal_area_level\": \"WorldWide\",\n      \"business_area_level\"\
-        : \"WorldWide\",\n      \"address_area_level\": \"WorldWide\",\n      \"personal_proof_qty\"\
+        : \"any\",\n      \"personal_area_level\": \"world_wide\",\n      \"business_area_level\"\
+        : \"world_wide\",\n      \"address_area_level\": \"world_wide\",\n      \"personal_proof_qty\"\
         : 1,\n      \"business_proof_qty\": 1,\n      \"address_proof_qty\": 1,\n\
         \      \"personal_mandatory_fields\": [\n        \"Birth Date\",\n       \
         \ \"Country\",\n        \"Personal Tax ID\"\n      ],\n      \"business_mandatory_fields\"\
@@ -96,28 +96,28 @@ interactions:
         \       \"url\": \"https://sandbox-api.didww.com/storage/public/w7f2irbo819la7vd7up7u67pkmkn\"\
         \n      }\n    },\n    {\n      \"id\": \"19cd7b22-559b-41d4-99c9-7ad7ad63d5d1\"\
         ,\n      \"type\": \"proof_types\",\n      \"attributes\": {\n        \"name\"\
-        : \"Drivers License\",\n        \"entity_type\": \"Personal\"\n      }\n \
+        : \"Drivers License\",\n        \"entity_type\": \"personal\"\n      }\n \
         \   },\n    {\n      \"id\": \"af07842f-6339-46fe-83b6-57e457af1eaf\",\n \
         \     \"type\": \"proof_types\",\n      \"attributes\": {\n        \"name\"\
         : \"Business Registration Certificate / Incorporation Certificate\",\n   \
-        \     \"entity_type\": \"Business\"\n      }\n    },\n    {\n      \"id\"\
+        \     \"entity_type\": \"business\"\n      }\n    },\n    {\n      \"id\"\
         : \"56b7d7cb-4d36-49c8-a786-2179967bba4c\",\n      \"type\": \"proof_types\"\
         ,\n      \"attributes\": {\n        \"name\": \"Trade License\",\n       \
-        \ \"entity_type\": \"Business\"\n      }\n    },\n    {\n      \"id\": \"\
+        \ \"entity_type\": \"business\"\n      }\n    },\n    {\n      \"id\": \"\
         ecf699c6-b1ad-4866-974b-06d2e8a698e6\",\n      \"type\": \"proof_types\",\n\
         \      \"attributes\": {\n        \"name\": \"Excerpt from the commercial\
-        \ register\",\n        \"entity_type\": \"Business\"\n      }\n    },\n  \
+        \ register\",\n        \"entity_type\": \"business\"\n      }\n    },\n  \
         \  {\n      \"id\": \"7f80edde-1b80-4410-af06-76a38ea9e576\",\n      \"type\"\
         : \"proof_types\",\n      \"attributes\": {\n        \"name\": \"Other\",\n\
-        \        \"entity_type\": \"Business\"\n      }\n    },\n    {\n      \"id\"\
+        \        \"entity_type\": \"business\"\n      }\n    },\n    {\n      \"id\"\
         : \"80253913-cd8b-4ce2-91a9-9299587ac409\",\n      \"type\": \"proof_types\"\
         ,\n      \"attributes\": {\n        \"name\": \"Passport\",\n        \"entity_type\"\
-        : \"Business\"\n      }\n    },\n    {\n      \"id\": \"0eb83bb2-730c-45fb-b39c-c0bf02f88e9e\"\
+        : \"business\"\n      }\n    },\n    {\n      \"id\": \"0eb83bb2-730c-45fb-b39c-c0bf02f88e9e\"\
         ,\n      \"type\": \"proof_types\",\n      \"attributes\": {\n        \"name\"\
-        : \"National ID\",\n        \"entity_type\": \"Business\"\n      }\n    },\n\
+        : \"National ID\",\n        \"entity_type\": \"business\"\n      }\n    },\n\
         \    {\n      \"id\": \"1f3f4747-0835-44a4-9e5f-40e52ec4fce7\",\n      \"\
         type\": \"proof_types\",\n      \"attributes\": {\n        \"name\": \"Drivers\
-        \ License\",\n        \"entity_type\": \"Business\"\n      }\n    },\n   \
+        \ License\",\n        \"entity_type\": \"business\"\n      }\n    },\n   \
         \ {\n      \"id\": \"d2c1b3fb-29f7-46ca-ba82-b617f4630b78\",\n      \"type\"\
         : \"proof_types\",\n      \"attributes\": {\n        \"name\": \"Copy of Phone\
         \ Bill\",\n        \"entity_type\": \"Address\"\n      }\n    }\n  ],\n  \"\

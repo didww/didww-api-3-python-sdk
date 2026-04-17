@@ -29,14 +29,14 @@ def to_enum_list(enum_cls, values):
 
 
 class CallbackMethod(str, Enum):
-    POST = "POST"
-    GET = "GET"
+    POST = "post"
+    GET = "get"
 
 
 class AddressVerificationStatus(str, Enum):
-    PENDING = "Pending"
-    APPROVED = "Approved"
-    REJECTED = "Rejected"
+    PENDING = "pending"
+    APPROVED = "approved"
+    REJECTED = "rejected"
 
 
 class ExportType(str, Enum):
@@ -45,21 +45,21 @@ class ExportType(str, Enum):
 
 
 class ExportStatus(str, Enum):
-    PENDING = "Pending"
-    PROCESSING = "Processing"
-    COMPLETED = "Completed"
+    PENDING = "pending"
+    PROCESSING = "processing"
+    COMPLETED = "completed"
 
 
 class IdentityType(str, Enum):
-    PERSONAL = "Personal"
-    BUSINESS = "Business"
-    ANY = "Any"
+    PERSONAL = "personal"
+    BUSINESS = "business"
+    ANY = "any"
 
 
 class OrderStatus(str, Enum):
-    PENDING = "Pending"
-    CANCELED = "Canceled"
-    COMPLETED = "Completed"
+    PENDING = "pending"
+    CANCELED = "canceled"
+    COMPLETED = "completed"
 
 
 class OnCliMismatchAction(str, Enum):
@@ -90,10 +90,10 @@ class EmergencyVerificationStatus(str, Enum):
 class EmergencyCallingServiceStatus(str, Enum):
     ACTIVE = "active"
     CANCELED = "canceled"
-    CHANGES_REQUIRED = "changes required"
-    IN_PROCESS = "in process"
+    CHANGES_REQUIRED = "changes_required"
+    IN_PROCESS = "in_process"
     NEW = "new"
-    PENDING_UPDATE = "pending update"
+    PENDING_UPDATE = "pending_update"
 
 
 class VoiceOutTrunkStatus(str, Enum):
@@ -108,10 +108,10 @@ class CliFormat(str, Enum):
 
 
 class AreaLevel(str, Enum):
-    WORLDWIDE = "WorldWide"
-    COUNTRY = "Country"
-    AREA = "Area"
-    CITY = "City"
+    WORLDWIDE = "world_wide"
+    COUNTRY = "country"
+    AREA = "area"
+    CITY = "city"
 
 
 class Feature(str, Enum):

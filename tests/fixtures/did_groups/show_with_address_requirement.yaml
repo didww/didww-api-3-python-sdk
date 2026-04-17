@@ -42,9 +42,9 @@ interactions:
         : \"Germany\",\n        \"prefix\": \"49\",\n        \"iso\": \"DE\"\n   \
         \   }\n    },\n    {\n      \"id\": \"8da1e0b2-047c-4baf-9c57-57143f09b9ce\"\
         ,\n      \"type\": \"address_requirements\",\n      \"attributes\": {\n        \"\
-        identity_type\": \"Any\",\n        \"personal_area_level\": \"WorldWide\"\
-        ,\n        \"business_area_level\": \"WorldWide\",\n        \"address_area_level\"\
-        : \"WorldWide\",\n        \"personal_proof_qty\": 0,\n        \"business_proof_qty\"\
+        identity_type\": \"any\",\n        \"personal_area_level\": \"world_wide\"\
+        ,\n        \"business_area_level\": \"world_wide\",\n        \"address_area_level\"\
+        : \"world_wide\",\n        \"personal_proof_qty\": 0,\n        \"business_proof_qty\"\
         : 0,\n        \"address_proof_qty\": 0,\n        \"personal_mandatory_fields\"\
         : [],\n        \"business_mandatory_fields\": [],\n        \"service_description_required\"\
         : false,\n        \"restriction_message\": null\n      }\n    }\n  ],\n  \"\
