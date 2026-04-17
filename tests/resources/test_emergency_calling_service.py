@@ -1,6 +1,28 @@
 from datetime import datetime, timezone
 
 from tests.conftest import my_vcr
+from didww.resources.emergency_calling_service import EmergencyCallingService
+
+
+class TestEmergencyCallingServiceStatusHelpers:
+    def test_is_active(self):
+        ecs = EmergencyCallingService()
+        ecs.status = "active"
+        assert ecs.is_active is True
+        assert ecs.is_canceled is False
+
+    def test_all_predicates(self):
+        ecs = EmergencyCallingService()
+        ecs.status = "canceled"
+        assert ecs.is_canceled is True
+        ecs.status = "changes required"
+        assert ecs.is_changes_required is True
+        ecs.status = "in process"
+        assert ecs.is_in_process is True
+        ecs.status = "new"
+        assert ecs.is_new is True
+        ecs.status = "pending update"
+        assert ecs.is_pending_update is True
 
 
 class TestEmergencyCallingService:

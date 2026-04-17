@@ -31,8 +31,39 @@ class EmergencyCallingService(DidwwApiModel):
     emergency_verification = RelationField("emergency_verification")
     dids = RelationField("dids")
 
+    STATUS_ACTIVE = "active"
+    STATUS_CANCELED = "canceled"
+    STATUS_CHANGES_REQUIRED = "changes required"
+    STATUS_IN_PROCESS = "in process"
+    STATUS_NEW = "new"
+    STATUS_PENDING_UPDATE = "pending update"
+
     class Meta:
         type = "emergency_calling_services"
+
+    @property
+    def is_active(self):
+        return self.status == self.STATUS_ACTIVE
+
+    @property
+    def is_canceled(self):
+        return self.status == self.STATUS_CANCELED
+
+    @property
+    def is_changes_required(self):
+        return self.status == self.STATUS_CHANGES_REQUIRED
+
+    @property
+    def is_in_process(self):
+        return self.status == self.STATUS_IN_PROCESS
+
+    @property
+    def is_new(self):
+        return self.status == self.STATUS_NEW
+
+    @property
+    def is_pending_update(self):
+        return self.status == self.STATUS_PENDING_UPDATE
 
 
 class EmergencyCallingServiceRepository(ReadOnlyRepository):
