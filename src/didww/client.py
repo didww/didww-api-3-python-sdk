@@ -272,6 +272,10 @@ class DidwwClient:
         from didww.resources.encrypted_file import EncryptedFileRepository
         return EncryptedFileRepository(self)
 
+    def did_history(self):
+        from didww.resources.did_history import DidHistoryRepository
+        return DidHistoryRepository(self)
+
     def dids(self):
         from didww.resources.did import DidRepository
         return DidRepository(self)

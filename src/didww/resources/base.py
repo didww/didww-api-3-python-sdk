@@ -16,6 +16,7 @@ _TYPE_MAP = {
     "capacity_pools": "didww.resources.capacity_pool:CapacityPool",
     "cities": "didww.resources.city:City",
     "countries": "didww.resources.country:Country",
+    "did_history": "didww.resources.did_history:DidHistory",
     "dids": "didww.resources.did:Did",
     "did_groups": "didww.resources.did_group:DidGroup",
     "did_group_types": "didww.resources.did_group_type:DidGroupType",
