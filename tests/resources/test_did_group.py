@@ -3,6 +3,14 @@ from tests.conftest import my_vcr
 from didww.query_params import QueryParams
 
 
+class TestDidGroupFeatures:
+    def test_new_features_enum_values(self):
+        assert Feature.P2P.value == "p2p"
+        assert Feature.A2P.value == "a2p"
+        assert Feature.EMERGENCY.value == "emergency"
+        assert Feature.CNAM_OUT.value == "cnam_out"
+
+
 class TestDidGroup:
     @my_vcr.use_cassette("did_groups/list.yaml")
     def test_list_did_groups(self, client):
