@@ -330,6 +330,29 @@ class TestVoiceOutTrunkSerialization:
         assert attrs["status"] == "Active"
         assert "authentication_method" in attrs
 
+    def test_patch_only_authentication_method_when_reassigned(self):
+        """PATCH must send only authentication_method when it is the only changed field."""
+        from didww.resources.authentication_method import CredentialsAndIpAuthenticationMethod
+        trunk = VoiceOutTrunk.build("abc-123")
+        assert len(trunk._dirty_attrs) == 0
+
+        trunk.authentication_method = CredentialsAndIpAuthenticationMethod(
+            allowed_sip_ips=["192.0.2.10/32"],
+            tech_prefix="99",
+        )
+
+        assert "authentication_method" in trunk._dirty_attrs
+        doc = trunk.to_jsonapi(include_id=True, dirty_only=True)
+        assert doc["id"] == "abc-123"
+        assert doc["type"] == "voice_out_trunks"
+        attrs = doc["attributes"]
+        assert "authentication_method" in attrs
+        assert attrs["authentication_method"]["type"] == "credentials_and_ip"
+        assert attrs["authentication_method"]["attributes"]["allowed_sip_ips"] == ["192.0.2.10/32"]
+        assert attrs["authentication_method"]["attributes"]["tech_prefix"] == "99"
+        # No other attributes should be present
+        assert set(attrs.keys()) == {"authentication_method"}
+
 
 # ---------------------------------------------------------------------------
 # Dirty-only PATCH serialization tests
