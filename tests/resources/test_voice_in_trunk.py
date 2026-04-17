@@ -17,6 +17,14 @@ from didww.resources.configuration.sip import SipConfiguration
 
 
 class TestVoiceInTrunk:
+    @my_vcr.use_cassette("voice_in_trunks/show.yaml")
+    def test_find_voice_in_trunk(self, client):
+        response = client.voice_in_trunks().find("2b4b1fcf-fe6a-4de9-8a58-7df46820ba13")
+        trunk = response.data
+        assert trunk.id == "2b4b1fcf-fe6a-4de9-8a58-7df46820ba13"
+        assert trunk.name == "sample trunk pstn"
+        assert trunk.external_reference_id == "crm-vit-0001"
+
     @my_vcr.use_cassette("voice_in_trunks/list.yaml")
     def test_list_voice_in_trunks(self, client):
         params = QueryParams().include("trunk_group", "pop")
