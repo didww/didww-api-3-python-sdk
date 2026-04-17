@@ -17,6 +17,7 @@ class TestOrder:
         assert order.description == "Payment processing fee"
         assert order.reference == "SPT-474057"
         assert len(order.items) > 0
+        assert order.external_reference_id == "crm-order-0001"
 
     @my_vcr.use_cassette("orders/create.yaml")
     def test_create_order(self, client):

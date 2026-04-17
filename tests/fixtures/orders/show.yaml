@@ -20,7 +20,9 @@ interactions:
         ,\n          \"attributes\": {\n            \"qty\": 1,\n            \"nrc\"\
         : \"25.07\",\n            \"mrc\": \"0.0\",\n            \"prorated_mrc\"\
         : false,\n            \"billed_from\": \"2018-08-17\",\n            \"billed_to\"\
-        : \"2018-09-16\"\n          }\n        }\n      ]\n    }\n  }\n}"
+        : \"2018-09-16\"\n          }\n        }\n      ],\n      \"external_reference_id\"\
+        : \"crm-order-0001\"\n    }\n  },\n  \"meta\": {\"api_version\": \"2026-04-16\"\
+        }\n}"
     headers:
       Content-Type:
       - application/vnd.api+json

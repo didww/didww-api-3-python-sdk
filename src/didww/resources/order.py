@@ -11,7 +11,7 @@ import didww.resources.order_item.generic_order_item  # noqa: F401
 
 
 class Order(DidwwApiModel):
-    _writable_attrs = {"allow_back_ordering", "items", "callback_url", "callback_method"}
+    _writable_attrs = {"allow_back_ordering", "items", "callback_url", "callback_method", "external_reference_id"}
 
     amount = SafeAttributeField("amount")
     status = EnumAttributeField("status", OrderStatus)
@@ -21,6 +21,7 @@ class Order(DidwwApiModel):
     callback_url = SafeAttributeField("callback_url")
     callback_method = EnumAttributeField("callback_method", CallbackMethod)
     allow_back_ordering = SafeAttributeField("allow_back_ordering")
+    external_reference_id = SafeAttributeField("external_reference_id")
 
     class Meta:
         type = "orders"
