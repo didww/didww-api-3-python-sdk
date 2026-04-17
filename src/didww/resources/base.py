@@ -266,6 +266,7 @@ class DidwwApiModel(ApiModel):
         super().__init__(raw_object=raw_object)
         self._dirty_attrs = set()
         self._dirty_rels = set()
+        self._resource_meta = {}
         self._install_dirty_tracking()
         self._clear_dirty_state()
 
@@ -337,6 +338,19 @@ class ReadOnlyRepository:
     def __init__(self, client):
         self.client = client
 
+    @staticmethod
+    def _attach_resource_meta(body, resources):
+        """Attach per-resource meta from the raw JSON:API body to parsed resources."""
+        data = body.get("data")
+        if data is None:
+            return
+        if isinstance(data, list):
+            for raw, resource in zip(data, resources):
+                if isinstance(raw, dict) and "meta" in raw:
+                    resource._resource_meta = raw["meta"]
+        elif isinstance(data, dict) and "meta" in data:
+            resources._resource_meta = data["meta"]
+
     def list(self, params=None):
         query = params.to_dict() if params else None
         body = self.client.get(self._path, params=query)
@@ -344,6 +358,7 @@ class ReadOnlyRepository:
         resources = self._resource_class.from_response_content(response)
         if not isinstance(resources, list):
             resources = [resources]
+        self._attach_resource_meta(body, resources)
         return ApiResponse(data=resources, meta=body.get("meta", {}))
 
     def find(self, resource_id, params=None):
@@ -351,6 +366,7 @@ class ReadOnlyRepository:
         body = self.client.get(f"{self._path}/{resource_id}", params=query)
         response = JsonApiResponse.from_data(body)
         resource = self._resource_class.from_response_content(response)
+        self._attach_resource_meta(body, resource)
         return ApiResponse(data=resource, meta=body.get("meta", {}))
 
 
