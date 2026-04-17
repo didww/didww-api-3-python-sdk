@@ -27,6 +27,7 @@ class Did(DidwwApiModel):
     address_verification = RelationField("address_verification")
     emergency_calling_service = RelationField("emergency_calling_service")
     emergency_verification = RelationField("emergency_verification")
+    identity = RelationField("identity")
 
     class Meta:
         type = "dids"

@@ -19,6 +19,10 @@ class TestDidRelationships:
         did = Did()
         assert hasattr(did, 'emergency_verification')
 
+    def test_identity_relationship(self):
+        did = Did()
+        assert hasattr(did, 'identity')
+
 
 class TestDid:
     @my_vcr.use_cassette("dids/list.yaml")
