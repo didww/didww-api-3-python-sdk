@@ -1,4 +1,5 @@
-from didww.resources.base import DidwwApiModel, DatetimeAttributeField, SafeAttributeField, RelationField, Repository
+from didww.enums import EmergencyVerificationStatus
+from didww.resources.base import DidwwApiModel, DatetimeAttributeField, SafeAttributeField, EnumAttributeField, RelationField, Repository
 
 
 class EmergencyVerification(DidwwApiModel):
@@ -6,7 +7,7 @@ class EmergencyVerification(DidwwApiModel):
 
     Attributes:
         reference (str): Verification reference code.
-        status (str): One of "pending", "approved", "rejected".
+        status (EmergencyVerificationStatus): One of pending, approved, rejected.
         reject_reasons (list[str] | None): List of reject reason codes when status is "rejected".
         reject_comment (str | None): Optional free-form comment accompanying a rejection.
         callback_url (str): Valid URI for callbacks.
@@ -18,7 +19,7 @@ class EmergencyVerification(DidwwApiModel):
     _writable_attrs = {"callback_url", "callback_method", "external_reference_id"}
 
     reference = SafeAttributeField("reference")
-    status = SafeAttributeField("status")
+    status = EnumAttributeField("status", EmergencyVerificationStatus)
     reject_reasons = SafeAttributeField("reject_reasons")
     reject_comment = SafeAttributeField("reject_comment")
     callback_url = SafeAttributeField("callback_url")
@@ -32,6 +33,18 @@ class EmergencyVerification(DidwwApiModel):
 
     class Meta:
         type = "emergency_verifications"
+
+    @property
+    def is_pending(self):
+        return self.status == EmergencyVerificationStatus.PENDING
+
+    @property
+    def is_approved(self):
+        return self.status == EmergencyVerificationStatus.APPROVED
+
+    @property
+    def is_rejected(self):
+        return self.status == EmergencyVerificationStatus.REJECTED
 
 
 class EmergencyVerificationRepository(Repository):

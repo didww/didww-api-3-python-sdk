@@ -1,10 +1,39 @@
 from datetime import datetime, timezone
 
 from tests.conftest import my_vcr
+from didww.enums import EmergencyVerificationStatus
 from didww.resources.emergency_verification import EmergencyVerification
 from didww.resources.address import Address
 from didww.resources.emergency_calling_service import EmergencyCallingService
 from didww.resources.did import Did
+
+
+class TestEmergencyVerificationStatusHelpers:
+    def test_is_pending(self):
+        ev = EmergencyVerification()
+        ev.status = EmergencyVerificationStatus.PENDING
+        assert ev.is_pending is True
+        assert ev.is_approved is False
+        assert ev.is_rejected is False
+
+    def test_is_approved(self):
+        ev = EmergencyVerification()
+        ev.status = EmergencyVerificationStatus.APPROVED
+        assert ev.is_approved is True
+        assert ev.is_pending is False
+        assert ev.is_rejected is False
+
+    def test_is_rejected(self):
+        ev = EmergencyVerification()
+        ev.status = EmergencyVerificationStatus.REJECTED
+        assert ev.is_rejected is True
+        assert ev.is_pending is False
+        assert ev.is_approved is False
+
+    def test_status_enum_from_string(self):
+        ev = EmergencyVerification()
+        ev.status = "pending"
+        assert ev.status == EmergencyVerificationStatus.PENDING
 
 
 class TestEmergencyVerification:

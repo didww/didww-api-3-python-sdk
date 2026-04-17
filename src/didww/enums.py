@@ -81,6 +81,12 @@ class DefaultDstAction(str, Enum):
     REJECT_ALL = "reject_all"
 
 
+class EmergencyVerificationStatus(str, Enum):
+    PENDING = "pending"
+    APPROVED = "approved"
+    REJECTED = "rejected"
+
+
 class EmergencyCallingServiceStatus(str, Enum):
     ACTIVE = "active"
     CANCELED = "canceled"
