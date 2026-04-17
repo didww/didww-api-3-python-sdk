@@ -89,6 +89,20 @@ class TestVoiceOutTrunk:
         assert result is None
 
 
+class TestVoiceOutTrunkStatusHelpers:
+    def test_is_active(self):
+        trunk = VoiceOutTrunk()
+        trunk.status = VoiceOutTrunkStatus.ACTIVE
+        assert trunk.is_active is True
+        assert trunk.is_blocked is False
+
+    def test_is_blocked(self):
+        trunk = VoiceOutTrunk()
+        trunk.status = VoiceOutTrunkStatus.BLOCKED
+        assert trunk.is_blocked is True
+        assert trunk.is_active is False
+
+
 class TestVoiceOutTrunkRelationships:
     def test_emergency_dids_relationship(self):
         trunk = VoiceOutTrunk()

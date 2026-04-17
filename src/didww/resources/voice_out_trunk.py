@@ -45,6 +45,14 @@ class VoiceOutTrunk(DidwwApiModel):
         type = "voice_out_trunks"
 
     @property
+    def is_active(self):
+        return self.status == VoiceOutTrunkStatus.ACTIVE
+
+    @property
+    def is_blocked(self):
+        return self.status == VoiceOutTrunkStatus.BLOCKED
+
+    @property
     def authentication_method(self):
         data = self.attributes.get("authentication_method")
         if data and isinstance(data, dict):
