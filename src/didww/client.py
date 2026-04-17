@@ -313,6 +313,6 @@ class DidwwClient:
         from didww.resources.proof import ProofRepository
         return ProofRepository(self)
 
-    def requirement_validations(self):
-        from didww.resources.requirement_validation import RequirementValidationRepository
-        return RequirementValidationRepository(self)
+    def address_requirement_validations(self):
+        from didww.resources.address_requirement_validation import AddressRequirementValidationRepository
+        return AddressRequirementValidationRepository(self)

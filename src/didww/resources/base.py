@@ -42,7 +42,7 @@ _TYPE_MAP = {
     "encrypted_files": "didww.resources.encrypted_file:EncryptedFile",
     "exports": "didww.resources.export:Export",
     "public_keys": "didww.resources.public_key:PublicKey",
-    "requirement_validations": "didww.resources.requirement_validation:RequirementValidation",
+    "address_requirement_validations": "didww.resources.address_requirement_validation:AddressRequirementValidation",
     "voice_out_trunk_regenerate_credentials": "didww.resources.voice_out_trunk_regenerate_credential:VoiceOutTrunkRegenerateCredential",
 }
 
