@@ -10,6 +10,12 @@ from didww.resources.voice_in_trunk import VoiceInTrunk
 from didww.resources.voice_in_trunk_group import VoiceInTrunkGroup
 
 
+class TestDidRelationships:
+    def test_emergency_calling_service_relationship(self):
+        did = Did()
+        assert hasattr(did, 'emergency_calling_service')
+
+
 class TestDid:
     @my_vcr.use_cassette("dids/list.yaml")
     def test_list_dids(self, client):
