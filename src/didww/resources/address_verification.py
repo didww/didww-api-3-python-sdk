@@ -1,5 +1,5 @@
 from didww.enums import AddressVerificationStatus, CallbackMethod
-from didww.resources.base import DidwwApiModel, DatetimeAttributeField, SafeAttributeField, EnumAttributeField, RelationField, CreateOnlyRepository
+from didww.resources.base import DidwwApiModel, DatetimeAttributeField, SafeAttributeField, EnumAttributeField, RelationField, Repository
 
 
 class AddressVerification(DidwwApiModel):
@@ -22,6 +22,6 @@ class AddressVerification(DidwwApiModel):
         type = "address_verifications"
 
 
-class AddressVerificationRepository(CreateOnlyRepository):
+class AddressVerificationRepository(Repository):
     _resource_class = AddressVerification
     _path = "address_verifications"
