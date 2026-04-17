@@ -7,6 +7,27 @@ from didww.resources.identity import Identity
 from didww.exceptions import DidwwApiError
 
 
+class TestAddressRequirementValidationRelationships:
+    def test_has_address_requirement_relationship(self):
+        rv = AddressRequirementValidation()
+        assert hasattr(rv.__class__, "address_requirement")
+
+    def test_has_address_relationship(self):
+        rv = AddressRequirementValidation()
+        assert hasattr(rv.__class__, "address")
+
+    def test_has_identity_relationship(self):
+        rv = AddressRequirementValidation()
+        assert hasattr(rv.__class__, "identity")
+
+    def test_maps_to_correct_type(self):
+        assert AddressRequirementValidation.Meta.type == "address_requirement_validations"
+
+    def test_repository_path(self, client):
+        repo = client.address_requirement_validations()
+        assert repo._path == "address_requirement_validations"
+
+
 class TestAddressRequirementValidation:
     @my_vcr.use_cassette("address_requirement_validations/create.yaml")
     def test_create_address_requirement_validation_success(self, client):
@@ -47,3 +68,12 @@ class TestAddressRequirementValidation:
         response = client.address_requirement_validations().create(rv)
         created = response.data
         assert created.id is None
+
+    @my_vcr.use_cassette("address_requirement_validations/create_204.yaml")
+    def test_create_returns_none_on_204(self, client):
+        rv = AddressRequirementValidation()
+        rv.address_requirement = AddressRequirement.build("11111111-2222-3333-4444-555555555555")
+        rv.address = Address.build("66666666-7777-8888-9999-aaaaaaaaaaaa")
+        rv.identity = Identity.build("bbbbbbbb-cccc-dddd-eeee-ffffffffffff")
+        result = client.address_requirement_validations().create(rv)
+        assert result is None
