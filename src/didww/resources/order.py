@@ -28,6 +28,18 @@ class Order(DidwwApiModel):
         type = "orders"
 
     @property
+    def is_pending(self):
+        return self.status == OrderStatus.PENDING
+
+    @property
+    def is_completed(self):
+        return self.status == OrderStatus.COMPLETED
+
+    @property
+    def is_cancelled(self):
+        return self.status == OrderStatus.CANCELED
+
+    @property
     def items(self):
         raw_items = self.attributes.get("items")
         if raw_items is None:

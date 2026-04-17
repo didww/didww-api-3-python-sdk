@@ -58,6 +58,29 @@ class TestEmergencyOrderItem:
         assert item.emergency_calling_service_id == "abc-123"
 
 
+class TestOrderStatusHelpers:
+    def test_is_pending(self):
+        order = Order()
+        order.status = OrderStatus.PENDING
+        assert order.is_pending is True
+        assert order.is_completed is False
+        assert order.is_cancelled is False
+
+    def test_is_completed(self):
+        order = Order()
+        order.status = OrderStatus.COMPLETED
+        assert order.is_completed is True
+        assert order.is_pending is False
+        assert order.is_cancelled is False
+
+    def test_is_cancelled(self):
+        order = Order()
+        order.status = OrderStatus.CANCELED
+        assert order.is_cancelled is True
+        assert order.is_pending is False
+        assert order.is_completed is False
+
+
 class TestOrder:
     @my_vcr.use_cassette("orders/show.yaml")
     def test_find_order(self, client):
