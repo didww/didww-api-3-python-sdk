@@ -23,6 +23,7 @@ class TestSharedCapacityGroup:
         assert cp is not None
         assert cp.name == "Standard"
         assert len(scg.dids) >= 16
+        assert scg.external_reference_id == "crm-scg-0001"
 
     @my_vcr.use_cassette("shared_capacity_groups/update.yaml")
     def test_update_shared_capacity_group(self, client):
