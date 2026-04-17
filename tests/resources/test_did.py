@@ -33,6 +33,7 @@ class TestDid:
         assert did.billing_cycles_count is None
         assert did.channels_included_count == 0
         assert did.dedicated_channels_count == 0
+        assert did.emergency_enabled is False
 
     @my_vcr.use_cassette("dids/show_with_address_verification_and_did_group.yaml")
     def test_find_did_with_address_verification_and_did_group(self, client):
