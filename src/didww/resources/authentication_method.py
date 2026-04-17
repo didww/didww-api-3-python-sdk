@@ -42,6 +42,13 @@ def _plain(key):
 
 
 class IpOnlyAuthenticationMethod(AuthenticationMethod):
+    """Read-only authentication method for VoiceOutTrunk.
+
+    ip_only authentication can only be configured manually by DIDWW staff
+    upon request. It cannot be set via the API on create or update.
+    Trunks with ip_only authentication can still be read and their
+    non-authentication attributes updated via the API.
+    """
     _type = "ip_only"
 
     allowed_sip_ips = _plain("allowed_sip_ips")
