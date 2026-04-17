@@ -17,25 +17,20 @@ class TestEncryptedFile:
         assert ef.description == "some description"
 
     @my_vcr_no_body.use_cassette("encrypted_files/upload.yaml")
-    def test_upload_encrypted_files(self, client):
-        ids = client.upload_encrypted_files(
+    def test_upload_encrypted_file(self, client):
+        file_id = client.upload_encrypted_file(
             fingerprint="c74684d7863639169c21c4d04747f8d6fa05cfe3:::8a586bd37fa0000501715321b2e6a7b3ca57894c",
-            files=[
-                {"data": b"file-content-1", "description": "some description"},
-                {"data": b"file-content-2"},
-            ],
+            data=b"file-content-1",
+            description="passport.pdf",
         )
-        assert ids == [
-            "6eed102c-66a9-4a9b-a95f-4312d70ec12a",
-            "371eafbd-ac6a-485c-aadf-9e3c5da37eb4",
-        ]
+        assert file_id == "f6a7b890-1234-5678-9abc-def123456789"
 
     @my_vcr_no_body.use_cassette("encrypted_files/upload_error.yaml")
-    def test_upload_encrypted_files_unexpected_response(self, client):
+    def test_upload_encrypted_file_unexpected_response(self, client):
         with pytest.raises(DidwwClientError, match="Unexpected encrypted_files upload response"):
-            client.upload_encrypted_files(
+            client.upload_encrypted_file(
                 fingerprint="fingerprint-123",
-                files=[{"data": b"example"}],
+                data=b"example",
             )
 
     @my_vcr.use_cassette("encrypted_files/delete.yaml")

@@ -96,31 +96,26 @@ class DidwwClient:
 
     # --- File upload / download ---
 
-    def upload_encrypted_files(self, fingerprint, files):
-        """Upload encrypted files via multipart POST.
+    def upload_encrypted_file(self, fingerprint, data, description=None, filename="file.enc"):
+        """Upload a single encrypted file via multipart POST.
 
         Args:
             fingerprint: Encryption fingerprint string.
-            files: List of dicts, each with:
-                - 'data' (bytes): encrypted file content
-                - 'description' (str, optional): file description
-                - 'filename' (str, optional): filename, defaults to 'file.enc'
+            data: Encrypted file content (bytes).
+            description: Optional file description.
+            filename: Filename, defaults to 'file.enc'.
 
         Returns:
-            List of uploaded file ID strings.
+            The created resource ID string.
         """
         url = self._url("encrypted_files")
         multipart_fields = [
             ("encrypted_files[encryption_fingerprint]", (None, fingerprint)),
+            ("encrypted_files[file]", (filename, data, "application/octet-stream")),
         ]
-        for item in files:
-            desc = item.get("description", "")
-            filename = item.get("filename", "file.enc")
+        if description:
             multipart_fields.append(
-                ("encrypted_files[items][][description]", (None, desc)),
-            )
-            multipart_fields.append(
-                ("encrypted_files[items][][file]", (filename, item["data"], "application/octet-stream")),
+                ("encrypted_files[description]", (None, description)),
             )
         resp = self._session.post(
             url,
@@ -139,9 +134,9 @@ class DidwwClient:
                 status_code=resp.status_code,
             )
         body = resp.json()
-        if "ids" not in body:
+        if "data" not in body or "id" not in body["data"]:
             raise DidwwClientError("Unexpected encrypted_files upload response")
-        return body["ids"]
+        return body["data"]["id"]
 
     def download_export(self, url, file_path):
         """Download an export file (.csv.gz).
