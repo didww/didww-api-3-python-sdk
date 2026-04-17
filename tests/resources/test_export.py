@@ -5,6 +5,29 @@ from didww.enums import ExportStatus, ExportType
 from didww.resources.export import Export
 
 
+class TestExportStatusHelpers:
+    def test_is_pending(self):
+        export = Export()
+        export.status = ExportStatus.PENDING
+        assert export.is_pending is True
+        assert export.is_processing is False
+        assert export.is_completed is False
+
+    def test_is_processing(self):
+        export = Export()
+        export.status = ExportStatus.PROCESSING
+        assert export.is_processing is True
+        assert export.is_pending is False
+        assert export.is_completed is False
+
+    def test_is_completed(self):
+        export = Export()
+        export.status = ExportStatus.COMPLETED
+        assert export.is_completed is True
+        assert export.is_pending is False
+        assert export.is_processing is False
+
+
 class TestExport:
     @my_vcr.use_cassette("exports/list.yaml")
     def test_list_exports(self, client):

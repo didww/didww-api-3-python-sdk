@@ -17,6 +17,18 @@ class Export(DidwwApiModel):
     class Meta:
         type = "exports"
 
+    @property
+    def is_pending(self):
+        return self.status == ExportStatus.PENDING
+
+    @property
+    def is_processing(self):
+        return self.status == ExportStatus.PROCESSING
+
+    @property
+    def is_completed(self):
+        return self.status == ExportStatus.COMPLETED
+
 
 class ExportRepository(Repository):
     _resource_class = Export
