@@ -3,7 +3,7 @@ from didww.resources.base import DidwwApiModel, DatetimeAttributeField, SafeAttr
 
 class EncryptedFile(DidwwApiModel):
     description = SafeAttributeField("description")
-    expire_at = DatetimeAttributeField("expire_at")
+    expires_at = DatetimeAttributeField("expires_at")
 
     class Meta:
         type = "encrypted_files"
