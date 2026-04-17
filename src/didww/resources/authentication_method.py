@@ -6,6 +6,10 @@ class AuthenticationMethod:
     def __init__(self, **kwargs):
         self._attributes = kwargs
 
+    @property
+    def type(self):
+        return self._type
+
     def _attr(self, key):
         return self._attributes.get(key)
 

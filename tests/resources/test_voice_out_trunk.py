@@ -201,3 +201,18 @@ class TestAuthenticationMethodPolymorphism:
         auth = IpOnlyAuthenticationMethod(allowed_sip_ips=["10.0.0.0/8"], tech_prefix="")
         serialized = auth.to_jsonapi()
         assert serialized == {"type": "ip_only", "attributes": {"allowed_sip_ips": ["10.0.0.0/8"], "tech_prefix": ""}}
+
+    def test_type_property_on_known_subclass(self):
+        auth = IpOnlyAuthenticationMethod(allowed_sip_ips=["203.0.113.0/24"])
+        assert auth.type == "ip_only"
+
+    def test_type_property_on_credentials_and_ip(self):
+        auth = CredentialsAndIpAuthenticationMethod(
+            allowed_sip_ips=["203.0.113.0/24"], username="u", password="p",
+        )
+        assert auth.type == "credentials_and_ip"
+
+    def test_type_property_on_generic(self):
+        data = {"type": "future_auth", "attributes": {"key": "val"}}
+        auth = AuthenticationMethod.from_jsonapi(data)
+        assert auth.type == "future_auth"
