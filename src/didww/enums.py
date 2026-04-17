@@ -106,6 +106,13 @@ class Feature(str, Enum):
     SMS_IN = "sms_in"
 
 
+class DiversionRelayPolicy(str, Enum):
+    NONE = "none"
+    AS_IS = "as_is"
+    SIP = "sip"
+    TEL = "tel"
+
+
 class StirShakenMode(str, Enum):
     DISABLED = "disabled"
     ORIGINAL = "original"
