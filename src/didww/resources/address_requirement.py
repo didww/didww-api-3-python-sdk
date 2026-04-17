@@ -2,7 +2,7 @@ from didww.enums import IdentityType, AreaLevel
 from didww.resources.base import DidwwApiModel, SafeAttributeField, EnumAttributeField, RelationField, ReadOnlyRepository
 
 
-class Requirement(DidwwApiModel):
+class AddressRequirement(DidwwApiModel):
     identity_type = EnumAttributeField("identity_type", IdentityType)
     personal_area_level = EnumAttributeField("personal_area_level", AreaLevel)
     business_area_level = EnumAttributeField("business_area_level", AreaLevel)
@@ -26,9 +26,9 @@ class Requirement(DidwwApiModel):
     address_proof_types = RelationField("address_proof_types")
 
     class Meta:
-        type = "requirements"
+        type = "address_requirements"
 
 
-class RequirementRepository(ReadOnlyRepository):
-    _resource_class = Requirement
-    _path = "requirements"
+class AddressRequirementRepository(ReadOnlyRepository):
+    _resource_class = AddressRequirement
+    _path = "address_requirements"

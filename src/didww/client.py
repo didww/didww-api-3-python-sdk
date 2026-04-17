@@ -241,9 +241,9 @@ class DidwwClient:
         from didww.resources.public_key import PublicKeyRepository
         return PublicKeyRepository(self)
 
-    def requirements(self):
-        from didww.resources.requirement import RequirementRepository
-        return RequirementRepository(self)
+    def address_requirements(self):
+        from didww.resources.address_requirement import AddressRequirementRepository
+        return AddressRequirementRepository(self)
 
     def supporting_document_templates(self):
         from didww.resources.supporting_document_template import SupportingDocumentTemplateRepository

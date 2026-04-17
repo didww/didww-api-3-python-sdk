@@ -3,21 +3,21 @@ from didww.enums import AreaLevel, IdentityType
 from didww.query_params import QueryParams
 
 
-class TestRequirement:
-    @my_vcr.use_cassette("requirements/list.yaml")
-    def test_list_requirements(self, client):
-        response = client.requirements().list()
+class TestAddressRequirement:
+    @my_vcr.use_cassette("address_requirements/list.yaml")
+    def test_list_address_requirements(self, client):
+        response = client.address_requirements().list()
         assert len(response.data) > 0
 
-    @my_vcr.use_cassette("requirements/show.yaml")
-    def test_find_requirement(self, client):
+    @my_vcr.use_cassette("address_requirements/show.yaml")
+    def test_find_address_requirement(self, client):
         params = QueryParams().include(
             "country", "did_group_type",
             "personal_permanent_document", "business_permanent_document",
             "personal_onetime_document", "business_onetime_document",
             "personal_proof_types", "business_proof_types", "address_proof_types",
         )
-        response = client.requirements().find("25d12afe-1ec6-4fe3-9621-b250dd1fb959", params)
+        response = client.address_requirements().find("25d12afe-1ec6-4fe3-9621-b250dd1fb959", params)
         req = response.data
         assert req.id == "25d12afe-1ec6-4fe3-9621-b250dd1fb959"
         assert req.identity_type == IdentityType.ANY

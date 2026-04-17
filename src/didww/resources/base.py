@@ -27,7 +27,7 @@ _TYPE_MAP = {
     "proofs": "didww.resources.proof:Proof",
     "proof_types": "didww.resources.proof_type:ProofType",
     "regions": "didww.resources.region:Region",
-    "requirements": "didww.resources.requirement:Requirement",
+    "address_requirements": "didww.resources.address_requirement:AddressRequirement",
     "shared_capacity_groups": "didww.resources.shared_capacity_group:SharedCapacityGroup",
     "supporting_document_templates": "didww.resources.supporting_document_template:SupportingDocumentTemplate",
     "voice_in_trunks": "didww.resources.voice_in_trunk:VoiceInTrunk",

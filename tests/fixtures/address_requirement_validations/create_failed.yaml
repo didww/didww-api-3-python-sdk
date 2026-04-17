@@ -6,7 +6,7 @@ interactions:
       \n        }\n      },\n      \"address\": {\n        \"data\": {\n         \
       \ \"type\": \"addresses\",\n          \"id\": \"d3414687-40f4-4346-a267-c2c65117d28c\"\
       \n        }\n      },\n      \"requirement\": {\n        \"data\": {\n     \
-      \     \"type\": \"requirements\",\n          \"id\": \"2efc3427-8ba6-4d50-875d-f2de4a068de8\"\
+      \     \"type\": \"address_requirements\",\n          \"id\": \"2efc3427-8ba6-4d50-875d-f2de4a068de8\"\
       \n        }\n      }\n    }\n  }\n}"
     headers:
       Accept:
