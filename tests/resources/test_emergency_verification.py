@@ -40,3 +40,24 @@ class TestEmergencyVerification:
         assert created.id == "ev-002"
         assert created.status == "pending"
         assert created.callback_url == "https://example.com/callback"
+
+    def test_patch_external_reference_id_request_body(self):
+        """PATCH must send exactly the id, type, and only the dirty attribute."""
+        ev = EmergencyVerification.build("ev-001")
+        ev.external_reference_id = "updated-ev-ref-77"
+        doc = ev.to_jsonapi(include_id=True, dirty_only=True)
+        assert doc == {
+            "id": "ev-001",
+            "type": "emergency_verifications",
+            "attributes": {"external_reference_id": "updated-ev-ref-77"},
+        }
+
+    @my_vcr.use_cassette("emergency_verifications/update.yaml")
+    def test_update_emergency_verification_external_reference_id(self, client):
+        ev = EmergencyVerification()
+        ev.id = "ev-001"
+        ev.external_reference_id = "updated-ev-ref-77"
+        response = client.emergency_verifications().update(ev)
+        updated = response.data
+        assert updated.id == "ev-001"
+        assert updated.external_reference_id == "updated-ev-ref-77"

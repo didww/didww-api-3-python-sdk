@@ -1,4 +1,4 @@
-from didww.resources.base import DidwwApiModel, DatetimeAttributeField, SafeAttributeField, RelationField, CreateOnlyRepository
+from didww.resources.base import DidwwApiModel, DatetimeAttributeField, SafeAttributeField, RelationField, Repository
 
 
 class EmergencyVerification(DidwwApiModel):
@@ -21,6 +21,6 @@ class EmergencyVerification(DidwwApiModel):
         type = "emergency_verifications"
 
 
-class EmergencyVerificationRepository(CreateOnlyRepository):
+class EmergencyVerificationRepository(Repository):
     _resource_class = EmergencyVerification
     _path = "emergency_verifications"
