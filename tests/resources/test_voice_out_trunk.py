@@ -89,6 +89,12 @@ class TestVoiceOutTrunk:
         assert result is None
 
 
+class TestVoiceOutTrunkRelationships:
+    def test_emergency_dids_relationship(self):
+        trunk = VoiceOutTrunk()
+        assert hasattr(trunk, 'emergency_dids')
+
+
 class TestAuthenticationMethodPolymorphism:
     def test_from_jsonapi_ip_only(self):
         data = {"type": "ip_only", "attributes": {"allowed_sip_ips": ["1.2.3.4/32"], "tech_prefix": "123"}}

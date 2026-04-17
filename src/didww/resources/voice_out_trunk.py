@@ -39,6 +39,7 @@ class VoiceOutTrunk(DidwwApiModel):
 
     default_did = RelationField("default_did")
     dids = RelationField("dids")
+    emergency_dids = RelationField("emergency_dids")
 
     class Meta:
         type = "voice_out_trunks"
