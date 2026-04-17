@@ -2,11 +2,12 @@ from didww.resources.base import DidwwApiModel, DatetimeAttributeField, SafeAttr
 
 
 class VoiceInTrunkGroup(DidwwApiModel):
-    _writable_attrs = {"capacity_limit", "name"}
+    _writable_attrs = {"capacity_limit", "name", "external_reference_id"}
 
     name = SafeAttributeField("name")
     capacity_limit = SafeAttributeField("capacity_limit")
     created_at = DatetimeAttributeField("created_at")
+    external_reference_id = SafeAttributeField("external_reference_id")
 
     voice_in_trunks = RelationField("voice_in_trunks")
 

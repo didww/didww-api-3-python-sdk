@@ -5,6 +5,14 @@ from didww.resources.voice_in_trunk import VoiceInTrunk
 
 
 class TestVoiceInTrunkGroup:
+    @my_vcr.use_cassette("voice_in_trunk_groups/show.yaml")
+    def test_find_voice_in_trunk_group(self, client):
+        response = client.voice_in_trunk_groups().find("b2319703-ce6c-480d-bb53-614e7abcfc96")
+        group = response.data
+        assert group.id == "b2319703-ce6c-480d-bb53-614e7abcfc96"
+        assert group.name == "Common Group"
+        assert group.external_reference_id == "crm-vitg-0001"
+
     @my_vcr.use_cassette("voice_in_trunk_groups/list.yaml")
     def test_list_voice_in_trunk_groups(self, client):
         response = client.voice_in_trunk_groups().list()
