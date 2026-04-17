@@ -178,3 +178,26 @@ class TestDid:
         assert exc_info.value.status_code == 422
         assert len(exc_info.value.errors) == 1
         assert "voice_in_trunk_group" in exc_info.value.errors[0]["detail"]
+
+    def test_unassign_emergency_calling_service_request_body(self):
+        """Nulling emergency_calling_service must send relationship data: null."""
+        did = Did.build("44957076-778a-4802-b60c-d22db0cda284")
+        did._null_relationship("emergency_calling_service")
+        doc = did.to_jsonapi(include_id=True, dirty_only=True)
+        assert doc == {
+            "id": "44957076-778a-4802-b60c-d22db0cda284",
+            "type": "dids",
+            "attributes": {},
+            "relationships": {
+                "emergency_calling_service": {"data": None},
+            },
+        }
+
+    @my_vcr.use_cassette("dids/update_unassign_ecs.yaml")
+    def test_update_did_unassign_emergency_calling_service(self, client):
+        did = Did.build("44957076-778a-4802-b60c-d22db0cda284")
+        did._null_relationship("emergency_calling_service")
+        response = client.dids().update(did)
+        updated = response.data
+        assert updated.id == "44957076-778a-4802-b60c-d22db0cda284"
+        assert updated.emergency_enabled is False
