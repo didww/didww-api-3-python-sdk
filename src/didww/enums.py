@@ -104,7 +104,6 @@ class Feature(str, Enum):
     VOICE_OUT = "voice_out"
     T38 = "t38"
     SMS_IN = "sms_in"
-    SMS_OUT = "sms_out"
 
 
 class StirShakenMode(str, Enum):
