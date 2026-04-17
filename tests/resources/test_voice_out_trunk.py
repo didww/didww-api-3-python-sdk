@@ -59,7 +59,7 @@ class TestVoiceOutTrunk:
         trunk = VoiceOutTrunk()
         trunk.name = "python-test"
         trunk.authentication_method = IpOnlyAuthenticationMethod(
-            allowed_sip_ips=["0.0.0.0/0"],
+            allowed_sip_ips=["203.0.113.0/24"],
             tech_prefix="",
         )
         trunk.on_cli_mismatch_action = OnCliMismatchAction.REPLACE_CLI

@@ -257,7 +257,7 @@ from didww.resources.voice_out_trunk import VoiceOutTrunk
 
 trunk = VoiceOutTrunk()
 trunk.name = "My Outbound Trunk"
-trunk.allowed_sip_ips = ["0.0.0.0/0"]
+trunk.allowed_sip_ips = ["203.0.113.0/24"]
 trunk.default_dst_action = DefaultDstAction.ALLOW_ALL
 trunk.on_cli_mismatch_action = OnCliMismatchAction.REJECT_CALL
 created = client.voice_out_trunks().create(trunk).data
