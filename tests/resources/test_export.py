@@ -30,6 +30,27 @@ class TestExport:
         assert created.id == "da15f006-5da4-45ca-b0df-735baeadf423"
         assert created.status == ExportStatus.PENDING
 
+    def test_patch_external_reference_id_request_body(self):
+        """PATCH must send exactly the id, type, and only the dirty attribute."""
+        export = Export.build("da15f006-5da4-45ca-b0df-735baeadf423")
+        export.external_reference_id = "renamed-ref-99"
+        doc = export.to_jsonapi(include_id=True, dirty_only=True)
+        assert doc == {
+            "id": "da15f006-5da4-45ca-b0df-735baeadf423",
+            "type": "exports",
+            "attributes": {"external_reference_id": "renamed-ref-99"},
+        }
+
+    @my_vcr.use_cassette("exports/update.yaml")
+    def test_update_export_external_reference_id(self, client):
+        export = Export()
+        export.id = "da15f006-5da4-45ca-b0df-735baeadf423"
+        export.external_reference_id = "renamed-ref-99"
+        response = client.exports().update(export)
+        updated = response.data
+        assert updated.id == "da15f006-5da4-45ca-b0df-735baeadf423"
+        assert updated.external_reference_id == "renamed-ref-99"
+
     @my_vcr.use_cassette("exports/download.yaml")
     def test_download_export(self, client):
         url = "https://sandbox-api.didww.com/v3/exports/02bf6df4-3af9-416c-96be-16e5b7eeb651.csv.gz"
