@@ -15,6 +15,7 @@ class VoiceOutTrunk(DidwwApiModel):
         "media_encryption_mode", "default_dst_action", "dst_prefixes",
         "force_symmetric_rtp", "rtp_ping", "callback_url",
         "authentication_method", "allowed_rtp_ips", "external_reference_id",
+        "emergency_enable_all",
     }
 
     name = SafeAttributeField("name")
@@ -33,6 +34,7 @@ class VoiceOutTrunk(DidwwApiModel):
     callback_url = SafeAttributeField("callback_url")
     created_at = DatetimeAttributeField("created_at")
     external_reference_id = SafeAttributeField("external_reference_id")
+    emergency_enable_all = SafeAttributeField("emergency_enable_all")
 
     default_did = RelationField("default_did")
     dids = RelationField("dids")
