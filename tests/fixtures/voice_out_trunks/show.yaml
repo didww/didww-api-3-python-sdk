@@ -20,7 +20,7 @@ interactions:
         "reject_all", "dst_prefixes": ["370"], "force_symmetric_rtp": true, "rtp_ping":
         true, "callback_url": null, "external_reference_id": "crm-vot-0001", "emergency_enable_all":
         false, "rtp_timeout": 30, "authentication_method": {"type": "credentials_and_ip",
-        "attributes": {"allowed_sip_ips": ["10.11.12.13/32"], "tech_prefix": "", "username":
+        "attributes": {"allowed_sip_ips": ["203.0.113.1/32"], "tech_prefix": "", "username":
         "dpjgwbbac9", "password": "z0hshvbcy7"}}}, "relationships": {"default_did":
         {"links": {"self": "https://sandbox-api.didww.com/v3/voice_out_trunks/425ce763-a3a9-49b4-af5b-ada1a65c8864/relationships/default_did",
         "related": "https://sandbox-api.didww.com/v3/voice_out_trunks/425ce763-a3a9-49b4-af5b-ada1a65c8864/default_did"},

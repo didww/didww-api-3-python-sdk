@@ -44,7 +44,7 @@ class TestVoiceOutTrunk:
         # polymorphic authentication_method
         auth = trunk.authentication_method
         assert isinstance(auth, CredentialsAndIpAuthenticationMethod)
-        assert auth.allowed_sip_ips == ["10.11.12.13/32"]
+        assert auth.allowed_sip_ips == ["203.0.113.1/32"]
         assert auth.username == "dpjgwbbac9"
         assert auth.password == "z0hshvbcy7"  # NOSONAR
         assert trunk.external_reference_id == "crm-vot-0001"
@@ -177,14 +177,14 @@ class TestVoiceOutTrunkEmergencyPatch:
 
 class TestAuthenticationMethodPolymorphism:
     def test_from_jsonapi_ip_only(self):
-        data = {"type": "ip_only", "attributes": {"allowed_sip_ips": ["1.2.3.4/32"], "tech_prefix": "123"}}
+        data = {"type": "ip_only", "attributes": {"allowed_sip_ips": ["203.0.113.4/32"], "tech_prefix": "123"}}
         auth = AuthenticationMethod.from_jsonapi(data)
         assert isinstance(auth, IpOnlyAuthenticationMethod)
-        assert auth.allowed_sip_ips == ["1.2.3.4/32"]
+        assert auth.allowed_sip_ips == ["203.0.113.4/32"]
         assert auth.tech_prefix == "123"
 
     def test_from_jsonapi_credentials_and_ip(self):
-        data = {"type": "credentials_and_ip", "attributes": {"allowed_sip_ips": ["1.2.3.4/32"], "tech_prefix": "", "username": "user", "password": "pass"}}  # NOSONAR
+        data = {"type": "credentials_and_ip", "attributes": {"allowed_sip_ips": ["203.0.113.4/32"], "tech_prefix": "", "username": "user", "password": "pass"}}  # NOSONAR
         auth = AuthenticationMethod.from_jsonapi(data)
         assert isinstance(auth, CredentialsAndIpAuthenticationMethod)
         assert auth.username == "user"
@@ -198,9 +198,9 @@ class TestAuthenticationMethodPolymorphism:
         assert auth._attr("some_field") == "val"
 
     def test_to_jsonapi_roundtrip(self):
-        auth = IpOnlyAuthenticationMethod(allowed_sip_ips=["10.0.0.0/8"], tech_prefix="")
+        auth = IpOnlyAuthenticationMethod(allowed_sip_ips=["203.0.113.0/24"], tech_prefix="")
         serialized = auth.to_jsonapi()
-        assert serialized == {"type": "ip_only", "attributes": {"allowed_sip_ips": ["10.0.0.0/8"], "tech_prefix": ""}}
+        assert serialized == {"type": "ip_only", "attributes": {"allowed_sip_ips": ["203.0.113.0/24"], "tech_prefix": ""}}
 
     def test_type_property_on_known_subclass(self):
         auth = IpOnlyAuthenticationMethod(allowed_sip_ips=["203.0.113.0/24"])

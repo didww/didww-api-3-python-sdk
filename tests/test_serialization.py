@@ -312,7 +312,7 @@ class TestVoiceOutTrunkSerialization:
                 "authentication_method": {
                     "type": "credentials_and_ip",
                     "attributes": {
-                        "allowed_sip_ips": ["1.2.3.4"],
+                        "allowed_sip_ips": ["203.0.113.4"],
                         "tech_prefix": "",
                         "username": "user123",
                         "password": "pass456",  # NOSONAR

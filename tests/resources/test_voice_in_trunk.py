@@ -57,7 +57,7 @@ class TestVoiceInTrunk:
         assert sip_trunk is not None, "No SIP trunk found in list fixture"
         config = sip_trunk.configuration
         assert config.username == "username"
-        assert config.host == "216.58.215.78"
+        assert config.host == "203.0.113.78"
         assert config.port == 8060
         assert config.codec_ids == [Codec.PCMU, Codec.PCMA, Codec.G729]
         assert config.transport_protocol_id == TransportProtocol.UDP
@@ -140,7 +140,7 @@ class TestVoiceInTrunk:
     def test_create_sip_trunk_with_rerouting_disconnect_codes(self, client):
         config = SipConfiguration()
         config.username = "username"
-        config.host = "216.58.215.110"
+        config.host = "203.0.113.110"
         config.sst_refresh_method_id = SstRefreshMethod.INVITE
         config.port = 5060
         config.codec_ids = [Codec.PCMU, Codec.PCMA, Codec.G729, Codec.G723, Codec.TELEPHONE_EVENT]
@@ -193,7 +193,7 @@ class TestVoiceInTrunk:
         ]
         config.media_encryption_mode = MediaEncryptionMode.ZRTP
         config.stir_shaken_mode = StirShakenMode.PAI
-        config.allowed_rtp_ips = ["127.0.0.1"]
+        config.allowed_rtp_ips = ["203.0.113.1"]
 
         trunk = VoiceInTrunk()
         trunk.name = "hello, test sip trunk"

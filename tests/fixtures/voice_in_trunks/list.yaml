@@ -35,7 +35,7 @@ interactions:
         \  \"cli_prefix\": \"\",\n        \"description\": \"\",\n        \"ringing_timeout\"\
         : null,\n        \"configuration\": {\n          \"type\": \"sip_configurations\"\
         ,\n          \"attributes\": {\n            \"username\": \"username\",\n\
-        \            \"host\": \"216.58.215.78\",\n            \"port\": 8060,\n \
+        \            \"host\": \"203.0.113.78\",\n            \"port\": 8060,\n \
         \           \"codec_ids\": [\n              9,\n              10,\n      \
         \        8\n            ],\n            \"rx_dtmf_format_id\": 1,\n      \
         \      \"tx_dtmf_format_id\": 1,\n            \"resolve_ruri\": true,\n  \

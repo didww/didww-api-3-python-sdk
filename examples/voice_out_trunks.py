@@ -62,7 +62,7 @@ print("\n=== Updating Voice Out Trunk ===")
 update = VoiceOutTrunk.build(created.id)
 update.name = f"Updated Outbound Trunk {suffix}"
 update.authentication_method = CredentialsAndIpAuthenticationMethod(
-    allowed_sip_ips=["10.0.0.0/8"],
+    allowed_sip_ips=["203.0.113.0/24"],
     tech_prefix="9",
 )
 updated = client.voice_out_trunks().update(update).data
