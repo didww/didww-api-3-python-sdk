@@ -8,6 +8,12 @@ from didww.enums import (
 from didww.query_params import QueryParams
 from didww.resources.voice_out_trunk import VoiceOutTrunk
 from didww.resources.did import Did
+from didww.resources.authentication_method import (
+    AuthenticationMethod,
+    IpOnlyAuthenticationMethod,
+    CredentialsAndIpAuthenticationMethod,
+    GenericAuthenticationMethod,
+)
 
 
 class TestVoiceOutTrunk:
@@ -24,7 +30,6 @@ class TestVoiceOutTrunk:
         assert trunk.id == "425ce763-a3a9-49b4-af5b-ada1a65c8864"
         assert trunk.name == "test"
         assert trunk.status == VoiceOutTrunkStatus.BLOCKED
-        assert trunk.allowed_sip_ips == ["10.11.12.13/32"]
         assert trunk.capacity_limit == 123
         assert trunk.allow_any_did_as_cli is False
         assert trunk.on_cli_mismatch_action == OnCliMismatchAction.REPLACE_CLI
@@ -36,8 +41,12 @@ class TestVoiceOutTrunk:
         assert trunk.threshold_reached is False
         assert trunk.threshold_amount == "200.0"
         assert trunk.callback_url is None
-        assert trunk.username == "dpjgwbbac9"
-        assert trunk.password == "z0hshvbcy7"
+        # polymorphic authentication_method
+        auth = trunk.authentication_method
+        assert isinstance(auth, CredentialsAndIpAuthenticationMethod)
+        assert auth.allowed_sip_ips == ["10.11.12.13/32"]
+        assert auth.username == "dpjgwbbac9"
+        assert auth.password == "z0hshvbcy7"
         assert len(trunk.dids) == 2
         assert trunk.default_did is not None
         assert trunk.default_did.number == "37061498222"
@@ -46,7 +55,10 @@ class TestVoiceOutTrunk:
     def test_create_voice_out_trunk(self, client):
         trunk = VoiceOutTrunk()
         trunk.name = "python-test"
-        trunk.allowed_sip_ips = ["0.0.0.0/0"]
+        trunk.authentication_method = IpOnlyAuthenticationMethod(
+            allowed_sip_ips=["0.0.0.0/0"],
+            tech_prefix="",
+        )
         trunk.on_cli_mismatch_action = OnCliMismatchAction.REPLACE_CLI
         did = Did.build("7a028c32-e6b6-4c86-bf01-90f901b37012")
         trunk.default_did = did
@@ -72,3 +84,31 @@ class TestVoiceOutTrunk:
     def test_delete_voice_out_trunk(self, client):
         result = client.voice_out_trunks().delete("425ce763-a3a9-49b4-af5b-ada1a65c8864")
         assert result is None
+
+
+class TestAuthenticationMethodPolymorphism:
+    def test_from_jsonapi_ip_only(self):
+        data = {"type": "ip_only", "attributes": {"allowed_sip_ips": ["1.2.3.4/32"], "tech_prefix": "123"}}
+        auth = AuthenticationMethod.from_jsonapi(data)
+        assert isinstance(auth, IpOnlyAuthenticationMethod)
+        assert auth.allowed_sip_ips == ["1.2.3.4/32"]
+        assert auth.tech_prefix == "123"
+
+    def test_from_jsonapi_credentials_and_ip(self):
+        data = {"type": "credentials_and_ip", "attributes": {"allowed_sip_ips": ["1.2.3.4/32"], "tech_prefix": "", "username": "user", "password": "pass"}}
+        auth = AuthenticationMethod.from_jsonapi(data)
+        assert isinstance(auth, CredentialsAndIpAuthenticationMethod)
+        assert auth.username == "user"
+        assert auth.password == "pass"
+
+    def test_from_jsonapi_unknown_type_returns_generic(self):
+        data = {"type": "future_auth", "attributes": {"some_field": "val"}}
+        auth = AuthenticationMethod.from_jsonapi(data)
+        assert isinstance(auth, GenericAuthenticationMethod)
+        assert auth._type == "future_auth"
+        assert auth._attr("some_field") == "val"
+
+    def test_to_jsonapi_roundtrip(self):
+        auth = IpOnlyAuthenticationMethod(allowed_sip_ips=["10.0.0.0/8"], tech_prefix="")
+        serialized = auth.to_jsonapi()
+        assert serialized == {"type": "ip_only", "attributes": {"allowed_sip_ips": ["10.0.0.0/8"], "tech_prefix": ""}}
