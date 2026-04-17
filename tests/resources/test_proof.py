@@ -6,6 +6,13 @@ from didww.resources.encrypted_file import EncryptedFile
 
 
 class TestProof:
+    @my_vcr.use_cassette("proofs/show.yaml")
+    def test_find_proof(self, client):
+        response = client.proofs().find("ed46925b-a830-482d-917d-015858cf7ab9")
+        proof = response.data
+        assert proof.id == "ed46925b-a830-482d-917d-015858cf7ab9"
+        assert proof.external_reference_id == "crm-proof-0001"
+
     @my_vcr.use_cassette("proofs/create.yaml")
     def test_create_proof(self, client):
         proof = Proof()
