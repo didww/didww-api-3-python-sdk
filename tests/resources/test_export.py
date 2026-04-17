@@ -23,7 +23,7 @@ class TestExport:
     def test_create_export(self, client):
         export = Export()
         export.export_type = ExportType.CDR_IN
-        export.filters = {"did_number": "1234556789", "year": "2019", "month": "01"}
+        export.filters = {"did_number": "1234556789", "from": "2026-04-01 00:00:00", "to": "2026-04-15 23:59:59"}
         response = client.exports().create(export)
         created = response.data
         assert created.id == "da15f006-5da4-45ca-b0df-735baeadf423"
