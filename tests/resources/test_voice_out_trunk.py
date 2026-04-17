@@ -109,6 +109,72 @@ class TestVoiceOutTrunkRelationships:
         assert hasattr(trunk, 'emergency_dids')
 
 
+class TestVoiceOutTrunkEmergencyPatch:
+    @my_vcr.use_cassette("voice_out_trunks/update_emergency_enable_all.yaml")
+    def test_toggle_emergency_enable_all(self, client):
+        trunk = VoiceOutTrunk.build("01234567-89ab-cdef-0123-456789abcdef")
+        trunk.emergency_enable_all = True
+        response = client.voice_out_trunks().update(trunk)
+        updated = response.data
+        assert updated.id == "01234567-89ab-cdef-0123-456789abcdef"
+        assert updated.emergency_enable_all is True
+
+    def test_replace_emergency_dids_request_body(self):
+        """PATCH must send emergency_dids as a has-many relationship."""
+        trunk = VoiceOutTrunk.build("01234567-89ab-cdef-0123-456789abcdef")
+        trunk.emergency_dids = [
+            Did.build("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"),
+            Did.build("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"),
+        ]
+        doc = trunk.to_jsonapi(include_id=True, dirty_only=True)
+        assert doc == {
+            "id": "01234567-89ab-cdef-0123-456789abcdef",
+            "type": "voice_out_trunks",
+            "attributes": {},
+            "relationships": {
+                "emergency_dids": {
+                    "data": [
+                        {"type": "dids", "id": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"},
+                        {"type": "dids", "id": "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"},
+                    ]
+                }
+            },
+        }
+
+    @my_vcr.use_cassette("voice_out_trunks/update_emergency_dids.yaml")
+    def test_replace_emergency_dids(self, client):
+        trunk = VoiceOutTrunk.build("01234567-89ab-cdef-0123-456789abcdef")
+        trunk.emergency_dids = [
+            Did.build("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"),
+            Did.build("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"),
+        ]
+        response = client.voice_out_trunks().update(trunk)
+        updated = response.data
+        assert updated.id == "01234567-89ab-cdef-0123-456789abcdef"
+
+    def test_clear_emergency_dids_request_body(self):
+        """PATCH with empty list must send emergency_dids data as []."""
+        trunk = VoiceOutTrunk.build("01234567-89ab-cdef-0123-456789abcdef")
+        trunk.emergency_dids = []
+        doc = trunk.to_jsonapi(include_id=True, dirty_only=True)
+        assert doc == {
+            "id": "01234567-89ab-cdef-0123-456789abcdef",
+            "type": "voice_out_trunks",
+            "attributes": {},
+            "relationships": {
+                "emergency_dids": {"data": []}
+            },
+        }
+
+    @my_vcr.use_cassette("voice_out_trunks/update_clear_emergency_dids.yaml")
+    def test_clear_emergency_dids(self, client):
+        trunk = VoiceOutTrunk.build("01234567-89ab-cdef-0123-456789abcdef")
+        trunk.emergency_dids = []
+        response = client.voice_out_trunks().update(trunk)
+        updated = response.data
+        assert updated.id == "01234567-89ab-cdef-0123-456789abcdef"
+
+
 class TestAuthenticationMethodPolymorphism:
     def test_from_jsonapi_ip_only(self):
         data = {"type": "ip_only", "attributes": {"allowed_sip_ips": ["1.2.3.4/32"], "tech_prefix": "123"}}
