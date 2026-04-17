@@ -14,7 +14,7 @@ This SDK uses [jsonapi-requests](https://github.com/socialwifi/jsonapi-requests)
 
 Read more https://doc.didww.com/api
 
-This SDK sends the `X-DIDWW-API-Version: 2022-05-10` header with every request.
+This SDK sends the `X-DIDWW-API-Version: 2026-04-16` header with every request.
 
 ## Requirements
 
