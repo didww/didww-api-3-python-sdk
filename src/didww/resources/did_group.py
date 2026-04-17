@@ -8,6 +8,7 @@ class DidGroup(DidwwApiModel):
     is_metered = SafeAttributeField("is_metered")
     area_name = SafeAttributeField("area_name")
     allow_additional_channels = SafeAttributeField("allow_additional_channels")
+    service_restrictions = SafeAttributeField("service_restrictions")
 
     country = RelationField("country")
     region = RelationField("region")

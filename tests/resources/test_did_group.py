@@ -28,6 +28,7 @@ class TestDidGroup:
         assert dg.is_metered is False
         assert dg.area_name == "Aachen"
         assert dg.allow_additional_channels is True
+        assert dg.service_restrictions is None
         country = dg.country
         assert country is not None
         assert country.name == "Germany"
