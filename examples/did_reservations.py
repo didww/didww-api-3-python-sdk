@@ -23,7 +23,7 @@ reservation.available_did = available_did
 reservation = client.did_reservations().create(reservation).data
 print(f"Created reservation: {reservation.id}")
 print(f"  description: {reservation.description}")
-print(f"  expires at: {reservation.expire_at}")
+print(f"  expires at: {reservation.expires_at}")
 
 # List reservations with includes
 params = QueryParams().include("available_did")

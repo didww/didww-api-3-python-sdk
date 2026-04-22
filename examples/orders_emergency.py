@@ -1,32 +1,48 @@
 """
-Orders with Emergency Order Items (2026-04-16).
-Demonstrates creating an order that includes an emergency calling service.
+Inspects Emergency orders (2026-04-16).
+
+Emergency orders are created server-side when an EmergencyCallingService
+is activated or renewed — customers cannot POST them directly.
 
 Usage: DIDWW_API_KEY=xxx python examples/orders_emergency.py
 """
 from client_factory import create_client
-from didww.resources.order import Order
-from didww.resources.order_item.emergency_order_item import EmergencyOrderItem
+from didww.query_params import QueryParams
 
 client = create_client()
 
-# Create an order with an emergency order item
-print("=== Creating Emergency Order ===")
-item = EmergencyOrderItem()
-item.qty = 1
-# Replace with a real emergency_calling_service_id
-# item.emergency_calling_service_id = "<emergency-calling-service-id>"
+# List recent orders, filter for emergency
+print("=== Recent Orders (filtering for Emergency) ===")
+params = QueryParams().sort("-created_at").page(1, 50)
+orders = client.orders().list(params).data
 
-order = Order()
-order.allow_back_ordering = True
-order.items = [item]
-order.external_reference_id = "emergency-order-001"
+emergency_orders = [
+    o for o in orders
+    if o.items and any(
+        (getattr(i, "type", None) or i.get("type", None) if isinstance(i, dict) else None)
+        == "emergency_order_items"
+        for i in o.items
+    )
+]
+print(f"Found {len(emergency_orders)} emergency orders out of {len(orders)} total")
 
-# Uncomment to create:
-# created = client.orders().create(order).data
-# print(f"Created order: {created.id}")
-# print(f"  status: {created.status}")
-# print(f"  external_reference_id: {created.external_reference_id}")
-# for i, oi in enumerate(created.items):
-#     print(f"  item {i}: type={type(oi).__name__}")
-print("(Uncomment the code above with valid IDs to run)")
+for o in emergency_orders[:5]:
+    print(f"\nOrder: {o.id}")
+    print(f"  Reference: {o.reference}")
+    print(f"  Status: {o.status}")
+    print(f"  Amount: {o.amount}")
+    print(f"  Created: {o.created_at}")
+
+# Follow the link from ECS to order
+print("\n=== Emergency Calling Service -> Order ===")
+params = QueryParams().include("order")
+services = client.emergency_calling_services().list(params).data
+if services:
+    svc = services[0]
+    print(f"ECS {svc.id} ({svc.name})")
+    if svc.order:
+        print(f"  -> Order {svc.order.id} — status: {svc.order.status}, amount: {svc.order.amount}")
+    else:
+        print("  -> No order linked yet")
+else:
+    print("No emergency_calling_services on this account")
