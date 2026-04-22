@@ -145,8 +145,8 @@ proof_types = client.proof_types().list().data
 # Public Keys
 public_keys = client.public_keys().list().data
 
-# Requirements
-requirements = client.requirements().list().data
+# Address Requirements
+requirements = client.address_requirements().list().data
 
 # Supporting Document Templates
 templates = client.supporting_document_templates().list().data
@@ -325,6 +325,86 @@ scg.capacity_pool = CapacityPool.build("pool-uuid")
 created = client.shared_capacity_groups().create(scg).data
 ```
 
+### Address Verifications
+
+```python
+from didww.resources.address_verification import AddressVerification
+from didww.resources.address import Address
+
+# List address verifications
+verifications = client.address_verifications().list().data
+
+# Create address verification
+verification = AddressVerification()
+verification.address = Address.build("address-uuid")
+created = client.address_verifications().create(verification).data
+
+# Update external_reference_id
+created.external_reference_id = "my-ref-123"
+client.address_verifications().update(created)
+```
+
+### Emergency Requirements
+
+```python
+# List emergency requirements
+emergency_reqs = client.emergency_requirements().list().data
+for req in emergency_reqs:
+    print(f"{req.name}: {req.estimate_setup_time}")
+
+# Find a specific emergency requirement
+req = client.emergency_requirements().find("uuid").data
+```
+
+### Emergency Verifications
+
+```python
+from didww.resources.emergency_verification import EmergencyVerification
+from didww.resources.address import Address
+
+# List emergency verifications
+verifications = client.emergency_verifications().list().data
+
+# Create emergency verification
+verification = EmergencyVerification()
+verification.address = Address.build("address-uuid")
+created = client.emergency_verifications().create(verification).data
+
+# Update external_reference_id
+created.external_reference_id = "ext-ref-456"
+client.emergency_verifications().update(created)
+```
+
+### Emergency Calling Services
+
+```python
+# List emergency calling services
+services = client.emergency_calling_services().list().data
+for svc in services:
+    print(f"Status: {svc.status}, Renew: {svc.renew_date}")
+
+# Find a specific emergency calling service
+service = client.emergency_calling_services().find("uuid").data
+
+# Delete an emergency calling service
+client.emergency_calling_services().delete("uuid")
+```
+
+### DID History
+
+```python
+from didww.query_params import QueryParams
+
+# List DID history records
+params = QueryParams().filter("did.id", "did-uuid")
+history = client.did_history().list(params).data
+for record in history:
+    print(f"DID: {record.number}, Order Date: {record.order_created_at}")
+
+# Find a specific DID history record
+record = client.did_history().find("uuid").data
+```
+
 ### Identities
 
 ```python
@@ -365,7 +445,7 @@ from didww.resources.export import Export
 
 export = Export()
 export.export_type = ExportType.CDR_IN
-export.filters = {"year": 2025, "month": 1}
+export.filters = {"from": "2025-01-01T00:00:00", "to": "2025-02-01T00:00:00"}
 created = client.exports().create(export).data
 
 # Download the export when completed
@@ -534,7 +614,7 @@ except DidwwClientError as e:
 | AvailableDid | `client.available_dids()` | list, find |
 | ProofType | `client.proof_types()` | list, find |
 | PublicKey | `client.public_keys()` | list, find |
-| Requirement | `client.requirements()` | list, find |
+| AddressRequirement | `client.address_requirements()` | list, find |
 | SupportingDocumentTemplate | `client.supporting_document_templates()` | list, find |
 | Balance | `client.balance()` | find |
 | Did | `client.dids()` | list, find, update, delete |
@@ -546,14 +626,19 @@ except DidwwClientError as e:
 | CapacityPool | `client.capacity_pools()` | list, find |
 | SharedCapacityGroup | `client.shared_capacity_groups()` | list, find, create, update, delete |
 | Order | `client.orders()` | list, find, create |
-| Export | `client.exports()` | list, find, create |
+| Export | `client.exports()` | list, find, create, update |
 | Address | `client.addresses()` | list, find, create, delete |
-| AddressVerification | `client.address_verifications()` | list, create |
+| AddressVerification | `client.address_verifications()` | list, find, create, update |
 | Identity | `client.identities()` | list, find, create, delete |
 | EncryptedFile | `client.encrypted_files()` | list, find, delete |
 | PermanentSupportingDocument | `client.permanent_supporting_documents()` | create, delete |
 | Proof | `client.proofs()` | create, delete |
-| RequirementValidation | `client.requirement_validations()` | create |
+| AddressRequirementValidation | `client.address_requirement_validations()` | create |
+| DidHistory | `client.did_history()` | list, find |
+| EmergencyRequirement | `client.emergency_requirements()` | list, find |
+| EmergencyRequirementValidation | `client.emergency_requirement_validations()` | create |
+| EmergencyCallingService | `client.emergency_calling_services()` | list, find, delete |
+| EmergencyVerification | `client.emergency_verifications()` | list, find, create, update |
 | StockKeepingUnit | _(include-only)_ | included via `did_groups`, `available_dids` |
 | QtyBasedPricing | _(include-only)_ | included via `capacity_pools` |
 
