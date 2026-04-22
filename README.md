@@ -394,9 +394,22 @@ regions = client.regions().list(params).data
 The SDK distinguishes between date-only and datetime fields:
 
 - **Datetime fields** are deserialized as `datetime.datetime` with `timezone.utc`:
-  - All `created_at` fields — present on most resources
-  - Expiry fields: `Did.expires_at`, `DidReservation.expire_at`, `Proof.expires_at`, `EncryptedFile.expire_at`
-- **Date-only fields** (`Identity.birth_date`, `CapacityPool.renew_date`, `DidOrderItem.billed_from`/`billed_to`) remain as `string` in `"YYYY-MM-DD"` format.
+  - `created_at` — present on most resources
+  - `expires_at` — `Did`, `DidReservation`, `Proof`, `EncryptedFile` (nullable)
+  - `activated_at` — `EmergencyCallingService` (nullable)
+  - `canceled_at` — `EmergencyCallingService` (nullable)
+- **Date-only fields** remain as `str` in `"YYYY-MM-DD"` format:
+  - `Identity.birth_date`
+  - `CapacityPool.renew_date`, `EmergencyCallingService.renew_date` (nullable)
+  - `DidOrderItem.billed_from` / `billed_to`
+- **String fields** (not numeric):
+  - `EmergencyRequirement.estimate_setup_time` — e.g. `"7-14 days"`, `"1"`
+  - `EmergencyRequirement.requirement_restriction_message` — nullable
+
+**Important changes from previous API versions:**
+- `expire_at` renamed to `expires_at` on `DidReservation` and `EncryptedFile`
+- `renew_date` is a date-only string, NOT a datetime
+- `estimate_setup_time` is a string, NOT an integer
 
 ```python
 from datetime import timezone
