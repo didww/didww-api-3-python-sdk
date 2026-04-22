@@ -424,10 +424,15 @@ print(identity.birth_date)  # "1990-05-20"
 
 ## Enums
 
-The SDK provides enum classes aligned with the Java SDK (for example `CallbackMethod`, `IdentityType`, `OrderStatus`, `ExportType`, `CliFormat`, `OnCliMismatchAction`, `MediaEncryptionMode`, `TransportProtocol`, `Codec`, and more).
+The SDK provides enum classes for all API option fields:
 
-> **Note:** `OnCliMismatchAction.REPLACE_CLI` and `OnCliMismatchAction.RANDOMIZE_CLI` require additional
-> account configuration. Contact DIDWW support to enable these values.
+`CallbackMethod`, `IdentityType`, `OrderStatus`, `ExportType`, `ExportStatus`, `CliFormat`,
+`OnCliMismatchAction`\*, `MediaEncryptionMode`, `DefaultDstAction`, `VoiceOutTrunkStatus`,
+`EmergencyCallingServiceStatus`, `EmergencyVerificationStatus`, `DiversionRelayPolicy`,
+`TransportProtocol`, `Codec`, `RxDtmfFormat`, `TxDtmfFormat`, `SstRefreshMethod`,
+`ReroutingDisconnectCode`, `Feature`, `AreaLevel`, `AddressVerificationStatus`, `StirShakenMode`
+
+\* `REPLACE_CLI` and `RANDOMIZE_CLI` require additional account configuration. Contact DIDWW support to enable these values.
 
 ```python
 from didww.enums import CallbackMethod, IdentityType
