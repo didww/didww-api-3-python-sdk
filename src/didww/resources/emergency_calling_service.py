@@ -13,7 +13,7 @@ class EmergencyCallingService(DidwwApiModel):
         activated_at (datetime): Timestamp when the service became active. None while pending.
         canceled_at (datetime): Timestamp when the service was canceled. None when active.
         created_at (datetime): Timestamp when the resource was created.
-        renew_date (datetime): Next renewal date. None when canceled.
+        renew_date (str): Next renewal date as date-only string (e.g. "2026-05-22"). None when canceled.
     """
 
     name = SafeAttributeField("name")
@@ -22,7 +22,7 @@ class EmergencyCallingService(DidwwApiModel):
     activated_at = DatetimeAttributeField("activated_at")
     canceled_at = DatetimeAttributeField("canceled_at")
     created_at = DatetimeAttributeField("created_at")
-    renew_date = DatetimeAttributeField("renew_date")
+    renew_date = SafeAttributeField("renew_date")
 
     country = RelationField("country")
     did_group_type = RelationField("did_group_type")
