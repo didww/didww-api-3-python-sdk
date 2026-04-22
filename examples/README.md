@@ -32,6 +32,13 @@ DIDWW_API_KEY=your_api_key python examples/balance.py
 | [`countries.py`](countries.py) | Lists countries, demonstrates filtering, and fetches one country by ID. |
 | [`did_groups.py`](did_groups.py) | Fetches DID groups with included SKUs and shows group details. |
 | [`trunks.py`](trunks.py) | Creates SIP and PSTN trunks, prints details, then deletes them. |
+| [`regions.py`](regions.py) | Lists regions, filters by country, and fetches a specific region. |
+| [`voice_in_trunks.py`](voice_in_trunks.py) | Lists voice in trunks with their configurations and POP details. |
+| [`orders.py`](orders.py) | Lists orders, creates a DID order, and cancels it. |
+| [`orders_available_dids.py`](orders_available_dids.py) | Orders a specific available DID using included DID group SKU. |
+| [`orders_reservation_dids.py`](orders_reservation_dids.py) | Reserves a DID and then places an order from that reservation. |
+| [`orders_all_item_types.py`](orders_all_item_types.py) | Creates orders with all 3 item types: by SKU, by available DID, and by reservation. |
+| [`orders_capacity.py`](orders_capacity.py) | Purchases capacity by creating a capacity order item. |
 | [`orders_sku.py`](orders_sku.py) | Creates a DID order with all item types: by SKU, by available DID, and by reservation. Fetches ordered DIDs. |
 | [`orders_nanpa.py`](orders_nanpa.py) | Orders a DID number by NPA/NXX prefix. |
 | [`upload_file.py`](upload_file.py) | Reads a file, encrypts it, and uploads to `encrypted_files`. |
