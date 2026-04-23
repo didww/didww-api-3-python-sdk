@@ -68,12 +68,3 @@ class TestAddressRequirementValidation:
         response = client.address_requirement_validations().create(rv)
         created = response.data
         assert created.id is None
-
-    @my_vcr.use_cassette("address_requirement_validations/create_204.yaml")
-    def test_create_returns_none_on_204(self, client):
-        rv = AddressRequirementValidation()
-        rv.address_requirement = AddressRequirement.build("11111111-2222-3333-4444-555555555555")
-        rv.address = Address.build("66666666-7777-8888-9999-aaaaaaaaaaaa")
-        rv.identity = Identity.build("bbbbbbbb-cccc-dddd-eeee-ffffffffffff")
-        result = client.address_requirement_validations().create(rv)
-        assert result is None

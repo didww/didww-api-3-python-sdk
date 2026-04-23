@@ -419,8 +419,6 @@ class CreateOnlyRepository(ReadOnlyRepository):
         query = params.to_dict() if params else None
         body = self.client.post(self._path, doc, params=query)
         resource._clear_dirty_state()
-        if body is None:
-            return None
         response = JsonApiResponse.from_data(body)
         created = self._resource_class.from_response_content(response)
         return ApiResponse(data=created, meta=body.get("meta", {}))

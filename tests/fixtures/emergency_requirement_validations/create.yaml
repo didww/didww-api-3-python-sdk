@@ -1,6 +1,6 @@
 interactions:
 - request:
-    body: '{"data":{"type":"emergency_requirement_validations","attributes":{},"relationships":{"emergency_requirement":{"data":{"type":"emergency_requirements","id":"er-001"}},"address":{"data":{"type":"addresses","id":"addr-001"}},"identity":{"data":{"type":"identities","id":"id-001"}}}}}'
+    body: '{"data":{"type":"emergency_requirement_validations","attributes":{},"relationships":{"emergency_requirement":{"data":{"type":"emergency_requirements","id":"c1d2e3f4-a5b6-7890-1234-567890abcdef"}},"address":{"data":{"type":"addresses","id":"a1b2c3d4-e5f6-7890-1234-567890abcdef"}},"identity":{"data":{"type":"identities","id":"b2c3d4e5-f6a7-8901-2345-67890abcdef1"}}}}}'
     headers:
       Accept:
       - application/vnd.api+json
@@ -12,11 +12,13 @@ interactions:
     uri: https://sandbox-api.didww.com/v3/emergency_requirement_validations
   response:
     body:
-      string: ''
+      string: "{\n  \"data\": {\n    \"id\": \"c1d2e3f4-a5b6-7890-1234-567890abcdef\"\
+        ,\n    \"type\": \"emergency_requirement_validations\"\n  },\n  \"meta\": {\n    \"\
+        api_version\": \"2026-04-16\"\n  }\n}"
     headers:
       Content-Type:
       - application/vnd.api+json
     status:
-      code: 204
-      message: No Content
+      code: 201
+      message: Created
 version: 1
