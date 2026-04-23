@@ -57,7 +57,7 @@ DIDWW_API_KEY=your_api_key python examples/balance.py
 | [`emergency_requirement_validations.py`](emergency_requirement_validations.py) | Validates emergency requirements (2026-04-16). |
 | [`emergency_scenario.py`](emergency_scenario.py) | End-to-end: find DID → check requirements → validate → create verification → get service. |
 | [`address_verifications.py`](address_verifications.py) | Lists address verifications with includes (2026-04-16). |
-| [`orders_emergency.py`](orders_emergency.py) | Creates an order with emergency order items (2026-04-16). |
+| [`orders_emergency.py`](orders_emergency.py) |  List recent orders, filter for emergency (2026-04-16). |
 
 ## Upload file example
 
