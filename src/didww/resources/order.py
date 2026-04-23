@@ -36,7 +36,7 @@ class Order(DidwwApiModel):
         return self.status == OrderStatus.COMPLETED
 
     @property
-    def is_cancelled(self):
+    def is_canceled(self):
         return self.status == OrderStatus.CANCELED
 
     @property

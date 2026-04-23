@@ -64,19 +64,19 @@ class TestOrderStatusHelpers:
         order.status = OrderStatus.PENDING
         assert order.is_pending is True
         assert order.is_completed is False
-        assert order.is_cancelled is False
+        assert order.is_canceled is False
 
     def test_is_completed(self):
         order = Order()
         order.status = OrderStatus.COMPLETED
         assert order.is_completed is True
         assert order.is_pending is False
-        assert order.is_cancelled is False
+        assert order.is_canceled is False
 
-    def test_is_cancelled(self):
+    def test_is_canceled(self):
         order = Order()
         order.status = OrderStatus.CANCELED
-        assert order.is_cancelled is True
+        assert order.is_canceled is True
         assert order.is_pending is False
         assert order.is_completed is False
 
