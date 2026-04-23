@@ -318,6 +318,11 @@ class DidwwApiModel(ApiModel):
             doc["relationships"] = rels
         return doc
 
+    @property
+    def meta(self):
+        """Per-resource meta from the JSON:API response."""
+        return self._resource_meta
+
     def _null_relationship(self, key):
         """Write null data into the ORM relationship, like Java's field = null."""
         self.raw_object.relationships[key] = {"data": None}

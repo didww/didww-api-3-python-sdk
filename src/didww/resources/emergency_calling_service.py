@@ -14,6 +14,8 @@ class EmergencyCallingService(DidwwApiModel):
         canceled_at (datetime): Timestamp when the service was canceled. None when active.
         created_at (datetime): Timestamp when the resource was created.
         renew_date (str): Next renewal date as date-only string (e.g. "2026-05-22"). None when canceled.
+
+    Resource-level meta: setup_price, monthly_price
     """
 
     name = SafeAttributeField("name")

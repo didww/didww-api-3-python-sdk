@@ -2,6 +2,11 @@ from didww.resources.base import DidwwApiModel, SafeAttributeField, RelationFiel
 
 
 class EmergencyRequirement(DidwwApiModel):
+    """Emergency requirement resource.
+
+    Resource-level meta: setup_price, monthly_price
+    """
+
     identity_type = SafeAttributeField("identity_type")
     address_area_level = SafeAttributeField("address_area_level")
     personal_area_level = SafeAttributeField("personal_area_level")

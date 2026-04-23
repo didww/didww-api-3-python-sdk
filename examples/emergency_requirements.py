@@ -19,4 +19,6 @@ print(f"Found {len(requirements)} emergency requirements")
 for req in requirements[:10]:
     country = req.country
     country_name = country.name if country else "N/A"
-    print(f"  {req.id}  country={country_name}")
+    setup_price = req.meta.get('setup_price')
+    monthly_price = req.meta.get('monthly_price')
+    print(f"  {req.id}  country={country_name}  setup_price={setup_price}  monthly_price={monthly_price}")

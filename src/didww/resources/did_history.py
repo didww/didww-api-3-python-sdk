@@ -13,7 +13,7 @@ class DidHistory(DidwwApiModel):
     Meta fields (present in the JSON:API ``meta`` hash on the response,
     not as resource attributes):
 
-        meta["from"] / meta["to"] (int):
+        meta["from"] / meta["to"] (str):
             Only present when action is "billing_cycles_count_changed".
             The previous (from) and new (to) billing_cycles_count values.
             Absent for every other action.

@@ -168,6 +168,8 @@ if ecs:
     print(f"  ECS: {ecs.id}")
     print(f"  Name: {ecs.name}")
     print(f"  Status: {ecs.status}")
+    print(f"  Setup Price: {ecs.meta.get('setup_price')}")
+    print(f"  Monthly Price: {ecs.meta.get('monthly_price')}")
 else:
     print("  No ECS linked yet (verification may still be pending).")
 

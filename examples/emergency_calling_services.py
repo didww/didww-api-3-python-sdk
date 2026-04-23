@@ -19,4 +19,6 @@ print(f"Found {len(services)} emergency calling services")
 for svc in services[:10]:
     country = svc.country
     country_name = country.name if country else "N/A"
-    print(f"  {svc.id}  status={svc.status}  country={country_name}")
+    setup_price = svc.meta.get('setup_price')
+    monthly_price = svc.meta.get('monthly_price')
+    print(f"  {svc.id}  status={svc.status}  country={country_name}  setup_price={setup_price}  monthly_price={monthly_price}")
