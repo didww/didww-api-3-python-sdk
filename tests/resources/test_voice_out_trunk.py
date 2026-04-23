@@ -175,6 +175,24 @@ class TestVoiceOutTrunkEmergencyPatch:
         assert updated.id == "01234567-89ab-cdef-0123-456789abcdef"
 
 
+class TestVoiceOutTrunkIpOnlyAuth:
+    @my_vcr.use_cassette("voice_out_trunks/show_ip_only.yaml")
+    def test_find_voice_out_trunk_with_ip_only_auth(self, client):
+        response = client.voice_out_trunks().find("23fd58f9-9094-406c-bfd9-f4d25bda13c6")
+        trunk = response.data
+        assert trunk.id == "23fd58f9-9094-406c-bfd9-f4d25bda13c6"
+        assert trunk.name == "SDK Test credentials_and_ip"
+        assert trunk.status == VoiceOutTrunkStatus.ACTIVE
+        # authentication_method must be IpOnly, not CredentialsAndIp
+        auth = trunk.authentication_method
+        assert isinstance(auth, IpOnlyAuthenticationMethod)
+        assert not isinstance(auth, CredentialsAndIpAuthenticationMethod)
+        assert auth.type == "ip_only"
+        assert auth.allowed_sip_ips == ["203.0.113.1/32"]
+        assert not hasattr(auth, "username")
+        assert not hasattr(auth, "password")
+
+
 class TestAuthenticationMethodPolymorphism:
     def test_from_jsonapi_ip_only(self):
         data = {"type": "ip_only", "attributes": {"allowed_sip_ips": ["203.0.113.4/32"], "tech_prefix": "123"}}
