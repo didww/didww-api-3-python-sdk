@@ -251,16 +251,29 @@ created = client.voice_in_trunk_groups().create(group).data
 
 > **Note:** Voice Out Trunks require additional account configuration. Contact DIDWW support to enable.
 
+Voice Out Trunks use a polymorphic `authentication_method` (2026-04-16). Three types are supported:
+
+- **`credentials_and_ip`** -- default method; `username` and `password` are server-generated and returned in the response.
+- **`twilio`** -- requires a `twilio_account_sid`.
+- **`ip_only`** -- read-only; can only be configured by DIDWW staff upon request. Cannot be set via the API.
+
 ```python
 from didww.enums import DefaultDstAction, OnCliMismatchAction
 from didww.resources.voice_out_trunk import VoiceOutTrunk
+from didww.resources.authentication_method import CredentialsAndIpAuthenticationMethod
 
 trunk = VoiceOutTrunk()
 trunk.name = "My Outbound Trunk"
-trunk.allowed_sip_ips = ["203.0.113.0/24"]
+# NOTE: 203.0.113.0/24 is RFC 5737 TEST-NET-3 documentation space.
+# Replace with the real CIDR of your SIP infrastructure.
+trunk.authentication_method = CredentialsAndIpAuthenticationMethod(
+    allowed_sip_ips=["203.0.113.0/24"],
+)
 trunk.default_dst_action = DefaultDstAction.ALLOW_ALL
 trunk.on_cli_mismatch_action = OnCliMismatchAction.REJECT_CALL
 created = client.voice_out_trunks().create(trunk).data
+# created.authentication_method.username -- server-generated
+# created.authentication_method.password -- server-generated
 ```
 
 ### Orders

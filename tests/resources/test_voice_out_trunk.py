@@ -12,6 +12,7 @@ from didww.resources.authentication_method import (
     AuthenticationMethod,
     IpOnlyAuthenticationMethod,
     CredentialsAndIpAuthenticationMethod,
+    TwilioAuthenticationMethod,
     GenericAuthenticationMethod,
 )
 
@@ -173,6 +174,38 @@ class TestVoiceOutTrunkEmergencyPatch:
         response = client.voice_out_trunks().update(trunk)
         updated = response.data
         assert updated.id == "01234567-89ab-cdef-0123-456789abcdef"
+
+
+class TestVoiceOutTrunkTwilioAuth:
+    @my_vcr.use_cassette("voice_out_trunks/show_twilio.yaml")
+    def test_find_voice_out_trunk_with_twilio_auth(self, client):
+        response = client.voice_out_trunks().find("b5e701f4-ea15-4f9d-8f35-6a0bdce04385")
+        trunk = response.data
+        assert trunk.id == "b5e701f4-ea15-4f9d-8f35-6a0bdce04385"
+        assert trunk.name == "SDK Test twilio"
+        assert trunk.status == VoiceOutTrunkStatus.ACTIVE
+        # authentication_method must be Twilio
+        auth = trunk.authentication_method
+        assert isinstance(auth, TwilioAuthenticationMethod)
+        assert auth.type == "twilio"
+        assert auth.twilio_account_sid == "AC22222222222222222222222222222222"
+
+    @my_vcr.use_cassette("voice_out_trunks/create_twilio.yaml")
+    def test_create_voice_out_trunk_with_twilio_auth(self, client):
+        trunk = VoiceOutTrunk()
+        trunk.name = "SDK Test twilio create"
+        trunk.authentication_method = TwilioAuthenticationMethod(
+            twilio_account_sid="AC33333333333333333333333333333333",
+        )
+        trunk.on_cli_mismatch_action = OnCliMismatchAction.REJECT_CALL
+        response = client.voice_out_trunks().create(trunk)
+        created = response.data
+        assert created.id == "507fa5a2-fd58-4c4d-a231-efba27f67c3a"
+        assert created.name == "SDK Test twilio create"
+        assert created.status == VoiceOutTrunkStatus.ACTIVE
+        auth = created.authentication_method
+        assert isinstance(auth, TwilioAuthenticationMethod)
+        assert auth.twilio_account_sid == "AC33333333333333333333333333333333"
 
 
 class TestVoiceOutTrunkIpOnlyAuth:
