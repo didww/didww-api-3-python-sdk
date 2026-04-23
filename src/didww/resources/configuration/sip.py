@@ -1,6 +1,7 @@
 from didww.resources.configuration.base import TrunkConfiguration
 from didww.enums import (
     Codec,
+    DiversionRelayPolicy,
     MediaEncryptionMode,
     ReroutingDisconnectCode,
     RxDtmfFormat,
@@ -67,6 +68,7 @@ class SipConfiguration(TrunkConfiguration):
     sst_refresh_method_id = _enum("sst_refresh_method_id", SstRefreshMethod)
     media_encryption_mode = _enum("media_encryption_mode", MediaEncryptionMode)
     stir_shaken_mode      = _enum("stir_shaken_mode", StirShakenMode)
+    diversion_relay_policy = _enum("diversion_relay_policy", DiversionRelayPolicy)
 
 
 TrunkConfiguration.register("sip_configurations", SipConfiguration)

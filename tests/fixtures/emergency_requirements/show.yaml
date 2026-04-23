@@ -1,0 +1,22 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept:
+      - application/vnd.api+json
+      Api-Key:
+      - test-api-key
+      Content-Type:
+      - application/vnd.api+json
+    method: GET
+    uri: https://sandbox-api.didww.com/v3/emergency_requirements/er-001
+  response:
+    body:
+      string: '{"data":{"id":"er-001","type":"emergency_requirements","attributes":{"identity_type":"personal","address_area_level":"city","personal_area_level":"country","business_area_level":"country","address_mandatory_fields":["city_name","address"],"personal_mandatory_fields":["first_name","last_name"],"business_mandatory_fields":["company_name"],"estimate_setup_time":"7-14 days","requirement_restriction_message":null}},"meta":{"api_version":"2026-04-16"}}'
+    headers:
+      Content-Type:
+      - application/vnd.api+json
+    status:
+      code: 200
+      message: OK
+version: 1

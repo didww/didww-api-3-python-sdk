@@ -3,6 +3,14 @@ from tests.conftest import my_vcr
 from didww.query_params import QueryParams
 
 
+class TestDidGroupFeatures:
+    def test_new_features_enum_values(self):
+        assert Feature.P2P.value == "p2p"
+        assert Feature.A2P.value == "a2p"
+        assert Feature.EMERGENCY.value == "emergency"
+        assert Feature.CNAM_OUT.value == "cnam_out"
+
+
 class TestDidGroup:
     @my_vcr.use_cassette("did_groups/list.yaml")
     def test_list_did_groups(self, client):
@@ -20,6 +28,7 @@ class TestDidGroup:
         assert dg.is_metered is False
         assert dg.area_name == "Aachen"
         assert dg.allow_additional_channels is True
+        assert dg.service_restrictions is None
         country = dg.country
         assert country is not None
         assert country.name == "Germany"
@@ -32,17 +41,17 @@ class TestDidGroup:
         assert dg.region is None
         assert len(dg.stock_keeping_units) == 2
 
-    @my_vcr.use_cassette("did_groups/show_with_requirement.yaml")
-    def test_find_did_group_with_requirement(self, client):
-        params = QueryParams().include("requirement")
+    @my_vcr.use_cassette("did_groups/show_with_address_requirement.yaml")
+    def test_find_did_group_with_address_requirement(self, client):
+        params = QueryParams().include("address_requirement")
         response = client.did_groups().find("2187c36d-28fb-436f-8861-5a0f5b5a3ee1", params)
         dg = response.data
         assert dg.id == "2187c36d-28fb-436f-8861-5a0f5b5a3ee1"
         assert dg.prefix == "241"
         assert dg.area_name == "Aachen"
-        requirement = dg.requirement
-        assert requirement is not None
-        assert requirement.id == "8da1e0b2-047c-4baf-9c57-57143f09b9ce"
-        assert requirement.identity_type == IdentityType.ANY
-        assert requirement.personal_area_level == AreaLevel.WORLDWIDE
-        assert requirement.service_description_required is False
+        address_requirement = dg.address_requirement
+        assert address_requirement is not None
+        assert address_requirement.id == "8da1e0b2-047c-4baf-9c57-57143f09b9ce"
+        assert address_requirement.identity_type == IdentityType.ANY
+        assert address_requirement.personal_area_level == AreaLevel.WORLDWIDE
+        assert address_requirement.service_description_required is False

@@ -29,8 +29,8 @@ def test_order_enums_from_response():
         "id": "1",
         "type": "orders",
         "attributes": {
-            "status": "Completed",
-            "callback_method": "POST",
+            "status": "completed",
+            "callback_method": "post",
         },
     })
     assert order.status == OrderStatus.COMPLETED

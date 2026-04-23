@@ -26,6 +26,7 @@ print(f"Created: {created.id}")
 print(f"  name: {created.name}")
 print(f"  metered: {created.metered_channels_count}")
 print(f"  shared: {created.shared_channels_count}")
+print(f"  external_reference_id: {created.external_reference_id}")
 
 # Delete
 client.shared_capacity_groups().delete(created.id)

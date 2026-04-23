@@ -5,6 +5,29 @@ from didww.enums import ExportStatus, ExportType
 from didww.resources.export import Export
 
 
+class TestExportStatusHelpers:
+    def test_is_pending(self):
+        export = Export()
+        export.status = ExportStatus.PENDING
+        assert export.is_pending is True
+        assert export.is_processing is False
+        assert export.is_completed is False
+
+    def test_is_processing(self):
+        export = Export()
+        export.status = ExportStatus.PROCESSING
+        assert export.is_processing is True
+        assert export.is_pending is False
+        assert export.is_completed is False
+
+    def test_is_completed(self):
+        export = Export()
+        export.status = ExportStatus.COMPLETED
+        assert export.is_completed is True
+        assert export.is_pending is False
+        assert export.is_processing is False
+
+
 class TestExport:
     @my_vcr.use_cassette("exports/list.yaml")
     def test_list_exports(self, client):
@@ -18,16 +41,38 @@ class TestExport:
         assert export.id == "da15f006-5da4-45ca-b0df-735baeadf423"
         assert export.status == ExportStatus.COMPLETED
         assert export.export_type == ExportType.CDR_IN
+        assert export.external_reference_id == "monthly-cdr-2026-04"
 
     @my_vcr.use_cassette("exports/create.yaml")
     def test_create_export(self, client):
         export = Export()
         export.export_type = ExportType.CDR_IN
-        export.filters = {"did_number": "1234556789", "year": "2019", "month": "01"}
+        export.filters = {"did_number": "1234556789", "from": "2026-04-01 00:00:00", "to": "2026-04-15 23:59:59"}
         response = client.exports().create(export)
         created = response.data
         assert created.id == "da15f006-5da4-45ca-b0df-735baeadf423"
         assert created.status == ExportStatus.PENDING
+
+    def test_patch_external_reference_id_request_body(self):
+        """PATCH must send exactly the id, type, and only the dirty attribute."""
+        export = Export.build("da15f006-5da4-45ca-b0df-735baeadf423")
+        export.external_reference_id = "renamed-ref-99"
+        doc = export.to_jsonapi(include_id=True, dirty_only=True)
+        assert doc == {
+            "id": "da15f006-5da4-45ca-b0df-735baeadf423",
+            "type": "exports",
+            "attributes": {"external_reference_id": "renamed-ref-99"},
+        }
+
+    @my_vcr.use_cassette("exports/update.yaml")
+    def test_update_export_external_reference_id(self, client):
+        export = Export()
+        export.id = "da15f006-5da4-45ca-b0df-735baeadf423"
+        export.external_reference_id = "renamed-ref-99"
+        response = client.exports().update(export)
+        updated = response.data
+        assert updated.id == "da15f006-5da4-45ca-b0df-735baeadf423"
+        assert updated.external_reference_id == "renamed-ref-99"
 
     @my_vcr.use_cassette("exports/download.yaml")
     def test_download_export(self, client):

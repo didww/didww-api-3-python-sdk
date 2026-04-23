@@ -1,0 +1,58 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept:
+      - application/vnd.api+json
+      Api-Key:
+      - test-api-key
+      Content-Type:
+      - application/vnd.api+json
+    method: GET
+    uri: https://sandbox-api.didww.com/v3/did_groups/2187c36d-28fb-436f-8861-5a0f5b5a3ee1
+  response:
+    body:
+      string: "{\n  \"data\": {\n    \"id\": \"2187c36d-28fb-436f-8861-5a0f5b5a3ee1\"\
+        ,\n    \"type\": \"did_groups\",\n    \"attributes\": {\n      \"prefix\"\
+        : \"241\",\n      \"local_prefix\": \"\",\n      \"features\": [\n       \
+        \ \"voice_in\"\n      ],\n      \"is_metered\": false,\n      \"area_name\":\
+        \ \"Aachen\",\n      \"allow_additional_channels\": true\n    },\n    \"relationships\"\
+        : {\n      \"country\": {\n        \"links\": {\n          \"self\": \"https://sandbox-api.didww.com/v3/did_groups/2187c36d-28fb-436f-8861-5a0f5b5a3ee1/relationships/country\"\
+        ,\n          \"related\": \"https://sandbox-api.didww.com/v3/did_groups/2187c36d-28fb-436f-8861-5a0f5b5a3ee1/country\"\
+        \n        },\n        \"data\": {\n          \"type\": \"countries\",\n  \
+        \        \"id\": \"dfd1a0a0-bd53-4f7a-9c8e-d2fc5dd1bf7e\"\n        }\n   \
+        \   },\n      \"city\": {\n        \"links\": {\n          \"self\": \"https://sandbox-api.didww.com/v3/did_groups/2187c36d-28fb-436f-8861-5a0f5b5a3ee1/relationships/city\"\
+        ,\n          \"related\": \"https://sandbox-api.didww.com/v3/did_groups/2187c36d-28fb-436f-8861-5a0f5b5a3ee1/city\"\
+        \n        },\n        \"data\": null\n      },\n      \"did_group_type\":\
+        \ {\n        \"links\": {\n          \"self\": \"https://sandbox-api.didww.com/v3/did_groups/2187c36d-28fb-436f-8861-5a0f5b5a3ee1/relationships/did_group_type\"\
+        ,\n          \"related\": \"https://sandbox-api.didww.com/v3/did_groups/2187c36d-28fb-436f-8861-5a0f5b5a3ee1/did_group_type\"\
+        \n        },\n        \"data\": null\n      },\n      \"region\": {\n     \
+        \   \"links\": {\n          \"self\": \"https://sandbox-api.didww.com/v3/did_groups/2187c36d-28fb-436f-8861-5a0f5b5a3ee1/relationships/region\"\
+        ,\n          \"related\": \"https://sandbox-api.didww.com/v3/did_groups/2187c36d-28fb-436f-8861-5a0f5b5a3ee1/region\"\
+        \n        },\n        \"data\": null\n      },\n      \"stock_keeping_units\"\
+        : {\n        \"links\": {\n          \"self\": \"https://sandbox-api.didww.com/v3/did_groups/2187c36d-28fb-436f-8861-5a0f5b5a3ee1/relationships/stock_keeping_units\"\
+        ,\n          \"related\": \"https://sandbox-api.didww.com/v3/did_groups/2187c36d-28fb-436f-8861-5a0f5b5a3ee1/stock_keeping_units\"\
+        \n        },\n        \"data\": []\n      },\n      \"address_requirement\": {\n  \
+        \      \"links\": {\n          \"self\": \"https://sandbox-api.didww.com/v3/did_groups/2187c36d-28fb-436f-8861-5a0f5b5a3ee1/relationships/requirement\"\
+        ,\n          \"related\": \"https://sandbox-api.didww.com/v3/did_groups/2187c36d-28fb-436f-8861-5a0f5b5a3ee1/requirement\"\
+        \n        },\n        \"data\": {\n          \"type\": \"address_requirements\",\n\
+        \          \"id\": \"8da1e0b2-047c-4baf-9c57-57143f09b9ce\"\n        }\n  \
+        \    }\n    }\n  },\n  \"included\": [\n    {\n      \"id\": \"dfd1a0a0-bd53-4f7a-9c8e-d2fc5dd1bf7e\"\
+        ,\n      \"type\": \"countries\",\n      \"attributes\": {\n        \"name\"\
+        : \"Germany\",\n        \"prefix\": \"49\",\n        \"iso\": \"DE\"\n   \
+        \   }\n    },\n    {\n      \"id\": \"8da1e0b2-047c-4baf-9c57-57143f09b9ce\"\
+        ,\n      \"type\": \"address_requirements\",\n      \"attributes\": {\n        \"\
+        identity_type\": \"any\",\n        \"personal_area_level\": \"world_wide\"\
+        ,\n        \"business_area_level\": \"world_wide\",\n        \"address_area_level\"\
+        : \"world_wide\",\n        \"personal_proof_qty\": 0,\n        \"business_proof_qty\"\
+        : 0,\n        \"address_proof_qty\": 0,\n        \"personal_mandatory_fields\"\
+        : [],\n        \"business_mandatory_fields\": [],\n        \"service_description_required\"\
+        : false,\n        \"restriction_message\": null\n      }\n    }\n  ],\n  \"\
+        meta\": {\n    \"api_version\": \"2022-05-09\"\n  }\n}"
+    headers:
+      Content-Type:
+      - application/vnd.api+json
+    status:
+      code: 200
+      message: OK
+version: 1

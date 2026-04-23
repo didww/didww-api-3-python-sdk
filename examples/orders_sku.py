@@ -65,6 +65,7 @@ item_by_reservation.did_reservation_id = reservation.id
 
 order = Order()
 order.items = [item_by_sku, item_by_available, item_by_reservation]
+order.external_reference_id = "python-sdk-example-order"
 created = client.orders().create(order).data
 
 print(f"\nOrder ID: {created.id}")
@@ -72,6 +73,7 @@ print(f"Amount: {created.amount}")
 print(f"Status: {created.status.value}")
 print(f"Created at: {created.created_at}")
 print(f"Reference: {created.reference}")
+print(f"External Reference ID: {created.external_reference_id}")
 print(f"Items count: {len(created.items)}")
 for i, item in enumerate(created.items):
     print(f"  Item {i+1}: type={item._type}")

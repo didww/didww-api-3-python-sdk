@@ -8,6 +8,13 @@ from didww.enums import (
 from didww.query_params import QueryParams
 from didww.resources.voice_out_trunk import VoiceOutTrunk
 from didww.resources.did import Did
+from didww.resources.authentication_method import (
+    AuthenticationMethod,
+    IpOnlyAuthenticationMethod,
+    CredentialsAndIpAuthenticationMethod,
+    TwilioAuthenticationMethod,
+    GenericAuthenticationMethod,
+)
 
 
 class TestVoiceOutTrunk:
@@ -24,7 +31,6 @@ class TestVoiceOutTrunk:
         assert trunk.id == "425ce763-a3a9-49b4-af5b-ada1a65c8864"
         assert trunk.name == "test"
         assert trunk.status == VoiceOutTrunkStatus.BLOCKED
-        assert trunk.allowed_sip_ips == ["10.11.12.13/32"]
         assert trunk.capacity_limit == 123
         assert trunk.allow_any_did_as_cli is False
         assert trunk.on_cli_mismatch_action == OnCliMismatchAction.REPLACE_CLI
@@ -36,8 +42,15 @@ class TestVoiceOutTrunk:
         assert trunk.threshold_reached is False
         assert trunk.threshold_amount == "200.0"
         assert trunk.callback_url is None
-        assert trunk.username == "dpjgwbbac9"
-        assert trunk.password == "z0hshvbcy7"
+        # polymorphic authentication_method
+        auth = trunk.authentication_method
+        assert isinstance(auth, CredentialsAndIpAuthenticationMethod)
+        assert auth.allowed_sip_ips == ["203.0.113.1/32"]
+        assert auth.username == "dpjgwbbac9"
+        assert auth.password == "z0hshvbcy7"  # NOSONAR
+        assert trunk.external_reference_id == "crm-vot-0001"
+        assert trunk.emergency_enable_all is False
+        assert trunk.rtp_timeout == 30
         assert len(trunk.dids) == 2
         assert trunk.default_did is not None
         assert trunk.default_did.number == "37061498222"
@@ -46,7 +59,10 @@ class TestVoiceOutTrunk:
     def test_create_voice_out_trunk(self, client):
         trunk = VoiceOutTrunk()
         trunk.name = "python-test"
-        trunk.allowed_sip_ips = ["0.0.0.0/0"]
+        trunk.authentication_method = IpOnlyAuthenticationMethod(
+            allowed_sip_ips=["203.0.113.0/24"],
+            tech_prefix="",
+        )
         trunk.on_cli_mismatch_action = OnCliMismatchAction.REPLACE_CLI
         did = Did.build("7a028c32-e6b6-4c86-bf01-90f901b37012")
         trunk.default_did = did
@@ -72,3 +88,182 @@ class TestVoiceOutTrunk:
     def test_delete_voice_out_trunk(self, client):
         result = client.voice_out_trunks().delete("425ce763-a3a9-49b4-af5b-ada1a65c8864")
         assert result is None
+
+
+class TestVoiceOutTrunkStatusHelpers:
+    def test_is_active(self):
+        trunk = VoiceOutTrunk()
+        trunk.status = VoiceOutTrunkStatus.ACTIVE
+        assert trunk.is_active is True
+        assert trunk.is_blocked is False
+
+    def test_is_blocked(self):
+        trunk = VoiceOutTrunk()
+        trunk.status = VoiceOutTrunkStatus.BLOCKED
+        assert trunk.is_blocked is True
+        assert trunk.is_active is False
+
+
+class TestVoiceOutTrunkRelationships:
+    def test_emergency_dids_relationship(self):
+        trunk = VoiceOutTrunk()
+        assert hasattr(trunk, 'emergency_dids')
+
+
+class TestVoiceOutTrunkEmergencyPatch:
+    @my_vcr.use_cassette("voice_out_trunks/update_emergency_enable_all.yaml")
+    def test_toggle_emergency_enable_all(self, client):
+        trunk = VoiceOutTrunk.build("01234567-89ab-cdef-0123-456789abcdef")
+        trunk.emergency_enable_all = True
+        response = client.voice_out_trunks().update(trunk)
+        updated = response.data
+        assert updated.id == "01234567-89ab-cdef-0123-456789abcdef"
+        assert updated.emergency_enable_all is True
+
+    def test_replace_emergency_dids_request_body(self):
+        """PATCH must send emergency_dids as a has-many relationship."""
+        trunk = VoiceOutTrunk.build("01234567-89ab-cdef-0123-456789abcdef")
+        trunk.emergency_dids = [
+            Did.build("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"),
+            Did.build("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"),
+        ]
+        doc = trunk.to_jsonapi(include_id=True, dirty_only=True)
+        assert doc == {
+            "id": "01234567-89ab-cdef-0123-456789abcdef",
+            "type": "voice_out_trunks",
+            "attributes": {},
+            "relationships": {
+                "emergency_dids": {
+                    "data": [
+                        {"type": "dids", "id": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"},
+                        {"type": "dids", "id": "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"},
+                    ]
+                }
+            },
+        }
+
+    @my_vcr.use_cassette("voice_out_trunks/update_emergency_dids.yaml")
+    def test_replace_emergency_dids(self, client):
+        trunk = VoiceOutTrunk.build("01234567-89ab-cdef-0123-456789abcdef")
+        trunk.emergency_dids = [
+            Did.build("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"),
+            Did.build("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"),
+        ]
+        response = client.voice_out_trunks().update(trunk)
+        updated = response.data
+        assert updated.id == "01234567-89ab-cdef-0123-456789abcdef"
+
+    def test_clear_emergency_dids_request_body(self):
+        """PATCH with empty list must send emergency_dids data as []."""
+        trunk = VoiceOutTrunk.build("01234567-89ab-cdef-0123-456789abcdef")
+        trunk.emergency_dids = []
+        doc = trunk.to_jsonapi(include_id=True, dirty_only=True)
+        assert doc == {
+            "id": "01234567-89ab-cdef-0123-456789abcdef",
+            "type": "voice_out_trunks",
+            "attributes": {},
+            "relationships": {
+                "emergency_dids": {"data": []}
+            },
+        }
+
+    @my_vcr.use_cassette("voice_out_trunks/update_clear_emergency_dids.yaml")
+    def test_clear_emergency_dids(self, client):
+        trunk = VoiceOutTrunk.build("01234567-89ab-cdef-0123-456789abcdef")
+        trunk.emergency_dids = []
+        response = client.voice_out_trunks().update(trunk)
+        updated = response.data
+        assert updated.id == "01234567-89ab-cdef-0123-456789abcdef"
+
+
+class TestVoiceOutTrunkTwilioAuth:
+    @my_vcr.use_cassette("voice_out_trunks/show_twilio.yaml")
+    def test_find_voice_out_trunk_with_twilio_auth(self, client):
+        response = client.voice_out_trunks().find("b5e701f4-ea15-4f9d-8f35-6a0bdce04385")
+        trunk = response.data
+        assert trunk.id == "b5e701f4-ea15-4f9d-8f35-6a0bdce04385"
+        assert trunk.name == "SDK Test twilio"
+        assert trunk.status == VoiceOutTrunkStatus.ACTIVE
+        # authentication_method must be Twilio
+        auth = trunk.authentication_method
+        assert isinstance(auth, TwilioAuthenticationMethod)
+        assert auth.type == "twilio"
+        assert auth.twilio_account_sid == "AC22222222222222222222222222222222"
+
+    @my_vcr.use_cassette("voice_out_trunks/create_twilio.yaml")
+    def test_create_voice_out_trunk_with_twilio_auth(self, client):
+        trunk = VoiceOutTrunk()
+        trunk.name = "SDK Test twilio create"
+        trunk.authentication_method = TwilioAuthenticationMethod(
+            twilio_account_sid="AC33333333333333333333333333333333",
+        )
+        trunk.on_cli_mismatch_action = OnCliMismatchAction.REJECT_CALL
+        response = client.voice_out_trunks().create(trunk)
+        created = response.data
+        assert created.id == "507fa5a2-fd58-4c4d-a231-efba27f67c3a"
+        assert created.name == "SDK Test twilio create"
+        assert created.status == VoiceOutTrunkStatus.ACTIVE
+        auth = created.authentication_method
+        assert isinstance(auth, TwilioAuthenticationMethod)
+        assert auth.twilio_account_sid == "AC33333333333333333333333333333333"
+
+
+class TestVoiceOutTrunkIpOnlyAuth:
+    @my_vcr.use_cassette("voice_out_trunks/show_ip_only.yaml")
+    def test_find_voice_out_trunk_with_ip_only_auth(self, client):
+        response = client.voice_out_trunks().find("23fd58f9-9094-406c-bfd9-f4d25bda13c6")
+        trunk = response.data
+        assert trunk.id == "23fd58f9-9094-406c-bfd9-f4d25bda13c6"
+        assert trunk.name == "SDK Test credentials_and_ip"
+        assert trunk.status == VoiceOutTrunkStatus.ACTIVE
+        # authentication_method must be IpOnly, not CredentialsAndIp
+        auth = trunk.authentication_method
+        assert isinstance(auth, IpOnlyAuthenticationMethod)
+        assert not isinstance(auth, CredentialsAndIpAuthenticationMethod)
+        assert auth.type == "ip_only"
+        assert auth.allowed_sip_ips == ["203.0.113.1/32"]
+        assert not hasattr(auth, "username")
+        assert not hasattr(auth, "password")
+
+
+class TestAuthenticationMethodPolymorphism:
+    def test_from_jsonapi_ip_only(self):
+        data = {"type": "ip_only", "attributes": {"allowed_sip_ips": ["203.0.113.4/32"], "tech_prefix": "123"}}
+        auth = AuthenticationMethod.from_jsonapi(data)
+        assert isinstance(auth, IpOnlyAuthenticationMethod)
+        assert auth.allowed_sip_ips == ["203.0.113.4/32"]
+        assert auth.tech_prefix == "123"
+
+    def test_from_jsonapi_credentials_and_ip(self):
+        data = {"type": "credentials_and_ip", "attributes": {"allowed_sip_ips": ["203.0.113.4/32"], "tech_prefix": "", "username": "user", "password": "pass"}}  # NOSONAR
+        auth = AuthenticationMethod.from_jsonapi(data)
+        assert isinstance(auth, CredentialsAndIpAuthenticationMethod)
+        assert auth.username == "user"
+        assert auth.password == "pass"  # NOSONAR
+
+    def test_from_jsonapi_unknown_type_returns_generic(self):
+        data = {"type": "future_auth", "attributes": {"some_field": "val"}}
+        auth = AuthenticationMethod.from_jsonapi(data)
+        assert isinstance(auth, GenericAuthenticationMethod)
+        assert auth._type == "future_auth"
+        assert auth._attr("some_field") == "val"
+
+    def test_to_jsonapi_roundtrip(self):
+        auth = IpOnlyAuthenticationMethod(allowed_sip_ips=["203.0.113.0/24"], tech_prefix="")
+        serialized = auth.to_jsonapi()
+        assert serialized == {"type": "ip_only", "attributes": {"allowed_sip_ips": ["203.0.113.0/24"], "tech_prefix": ""}}
+
+    def test_type_property_on_known_subclass(self):
+        auth = IpOnlyAuthenticationMethod(allowed_sip_ips=["203.0.113.0/24"])
+        assert auth.type == "ip_only"
+
+    def test_type_property_on_credentials_and_ip(self):
+        auth = CredentialsAndIpAuthenticationMethod(
+            allowed_sip_ips=["203.0.113.0/24"], username="u", password="p",  # NOSONAR
+        )
+        assert auth.type == "credentials_and_ip"
+
+    def test_type_property_on_generic(self):
+        data = {"type": "future_auth", "attributes": {"key": "val"}}
+        auth = AuthenticationMethod.from_jsonapi(data)
+        assert auth.type == "future_auth"

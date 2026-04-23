@@ -5,7 +5,7 @@ from didww.resources.base import DidwwApiModel, DatetimeAttributeField, SafeAttr
 class DidReservation(DidwwApiModel):
     _writable_attrs = {"description"}
 
-    expire_at = DatetimeAttributeField("expire_at")
+    expires_at = DatetimeAttributeField("expires_at")
     created_at = DatetimeAttributeField("created_at")
     description = SafeAttributeField("description")
 

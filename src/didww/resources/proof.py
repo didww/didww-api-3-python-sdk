@@ -2,10 +2,11 @@ from didww.resources.base import DidwwApiModel, DatetimeAttributeField, SafeAttr
 
 
 class Proof(DidwwApiModel):
-    _writable_attrs = set()
+    _writable_attrs = {"external_reference_id"}
 
     created_at = DatetimeAttributeField("created_at")
     expires_at = DatetimeAttributeField("expires_at")
+    external_reference_id = SafeAttributeField("external_reference_id")
 
     proof_type = RelationField("proof_type")
     entity = RelationField("entity")

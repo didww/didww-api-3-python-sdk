@@ -17,6 +17,14 @@ from didww.resources.configuration.sip import SipConfiguration
 
 
 class TestVoiceInTrunk:
+    @my_vcr.use_cassette("voice_in_trunks/show.yaml")
+    def test_find_voice_in_trunk(self, client):
+        response = client.voice_in_trunks().find("2b4b1fcf-fe6a-4de9-8a58-7df46820ba13")
+        trunk = response.data
+        assert trunk.id == "2b4b1fcf-fe6a-4de9-8a58-7df46820ba13"
+        assert trunk.name == "sample trunk pstn"
+        assert trunk.external_reference_id == "crm-vit-0001"
+
     @my_vcr.use_cassette("voice_in_trunks/list.yaml")
     def test_list_voice_in_trunks(self, client):
         params = QueryParams().include("trunk_group", "pop")
@@ -49,13 +57,13 @@ class TestVoiceInTrunk:
         assert sip_trunk is not None, "No SIP trunk found in list fixture"
         config = sip_trunk.configuration
         assert config.username == "username"
-        assert config.host == "216.58.215.78"
+        assert config.host == "203.0.113.78"
         assert config.port == 8060
         assert config.codec_ids == [Codec.PCMU, Codec.PCMA, Codec.G729]
         assert config.transport_protocol_id == TransportProtocol.UDP
         assert config.auth_enabled is True
         assert config.auth_user == "auth_user"
-        assert config.auth_password == "auth_password"
+        assert config.auth_password == "auth_password"  # NOSONAR
         assert config.auth_from_user == ""
         assert config.auth_from_domain == ""
         assert config.resolve_ruri is True
@@ -132,7 +140,7 @@ class TestVoiceInTrunk:
     def test_create_sip_trunk_with_rerouting_disconnect_codes(self, client):
         config = SipConfiguration()
         config.username = "username"
-        config.host = "216.58.215.110"
+        config.host = "203.0.113.110"
         config.sst_refresh_method_id = SstRefreshMethod.INVITE
         config.port = 5060
         config.codec_ids = [Codec.PCMU, Codec.PCMA, Codec.G729, Codec.G723, Codec.TELEPHONE_EVENT]
@@ -185,7 +193,7 @@ class TestVoiceInTrunk:
         ]
         config.media_encryption_mode = MediaEncryptionMode.ZRTP
         config.stir_shaken_mode = StirShakenMode.PAI
-        config.allowed_rtp_ips = ["127.0.0.1"]
+        config.allowed_rtp_ips = ["203.0.113.1"]
 
         trunk = VoiceInTrunk()
         trunk.name = "hello, test sip trunk"

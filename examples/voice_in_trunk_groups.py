@@ -62,7 +62,7 @@ groups = client.voice_in_trunk_groups().list(params).data
 print(f"\nAll trunk groups ({len(groups)}):")
 for g in groups:
     trunks = g.voice_in_trunks or []
-    print(f"  {g.name} ({len(trunks)} trunks)")
+    print(f"  {g.name} ({len(trunks)} trunks) external_reference_id={g.external_reference_id}")
 
 # Update group name
 update = VoiceInTrunkGroup.build(group.id)

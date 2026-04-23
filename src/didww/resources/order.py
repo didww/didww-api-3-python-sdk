@@ -8,10 +8,11 @@ import didww.resources.order_item.capacity_order_item  # noqa: F401
 import didww.resources.order_item.available_did_order_item  # noqa: F401
 import didww.resources.order_item.reservation_did_order_item  # noqa: F401
 import didww.resources.order_item.generic_order_item  # noqa: F401
+import didww.resources.order_item.emergency_order_item  # noqa: F401
 
 
 class Order(DidwwApiModel):
-    _writable_attrs = {"allow_back_ordering", "items", "callback_url", "callback_method"}
+    _writable_attrs = {"allow_back_ordering", "items", "callback_url", "callback_method", "external_reference_id"}
 
     amount = SafeAttributeField("amount")
     status = EnumAttributeField("status", OrderStatus)
@@ -21,9 +22,22 @@ class Order(DidwwApiModel):
     callback_url = SafeAttributeField("callback_url")
     callback_method = EnumAttributeField("callback_method", CallbackMethod)
     allow_back_ordering = SafeAttributeField("allow_back_ordering")
+    external_reference_id = SafeAttributeField("external_reference_id")
 
     class Meta:
         type = "orders"
+
+    @property
+    def is_pending(self):
+        return self.status == OrderStatus.PENDING
+
+    @property
+    def is_completed(self):
+        return self.status == OrderStatus.COMPLETED
+
+    @property
+    def is_cancelled(self):
+        return self.status == OrderStatus.CANCELED
 
     @property
     def items(self):

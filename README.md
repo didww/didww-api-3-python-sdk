@@ -14,7 +14,7 @@ This SDK uses [jsonapi-requests](https://github.com/socialwifi/jsonapi-requests)
 
 Read more https://doc.didww.com/api
 
-This SDK sends the `X-DIDWW-API-Version: 2022-05-10` header with every request.
+This SDK sends the `X-DIDWW-API-Version: 2026-04-16` header with every request.
 
 ## Requirements
 
@@ -145,8 +145,8 @@ proof_types = client.proof_types().list().data
 # Public Keys
 public_keys = client.public_keys().list().data
 
-# Requirements
-requirements = client.requirements().list().data
+# Address Requirements
+requirements = client.address_requirements().list().data
 
 # Supporting Document Templates
 templates = client.supporting_document_templates().list().data
@@ -251,16 +251,29 @@ created = client.voice_in_trunk_groups().create(group).data
 
 > **Note:** Voice Out Trunks require additional account configuration. Contact DIDWW support to enable.
 
+Voice Out Trunks use a polymorphic `authentication_method` (2026-04-16). Three types are supported:
+
+- **`credentials_and_ip`** -- default method; `username` and `password` are server-generated and returned in the response.
+- **`twilio`** -- requires a `twilio_account_sid`.
+- **`ip_only`** -- read-only; can only be configured by DIDWW staff upon request. Cannot be set via the API.
+
 ```python
 from didww.enums import DefaultDstAction, OnCliMismatchAction
 from didww.resources.voice_out_trunk import VoiceOutTrunk
+from didww.resources.authentication_method import CredentialsAndIpAuthenticationMethod
 
 trunk = VoiceOutTrunk()
 trunk.name = "My Outbound Trunk"
-trunk.allowed_sip_ips = ["0.0.0.0/0"]
+# NOTE: 203.0.113.0/24 is RFC 5737 TEST-NET-3 documentation space.
+# Replace with the real CIDR of your SIP infrastructure.
+trunk.authentication_method = CredentialsAndIpAuthenticationMethod(
+    allowed_sip_ips=["203.0.113.0/24"],
+)
 trunk.default_dst_action = DefaultDstAction.ALLOW_ALL
 trunk.on_cli_mismatch_action = OnCliMismatchAction.REJECT_CALL
 created = client.voice_out_trunks().create(trunk).data
+# created.authentication_method.username -- server-generated
+# created.authentication_method.password -- server-generated
 ```
 
 ### Orders
@@ -325,6 +338,86 @@ scg.capacity_pool = CapacityPool.build("pool-uuid")
 created = client.shared_capacity_groups().create(scg).data
 ```
 
+### Address Verifications
+
+```python
+from didww.resources.address_verification import AddressVerification
+from didww.resources.address import Address
+
+# List address verifications
+verifications = client.address_verifications().list().data
+
+# Create address verification
+verification = AddressVerification()
+verification.address = Address.build("address-uuid")
+created = client.address_verifications().create(verification).data
+
+# Update external_reference_id
+created.external_reference_id = "my-ref-123"
+client.address_verifications().update(created)
+```
+
+### Emergency Requirements
+
+```python
+# List emergency requirements
+emergency_reqs = client.emergency_requirements().list().data
+for req in emergency_reqs:
+    print(f"{req.name}: {req.estimate_setup_time}")
+
+# Find a specific emergency requirement
+req = client.emergency_requirements().find("uuid").data
+```
+
+### Emergency Verifications
+
+```python
+from didww.resources.emergency_verification import EmergencyVerification
+from didww.resources.address import Address
+
+# List emergency verifications
+verifications = client.emergency_verifications().list().data
+
+# Create emergency verification
+verification = EmergencyVerification()
+verification.address = Address.build("address-uuid")
+created = client.emergency_verifications().create(verification).data
+
+# Update external_reference_id
+created.external_reference_id = "ext-ref-456"
+client.emergency_verifications().update(created)
+```
+
+### Emergency Calling Services
+
+```python
+# List emergency calling services
+services = client.emergency_calling_services().list().data
+for svc in services:
+    print(f"Status: {svc.status}, Renew: {svc.renew_date}")
+
+# Find a specific emergency calling service
+service = client.emergency_calling_services().find("uuid").data
+
+# Delete an emergency calling service
+client.emergency_calling_services().delete("uuid")
+```
+
+### DID History
+
+```python
+from didww.query_params import QueryParams
+
+# List DID history records
+params = QueryParams().filter("did.id", "did-uuid")
+history = client.did_history().list(params).data
+for record in history:
+    print(f"DID: {record.number}, Order Date: {record.order_created_at}")
+
+# Find a specific DID history record
+record = client.did_history().find("uuid").data
+```
+
 ### Identities
 
 ```python
@@ -365,7 +458,7 @@ from didww.resources.export import Export
 
 export = Export()
 export.export_type = ExportType.CDR_IN
-export.filters = {"year": 2025, "month": 1}
+export.filters = {"from": "2025-01-01T00:00:00", "to": "2025-02-01T00:00:00"}
 created = client.exports().create(export).data
 
 # Download the export when completed
@@ -394,9 +487,22 @@ regions = client.regions().list(params).data
 The SDK distinguishes between date-only and datetime fields:
 
 - **Datetime fields** are deserialized as `datetime.datetime` with `timezone.utc`:
-  - All `created_at` fields — present on most resources
-  - Expiry fields: `Did.expires_at`, `DidReservation.expire_at`, `Proof.expires_at`, `EncryptedFile.expire_at`
-- **Date-only fields** (`Identity.birth_date`, `CapacityPool.renew_date`, `DidOrderItem.billed_from`/`billed_to`) remain as `string` in `"YYYY-MM-DD"` format.
+  - `created_at` — present on most resources
+  - `expires_at` — `Did`, `DidReservation`, `Proof`, `EncryptedFile` (nullable)
+  - `activated_at` — `EmergencyCallingService` (nullable)
+  - `canceled_at` — `EmergencyCallingService` (nullable)
+- **Date-only fields** remain as `str` in `"YYYY-MM-DD"` format:
+  - `Identity.birth_date`
+  - `CapacityPool.renew_date`, `EmergencyCallingService.renew_date` (nullable)
+  - `DidOrderItem.billed_from` / `billed_to`
+- **String fields** (not numeric):
+  - `EmergencyRequirement.estimate_setup_time` — e.g. `"7-14 days"`, `"1"`
+  - `EmergencyRequirement.requirement_restriction_message` — nullable
+
+**Important changes from previous API versions:**
+- `expire_at` renamed to `expires_at` on `DidReservation` and `EncryptedFile`
+- `renew_date` is a date-only string, NOT a datetime
+- `estimate_setup_time` is a string, NOT an integer
 
 ```python
 from datetime import timezone
@@ -411,10 +517,15 @@ print(identity.birth_date)  # "1990-05-20"
 
 ## Enums
 
-The SDK provides enum classes aligned with the Java SDK (for example `CallbackMethod`, `IdentityType`, `OrderStatus`, `ExportType`, `CliFormat`, `OnCliMismatchAction`, `MediaEncryptionMode`, `TransportProtocol`, `Codec`, and more).
+The SDK provides enum classes for all API option fields:
 
-> **Note:** `OnCliMismatchAction.REPLACE_CLI` and `OnCliMismatchAction.RANDOMIZE_CLI` require additional
-> account configuration. Contact DIDWW support to enable these values.
+`CallbackMethod`, `IdentityType`, `OrderStatus`, `ExportType`, `ExportStatus`, `CliFormat`,
+`OnCliMismatchAction`\*, `MediaEncryptionMode`, `DefaultDstAction`, `VoiceOutTrunkStatus`,
+`EmergencyCallingServiceStatus`, `EmergencyVerificationStatus`, `DiversionRelayPolicy`,
+`TransportProtocol`, `Codec`, `RxDtmfFormat`, `TxDtmfFormat`, `SstRefreshMethod`,
+`ReroutingDisconnectCode`, `Feature`, `AreaLevel`, `AddressVerificationStatus`, `StirShakenMode`
+
+\* `REPLACE_CLI` and `RANDOMIZE_CLI` require additional account configuration. Contact DIDWW support to enable these values.
 
 ```python
 from didww.enums import CallbackMethod, IdentityType
@@ -516,7 +627,7 @@ except DidwwClientError as e:
 | AvailableDid | `client.available_dids()` | list, find |
 | ProofType | `client.proof_types()` | list, find |
 | PublicKey | `client.public_keys()` | list, find |
-| Requirement | `client.requirements()` | list, find |
+| AddressRequirement | `client.address_requirements()` | list, find |
 | SupportingDocumentTemplate | `client.supporting_document_templates()` | list, find |
 | Balance | `client.balance()` | find |
 | Did | `client.dids()` | list, find, update, delete |
@@ -528,14 +639,19 @@ except DidwwClientError as e:
 | CapacityPool | `client.capacity_pools()` | list, find |
 | SharedCapacityGroup | `client.shared_capacity_groups()` | list, find, create, update, delete |
 | Order | `client.orders()` | list, find, create |
-| Export | `client.exports()` | list, find, create |
+| Export | `client.exports()` | list, find, create, update |
 | Address | `client.addresses()` | list, find, create, delete |
-| AddressVerification | `client.address_verifications()` | list, create |
+| AddressVerification | `client.address_verifications()` | list, find, create, update |
 | Identity | `client.identities()` | list, find, create, delete |
 | EncryptedFile | `client.encrypted_files()` | list, find, delete |
 | PermanentSupportingDocument | `client.permanent_supporting_documents()` | create, delete |
 | Proof | `client.proofs()` | create, delete |
-| RequirementValidation | `client.requirement_validations()` | create |
+| AddressRequirementValidation | `client.address_requirement_validations()` | create |
+| DidHistory | `client.did_history()` | list, find |
+| EmergencyRequirement | `client.emergency_requirements()` | list, find |
+| EmergencyRequirementValidation | `client.emergency_requirement_validations()` | create |
+| EmergencyCallingService | `client.emergency_calling_services()` | list, find, delete |
+| EmergencyVerification | `client.emergency_verifications()` | list, find, create, update |
 | StockKeepingUnit | _(include-only)_ | included via `did_groups`, `available_dids` |
 | QtyBasedPricing | _(include-only)_ | included via `capacity_pools` |
 

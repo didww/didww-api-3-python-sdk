@@ -17,6 +17,7 @@ class Did(DidwwApiModel):
     channels_included_count = SafeAttributeField("channels_included_count")
     billing_cycles_count = SafeAttributeField("billing_cycles_count")
     dedicated_channels_count = SafeAttributeField("dedicated_channels_count")
+    emergency_enabled = SafeAttributeField("emergency_enabled")
     order = RelationField("order")
     did_group = RelationField("did_group")
     voice_in_trunk = ExclusiveRelationField("voice_in_trunk", excludes="voice_in_trunk_group")
@@ -24,6 +25,9 @@ class Did(DidwwApiModel):
     capacity_pool = RelationField("capacity_pool")
     shared_capacity_group = RelationField("shared_capacity_group")
     address_verification = RelationField("address_verification")
+    emergency_calling_service = RelationField("emergency_calling_service")
+    emergency_verification = RelationField("emergency_verification")
+    identity = RelationField("identity")
 
     class Meta:
         type = "dids"

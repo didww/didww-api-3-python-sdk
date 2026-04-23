@@ -29,14 +29,14 @@ def to_enum_list(enum_cls, values):
 
 
 class CallbackMethod(str, Enum):
-    POST = "POST"
-    GET = "GET"
+    POST = "post"
+    GET = "get"
 
 
 class AddressVerificationStatus(str, Enum):
-    PENDING = "Pending"
-    APPROVED = "Approved"
-    REJECTED = "Rejected"
+    PENDING = "pending"
+    APPROVED = "approved"
+    REJECTED = "rejected"
 
 
 class ExportType(str, Enum):
@@ -45,21 +45,21 @@ class ExportType(str, Enum):
 
 
 class ExportStatus(str, Enum):
-    PENDING = "Pending"
-    PROCESSING = "Processing"
-    COMPLETED = "Completed"
+    PENDING = "pending"
+    PROCESSING = "processing"
+    COMPLETED = "completed"
 
 
 class IdentityType(str, Enum):
-    PERSONAL = "Personal"
-    BUSINESS = "Business"
-    ANY = "Any"
+    PERSONAL = "personal"
+    BUSINESS = "business"
+    ANY = "any"
 
 
 class OrderStatus(str, Enum):
-    PENDING = "Pending"
-    CANCELED = "Canceled"
-    COMPLETED = "Completed"
+    PENDING = "pending"
+    CANCELED = "canceled"
+    COMPLETED = "completed"
 
 
 class OnCliMismatchAction(str, Enum):
@@ -81,6 +81,21 @@ class DefaultDstAction(str, Enum):
     REJECT_ALL = "reject_all"
 
 
+class EmergencyVerificationStatus(str, Enum):
+    PENDING = "pending"
+    APPROVED = "approved"
+    REJECTED = "rejected"
+
+
+class EmergencyCallingServiceStatus(str, Enum):
+    ACTIVE = "active"
+    CANCELED = "canceled"
+    CHANGES_REQUIRED = "changes_required"
+    IN_PROCESS = "in_process"
+    NEW = "new"
+    PENDING_UPDATE = "pending_update"
+
+
 class VoiceOutTrunkStatus(str, Enum):
     ACTIVE = "active"
     BLOCKED = "blocked"
@@ -93,10 +108,10 @@ class CliFormat(str, Enum):
 
 
 class AreaLevel(str, Enum):
-    WORLDWIDE = "WorldWide"
-    COUNTRY = "Country"
-    AREA = "Area"
-    CITY = "City"
+    WORLDWIDE = "world_wide"
+    COUNTRY = "country"
+    AREA = "area"
+    CITY = "city"
 
 
 class Feature(str, Enum):
@@ -104,7 +119,17 @@ class Feature(str, Enum):
     VOICE_OUT = "voice_out"
     T38 = "t38"
     SMS_IN = "sms_in"
-    SMS_OUT = "sms_out"
+    P2P = "p2p"
+    A2P = "a2p"
+    EMERGENCY = "emergency"
+    CNAM_OUT = "cnam_out"
+
+
+class DiversionRelayPolicy(str, Enum):
+    NONE = "none"
+    AS_IS = "as_is"
+    SIP = "sip"
+    TEL = "tel"
 
 
 class StirShakenMode(str, Enum):

@@ -16,7 +16,12 @@ _TYPE_MAP = {
     "capacity_pools": "didww.resources.capacity_pool:CapacityPool",
     "cities": "didww.resources.city:City",
     "countries": "didww.resources.country:Country",
+    "did_history": "didww.resources.did_history:DidHistory",
     "dids": "didww.resources.did:Did",
+    "emergency_calling_services": "didww.resources.emergency_calling_service:EmergencyCallingService",
+    "emergency_requirements": "didww.resources.emergency_requirement:EmergencyRequirement",
+    "emergency_requirement_validations": "didww.resources.emergency_requirement_validation:EmergencyRequirementValidation",
+    "emergency_verifications": "didww.resources.emergency_verification:EmergencyVerification",
     "did_groups": "didww.resources.did_group:DidGroup",
     "did_group_types": "didww.resources.did_group_type:DidGroupType",
     "did_reservations": "didww.resources.did_reservation:DidReservation",
@@ -27,7 +32,7 @@ _TYPE_MAP = {
     "proofs": "didww.resources.proof:Proof",
     "proof_types": "didww.resources.proof_type:ProofType",
     "regions": "didww.resources.region:Region",
-    "requirements": "didww.resources.requirement:Requirement",
+    "address_requirements": "didww.resources.address_requirement:AddressRequirement",
     "shared_capacity_groups": "didww.resources.shared_capacity_group:SharedCapacityGroup",
     "supporting_document_templates": "didww.resources.supporting_document_template:SupportingDocumentTemplate",
     "voice_in_trunks": "didww.resources.voice_in_trunk:VoiceInTrunk",
@@ -42,7 +47,7 @@ _TYPE_MAP = {
     "encrypted_files": "didww.resources.encrypted_file:EncryptedFile",
     "exports": "didww.resources.export:Export",
     "public_keys": "didww.resources.public_key:PublicKey",
-    "requirement_validations": "didww.resources.requirement_validation:RequirementValidation",
+    "address_requirement_validations": "didww.resources.address_requirement_validation:AddressRequirementValidation",
     "voice_out_trunk_regenerate_credentials": "didww.resources.voice_out_trunk_regenerate_credential:VoiceOutTrunkRegenerateCredential",
 }
 
@@ -261,6 +266,7 @@ class DidwwApiModel(ApiModel):
         super().__init__(raw_object=raw_object)
         self._dirty_attrs = set()
         self._dirty_rels = set()
+        self._resource_meta = {}
         self._install_dirty_tracking()
         self._clear_dirty_state()
 
@@ -312,6 +318,11 @@ class DidwwApiModel(ApiModel):
             doc["relationships"] = rels
         return doc
 
+    @property
+    def meta(self):
+        """Per-resource meta from the JSON:API response."""
+        return self._resource_meta
+
     def _null_relationship(self, key):
         """Write null data into the ORM relationship, like Java's field = null."""
         self.raw_object.relationships[key] = {"data": None}
@@ -332,6 +343,19 @@ class ReadOnlyRepository:
     def __init__(self, client):
         self.client = client
 
+    @staticmethod
+    def _attach_resource_meta(body, resources):
+        """Attach per-resource meta from the raw JSON:API body to parsed resources."""
+        data = body.get("data")
+        if data is None:
+            return
+        if isinstance(data, list):
+            for raw, resource in zip(data, resources):
+                if isinstance(raw, dict) and "meta" in raw:
+                    resource._resource_meta = raw["meta"]
+        elif isinstance(data, dict) and "meta" in data:
+            resources._resource_meta = data["meta"]
+
     def list(self, params=None):
         query = params.to_dict() if params else None
         body = self.client.get(self._path, params=query)
@@ -339,6 +363,7 @@ class ReadOnlyRepository:
         resources = self._resource_class.from_response_content(response)
         if not isinstance(resources, list):
             resources = [resources]
+        self._attach_resource_meta(body, resources)
         return ApiResponse(data=resources, meta=body.get("meta", {}))
 
     def find(self, resource_id, params=None):
@@ -346,6 +371,7 @@ class ReadOnlyRepository:
         body = self.client.get(f"{self._path}/{resource_id}", params=query)
         response = JsonApiResponse.from_data(body)
         resource = self._resource_class.from_response_content(response)
+        self._attach_resource_meta(body, resource)
         return ApiResponse(data=resource, meta=body.get("meta", {}))
 
 
@@ -393,6 +419,8 @@ class CreateOnlyRepository(ReadOnlyRepository):
         query = params.to_dict() if params else None
         body = self.client.post(self._path, doc, params=query)
         resource._clear_dirty_state()
+        if body is None:
+            return None
         response = JsonApiResponse.from_data(body)
         created = self._resource_class.from_response_content(response)
         return ApiResponse(data=created, meta=body.get("meta", {}))

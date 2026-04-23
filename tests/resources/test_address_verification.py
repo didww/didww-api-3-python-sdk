@@ -98,3 +98,48 @@ class TestAddressVerification:
         assert created.callback_url == "http://example.com"
         assert created.address is not None
         assert created.address.city_name == "Chicago"
+
+class TestAddressVerificationStatusHelpers:
+    def test_is_pending(self):
+        av = AddressVerification()
+        av.status = AddressVerificationStatus.PENDING
+        assert av.is_pending is True
+        assert av.is_approved is False
+        assert av.is_rejected is False
+
+    def test_is_approved(self):
+        av = AddressVerification()
+        av.status = AddressVerificationStatus.APPROVED
+        assert av.is_approved is True
+        assert av.is_pending is False
+        assert av.is_rejected is False
+
+    def test_is_rejected(self):
+        av = AddressVerification()
+        av.status = AddressVerificationStatus.REJECTED
+        assert av.is_rejected is True
+        assert av.is_pending is False
+        assert av.is_approved is False
+
+
+class TestAddressVerificationUpdate:
+    def test_patch_external_reference_id_request_body(self):
+        """PATCH must send exactly the id, type, and only the dirty attribute."""
+        av = AddressVerification.build("c8e004b0-87ec-4987-b4fb-ee89db099f0e")
+        av.external_reference_id = "ext-ref-123"
+        doc = av.to_jsonapi(include_id=True, dirty_only=True)
+        assert doc == {
+            "id": "c8e004b0-87ec-4987-b4fb-ee89db099f0e",
+            "type": "address_verifications",
+            "attributes": {"external_reference_id": "ext-ref-123"},
+        }
+
+    @my_vcr.use_cassette("address_verifications/update.yaml")
+    def test_update_address_verification_external_reference_id(self, client):
+        av = AddressVerification()
+        av.id = "c8e004b0-87ec-4987-b4fb-ee89db099f0e"
+        av.external_reference_id = "ext-ref-123"
+        response = client.address_verifications().update(av)
+        updated = response.data
+        assert updated.id == "c8e004b0-87ec-4987-b4fb-ee89db099f0e"
+        assert updated.external_reference_id == "ext-ref-123"

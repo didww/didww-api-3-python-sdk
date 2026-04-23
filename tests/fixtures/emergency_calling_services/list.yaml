@@ -1,0 +1,22 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept:
+      - application/vnd.api+json
+      Api-Key:
+      - test-api-key
+      Content-Type:
+      - application/vnd.api+json
+    method: GET
+    uri: https://sandbox-api.didww.com/v3/emergency_calling_services
+  response:
+    body:
+      string: '{"data":[{"id":"ecs-001","type":"emergency_calling_services","attributes":{"name":"US Emergency","reference":"ECS-123","status":"active","activated_at":"2026-04-01T00:00:00.000Z","canceled_at":null,"created_at":"2026-03-15T10:00:00.000Z","renew_date":"2026-05-01"},"relationships":{"country":{"links":{"self":"https://sandbox-api.didww.com/v3/emergency_calling_services/ecs-001/relationships/country","related":"https://sandbox-api.didww.com/v3/emergency_calling_services/ecs-001/country"}},"did_group_type":{"links":{"self":"https://sandbox-api.didww.com/v3/emergency_calling_services/ecs-001/relationships/did_group_type","related":"https://sandbox-api.didww.com/v3/emergency_calling_services/ecs-001/did_group_type"}},"dids":{"links":{"self":"https://sandbox-api.didww.com/v3/emergency_calling_services/ecs-001/relationships/dids","related":"https://sandbox-api.didww.com/v3/emergency_calling_services/ecs-001/dids"}}}}],"meta":{"api_version":"2026-04-16","total_records":1}}'
+    headers:
+      Content-Type:
+      - application/vnd.api+json
+    status:
+      code: 200
+      message: OK
+version: 1

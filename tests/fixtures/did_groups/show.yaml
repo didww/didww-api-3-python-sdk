@@ -16,7 +16,8 @@ interactions:
         ,\n    \"type\": \"did_groups\",\n    \"attributes\": {\n      \"prefix\"\
         : \"241\",\n      \"local_prefix\": \"\",\n      \"features\": [\n       \
         \ \"voice_in\"\n      ],\n      \"is_metered\": false,\n      \"area_name\":\
-        \ \"Aachen\",\n      \"allow_additional_channels\": true\n    },\n    \"relationships\"\
+        \ \"Aachen\",\n      \"allow_additional_channels\": true,\n      \"service_restrictions\"\
+        : null\n    },\n    \"relationships\"\
         : {\n      \"country\": {\n        \"links\": {\n          \"self\": \"https://sandbox-api.didww.com/v3/did_groups/2187c36d-28fb-436f-8861-5a0f5b5a3ee1/relationships/country\"\
         ,\n          \"related\": \"https://sandbox-api.didww.com/v3/did_groups/2187c36d-28fb-436f-8861-5a0f5b5a3ee1/country\"\
         \n        },\n        \"data\": {\n          \"type\": \"countries\",\n  \
@@ -42,7 +43,7 @@ interactions:
         \       \"id\": \"afcb54cd-1e36-472a-9f5b-07328d0d187f\"\n          }\n  \
         \      ]\n      }\n    },\n    \"meta\": {\n      \"needs_registration\":\
         \ true,\n      \"is_available\": true,\n      \"restrictions\": \"German Geographic\
-        \ Registration:\\r\\n\\r\\nGerman Local DID registration requirements:\\r\\\
+        \ Registration:\\r\\n\\r\\nGerman Local DID registration address_requirements:\\r\\\
         n1. Name, business name and contact phone number.\\r\\n2. Passport or ID copy.**\\\
         r\\n3. Current address in Germany, must be from the same city in Germany as\
         \ the DID ordered (street, building number, postal code, city).\\r\\n4. Proof\

@@ -92,12 +92,12 @@ class TestOrderSerialization:
             "type": "orders",
             "attributes": {
                 "amount": "99.99",
-                "status": "Completed",
+                "status": "completed",
                 "created_at": "2021-01-01T00:00:00Z",
                 "description": "Order desc",
                 "reference": "REF-123",
                 "callback_url": "http://example.com",
-                "callback_method": "POST",
+                "callback_method": "post",
                 "allow_back_ordering": True,
                 "items": [],
             },
@@ -122,13 +122,13 @@ class TestExportSerialization:
             "id": "abc",
             "type": "exports",
             "attributes": {
-                "status": "Completed",
+                "status": "completed",
                 "created_at": "2021-01-01T00:00:00Z",
                 "url": "https://example.com/export.csv.gz",
                 "export_type": "cdr_in",
                 "filters": {"year": "2021"},
                 "callback_url": "http://example.com",
-                "callback_method": "POST",
+                "callback_method": "post",
             },
         })
         doc = export.to_jsonapi()
@@ -159,7 +159,7 @@ class TestIdentitySerialization:
                 "vat_id": "VAT-1",
                 "description": "desc",
                 "personal_tax_id": "TAX-1",
-                "identity_type": "Personal",
+                "identity_type": "personal",
                 "external_reference_id": "EXT-1",
                 "contact_email": "john@example.com",
                 "created_at": "2021-01-01T00:00:00Z",
@@ -208,10 +208,10 @@ class TestAddressVerificationSerialization:
             "id": "abc",
             "type": "address_verifications",
             "attributes": {
-                "status": "Pending",
+                "status": "pending",
                 "service_description": "svc",
                 "callback_url": "http://example.com",
-                "callback_method": "GET",
+                "callback_method": "get",
                 "reject_reasons": "reason",
                 "reference": "REF-1",
                 "created_at": "2021-01-01T00:00:00Z",
@@ -304,27 +304,54 @@ class TestVoiceOutTrunkSerialization:
             "type": "voice_out_trunks",
             "attributes": {
                 "name": "Trunk 1",
-                "allowed_sip_ips": ["1.2.3.4"],
                 "on_cli_mismatch_action": "reject",
                 "capacity_limit": 10,
                 "status": "Active",
-                "username": "user123",
-                "password": "pass456",
                 "threshold_reached": False,
                 "created_at": "2021-01-01T00:00:00Z",
+                "authentication_method": {
+                    "type": "credentials_and_ip",
+                    "attributes": {
+                        "allowed_sip_ips": ["203.0.113.4"],
+                        "tech_prefix": "",
+                        "username": "user123",
+                        "password": "pass456",  # NOSONAR
+                    },
+                },
             },
         })
         doc = trunk.to_jsonapi()
         attrs = doc["attributes"]
-        assert "username" not in attrs
-        assert "password" not in attrs
         assert "threshold_reached" not in attrs
         assert "created_at" not in attrs
         # writable fields must be present
         assert attrs["name"] == "Trunk 1"
-        assert attrs["allowed_sip_ips"] == ["1.2.3.4"]
         assert attrs["capacity_limit"] == 10
         assert attrs["status"] == "Active"
+        assert "authentication_method" in attrs
+
+    def test_patch_only_authentication_method_when_reassigned(self):
+        """PATCH must send only authentication_method when it is the only changed field."""
+        from didww.resources.authentication_method import CredentialsAndIpAuthenticationMethod
+        trunk = VoiceOutTrunk.build("abc-123")
+        assert len(trunk._dirty_attrs) == 0
+
+        trunk.authentication_method = CredentialsAndIpAuthenticationMethod(
+            allowed_sip_ips=["192.0.2.10/32"],
+            tech_prefix="99",
+        )
+
+        assert "authentication_method" in trunk._dirty_attrs
+        doc = trunk.to_jsonapi(include_id=True, dirty_only=True)
+        assert doc["id"] == "abc-123"
+        assert doc["type"] == "voice_out_trunks"
+        attrs = doc["attributes"]
+        assert "authentication_method" in attrs
+        assert attrs["authentication_method"]["type"] == "credentials_and_ip"
+        assert attrs["authentication_method"]["attributes"]["allowed_sip_ips"] == ["192.0.2.10/32"]
+        assert attrs["authentication_method"]["attributes"]["tech_prefix"] == "99"
+        # No other attributes should be present
+        assert set(attrs.keys()) == {"authentication_method"}
 
 
 # ---------------------------------------------------------------------------
@@ -516,50 +543,50 @@ class TestMutableAttributeTracking:
         })
 
     def test_list_append_marks_dirty(self):
-        trunk = self._voice_out_trunk(allowed_sip_ips=["1.2.3.4"])
-        trunk.allowed_sip_ips.append("5.6.7.8")
+        trunk = self._voice_out_trunk(dst_prefixes=["370"])
+        trunk.dst_prefixes.append("371")
         doc = trunk.to_jsonapi(include_id=True, dirty_only=True)
-        assert doc["attributes"]["allowed_sip_ips"] == ["1.2.3.4", "5.6.7.8"]
+        assert doc["attributes"]["dst_prefixes"] == ["370", "371"]
 
     def test_list_extend_marks_dirty(self):
-        trunk = self._voice_out_trunk(allowed_sip_ips=["1.2.3.4"])
-        trunk.allowed_sip_ips.extend(["5.6.7.8", "9.10.11.12"])
+        trunk = self._voice_out_trunk(dst_prefixes=["370"])
+        trunk.dst_prefixes.extend(["371", "372"])
         doc = trunk.to_jsonapi(include_id=True, dirty_only=True)
-        assert doc["attributes"]["allowed_sip_ips"] == ["1.2.3.4", "5.6.7.8", "9.10.11.12"]
+        assert doc["attributes"]["dst_prefixes"] == ["370", "371", "372"]
 
     def test_list_remove_marks_dirty(self):
-        trunk = self._voice_out_trunk(allowed_sip_ips=["1.2.3.4", "5.6.7.8"])
-        trunk.allowed_sip_ips.remove("1.2.3.4")
+        trunk = self._voice_out_trunk(dst_prefixes=["370", "371"])
+        trunk.dst_prefixes.remove("370")
         doc = trunk.to_jsonapi(include_id=True, dirty_only=True)
-        assert doc["attributes"]["allowed_sip_ips"] == ["5.6.7.8"]
+        assert doc["attributes"]["dst_prefixes"] == ["371"]
 
     def test_list_iadd_marks_dirty(self):
-        trunk = self._voice_out_trunk(allowed_sip_ips=["1.2.3.4"])
-        trunk.allowed_sip_ips += ["5.6.7.8"]
+        trunk = self._voice_out_trunk(dst_prefixes=["370"])
+        trunk.dst_prefixes += ["371"]
         doc = trunk.to_jsonapi(include_id=True, dirty_only=True)
-        assert doc["attributes"]["allowed_sip_ips"] == ["1.2.3.4", "5.6.7.8"]
+        assert doc["attributes"]["dst_prefixes"] == ["370", "371"]
 
     def test_list_sort_marks_dirty(self):
-        trunk = self._voice_out_trunk(allowed_sip_ips=["5.6.7.8", "1.2.3.4"])
-        trunk.allowed_sip_ips.sort()
+        trunk = self._voice_out_trunk(dst_prefixes=["371", "370"])
+        trunk.dst_prefixes.sort()
         doc = trunk.to_jsonapi(include_id=True, dirty_only=True)
-        assert doc["attributes"]["allowed_sip_ips"] == ["1.2.3.4", "5.6.7.8"]
+        assert doc["attributes"]["dst_prefixes"] == ["370", "371"]
 
     def test_list_reverse_marks_dirty(self):
-        trunk = self._voice_out_trunk(allowed_sip_ips=["1.2.3.4", "5.6.7.8"])
-        trunk.allowed_sip_ips.reverse()
+        trunk = self._voice_out_trunk(dst_prefixes=["370", "371"])
+        trunk.dst_prefixes.reverse()
         doc = trunk.to_jsonapi(include_id=True, dirty_only=True)
-        assert doc["attributes"]["allowed_sip_ips"] == ["5.6.7.8", "1.2.3.4"]
+        assert doc["attributes"]["dst_prefixes"] == ["371", "370"]
 
     def test_setdefault_wraps_list_for_mutation_tracking(self):
         """setdefault with a list default must wrap it so in-place mutations are tracked after dirty clear."""
         trunk = self._voice_out_trunk()
-        trunk.attributes.setdefault("allowed_sip_ips", ["1.2.3.4"])
+        trunk.attributes.setdefault("dst_prefixes", ["370"])
         # Clear dirty state to simulate a save/reload cycle
         trunk._clear_dirty_state()
         assert len(trunk._dirty_attrs) == 0
         # Mutate the list in-place — only a wrapped list will re-mark the key dirty
-        trunk.allowed_sip_ips.append("5.6.7.8")
+        trunk.dst_prefixes.append("371")
         doc = trunk.to_jsonapi(include_id=True, dirty_only=True)
-        assert doc["attributes"]["allowed_sip_ips"] == ["1.2.3.4", "5.6.7.8"]
+        assert doc["attributes"]["dst_prefixes"] == ["370", "371"]
 

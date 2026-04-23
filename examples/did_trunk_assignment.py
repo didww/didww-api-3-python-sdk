@@ -34,6 +34,7 @@ if not dids:
     raise RuntimeError("No DIDs found. Order a DID first.")
 did = dids[0]
 print(f"Using DID: {did.number} ({did.id})")
+print(f"  Emergency enabled: {did.emergency_enabled}")
 
 # Get a POP
 pop = client.pops().list().data[0]

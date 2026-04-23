@@ -99,7 +99,7 @@ interactions:
         \n          }\n        }\n      }\n    }\n  ],\n  \"included\": [\n    {\n\
         \      \"id\": \"11b3fba2-96e2-452e-bed8-5124ed351af3\",\n      \"type\":\
         \ \"orders\",\n      \"attributes\": {\n        \"amount\": \"0.37\",\n  \
-        \      \"status\": \"Completed\",\n        \"created_at\": \"2018-12-27T09:59:54.892Z\"\
+        \      \"status\": \"completed\",\n        \"created_at\": \"2018-12-27T09:59:54.892Z\"\
         ,\n        \"description\": \"DID\",\n        \"reference\": \"TZO-560180\"\
         ,\n        \"items\": [\n          {\n            \"type\": \"did_order_items\"\
         ,\n            \"attributes\": {\n              \"qty\": 1,\n            \

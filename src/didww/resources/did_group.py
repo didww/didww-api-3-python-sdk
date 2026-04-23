@@ -8,13 +8,14 @@ class DidGroup(DidwwApiModel):
     is_metered = SafeAttributeField("is_metered")
     area_name = SafeAttributeField("area_name")
     allow_additional_channels = SafeAttributeField("allow_additional_channels")
+    service_restrictions = SafeAttributeField("service_restrictions")
 
     country = RelationField("country")
     region = RelationField("region")
     city = RelationField("city")
     did_group_type = RelationField("did_group_type")
     stock_keeping_units = RelationField("stock_keeping_units")
-    requirement = RelationField("requirement")
+    address_requirement = RelationField("address_requirement")
 
     class Meta:
         type = "did_groups"

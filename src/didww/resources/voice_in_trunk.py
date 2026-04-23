@@ -11,6 +11,7 @@ class VoiceInTrunk(DidwwApiModel):
     _writable_attrs = {
         "priority", "capacity_limit", "weight", "name", "cli_format",
         "cli_prefix", "description", "ringing_timeout", "configuration",
+        "external_reference_id",
     }
 
     name = SafeAttributeField("name")
@@ -22,6 +23,7 @@ class VoiceInTrunk(DidwwApiModel):
     description = SafeAttributeField("description")
     ringing_timeout = SafeAttributeField("ringing_timeout")
     created_at = DatetimeAttributeField("created_at")
+    external_reference_id = SafeAttributeField("external_reference_id")
 
     pop = RelationField("pop")
     voice_in_trunk_group = RelationField("voice_in_trunk_group")

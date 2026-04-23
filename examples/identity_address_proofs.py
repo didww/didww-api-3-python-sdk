@@ -2,10 +2,10 @@
 Example: Create identity, address, and attach proofs with encrypted files.
 
 Demonstrates:
-1. Create an identity with a country
+1. Create an identity with a country (and optional birth_country, 2026-04-16)
 2. Create an address linked to the identity
 3. Fetch proof types for identity and address
-4. Encrypt and upload a PDF file
+4. Encrypt and upload a PDF file (single file per request, 2026-04-16)
 5. Create proofs attached to identity and address
 6. Clean up created resources
 """
@@ -89,10 +89,17 @@ for label in ["identity_proof", "address_proof"]:
         "filename": f"{label}.pdf.enc",
     })
 
-file_ids = client.upload_encrypted_files(
-    fingerprint=fingerprint,
-    files=files_to_upload,
-)
+file_ids = []
+for item in files_to_upload:
+    fid = client.upload_encrypted_file(
+        fingerprint=fingerprint,
+        data=item["data"],
+        description=item["description"],
+        filename=item["filename"],
+    )
+    file_ids.append(fid)
+# Note: with API 2026-04-16, upload_encrypted_file accepts a single file per request.
+# The old upload_encrypted_files (plural) method is no longer available.
 print(f"Uploaded encrypted files: {file_ids}")
 
 # --- Step 6: Create proof for identity ---

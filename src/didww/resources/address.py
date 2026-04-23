@@ -2,7 +2,7 @@ from didww.resources.base import DidwwApiModel, DatetimeAttributeField, SafeAttr
 
 
 class Address(DidwwApiModel):
-    _writable_attrs = {"city_name", "postal_code", "address", "description"}
+    _writable_attrs = {"city_name", "postal_code", "address", "description", "external_reference_id"}
 
     city_name = SafeAttributeField("city_name")
     postal_code = SafeAttributeField("postal_code")
@@ -10,6 +10,7 @@ class Address(DidwwApiModel):
     description = SafeAttributeField("description")
     created_at = DatetimeAttributeField("created_at")
     verified = SafeAttributeField("verified")
+    external_reference_id = SafeAttributeField("external_reference_id")
 
     country = RelationField("country")
     identity = RelationField("identity")

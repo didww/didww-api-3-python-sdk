@@ -13,7 +13,7 @@ except PackageNotFoundError:
 
 
 class DidwwClient:
-    API_VERSION = "2022-05-10"
+    API_VERSION = "2026-04-16"
 
     def __init__(self, api_key, environment=Environment.SANDBOX, base_url=None, session=None):
         if not api_key:
@@ -96,31 +96,26 @@ class DidwwClient:
 
     # --- File upload / download ---
 
-    def upload_encrypted_files(self, fingerprint, files):
-        """Upload encrypted files via multipart POST.
+    def upload_encrypted_file(self, fingerprint, data, description=None, filename="file.enc"):
+        """Upload a single encrypted file via multipart POST.
 
         Args:
             fingerprint: Encryption fingerprint string.
-            files: List of dicts, each with:
-                - 'data' (bytes): encrypted file content
-                - 'description' (str, optional): file description
-                - 'filename' (str, optional): filename, defaults to 'file.enc'
+            data: Encrypted file content (bytes).
+            description: Optional file description.
+            filename: Filename, defaults to 'file.enc'.
 
         Returns:
-            List of uploaded file ID strings.
+            The created resource ID string.
         """
         url = self._url("encrypted_files")
         multipart_fields = [
             ("encrypted_files[encryption_fingerprint]", (None, fingerprint)),
+            ("encrypted_files[file]", (filename, data, "application/octet-stream")),
         ]
-        for item in files:
-            desc = item.get("description", "")
-            filename = item.get("filename", "file.enc")
+        if description:
             multipart_fields.append(
-                ("encrypted_files[items][][description]", (None, desc)),
-            )
-            multipart_fields.append(
-                ("encrypted_files[items][][file]", (filename, item["data"], "application/octet-stream")),
+                ("encrypted_files[description]", (None, description)),
             )
         resp = self._session.post(
             url,
@@ -139,9 +134,9 @@ class DidwwClient:
                 status_code=resp.status_code,
             )
         body = resp.json()
-        if "ids" not in body:
+        if "data" not in body or "id" not in body["data"]:
             raise DidwwClientError("Unexpected encrypted_files upload response")
-        return body["ids"]
+        return body["data"]["id"]
 
     def download_export(self, url, file_path):
         """Download an export file (.csv.gz).
@@ -241,9 +236,9 @@ class DidwwClient:
         from didww.resources.public_key import PublicKeyRepository
         return PublicKeyRepository(self)
 
-    def requirements(self):
-        from didww.resources.requirement import RequirementRepository
-        return RequirementRepository(self)
+    def address_requirements(self):
+        from didww.resources.address_requirement import AddressRequirementRepository
+        return AddressRequirementRepository(self)
 
     def supporting_document_templates(self):
         from didww.resources.supporting_document_template import SupportingDocumentTemplateRepository
@@ -276,6 +271,26 @@ class DidwwClient:
     def encrypted_files(self):
         from didww.resources.encrypted_file import EncryptedFileRepository
         return EncryptedFileRepository(self)
+
+    def did_history(self):
+        from didww.resources.did_history import DidHistoryRepository
+        return DidHistoryRepository(self)
+
+    def emergency_requirements(self):
+        from didww.resources.emergency_requirement import EmergencyRequirementRepository
+        return EmergencyRequirementRepository(self)
+
+    def emergency_requirement_validations(self):
+        from didww.resources.emergency_requirement_validation import EmergencyRequirementValidationRepository
+        return EmergencyRequirementValidationRepository(self)
+
+    def emergency_calling_services(self):
+        from didww.resources.emergency_calling_service import EmergencyCallingServiceRepository
+        return EmergencyCallingServiceRepository(self)
+
+    def emergency_verifications(self):
+        from didww.resources.emergency_verification import EmergencyVerificationRepository
+        return EmergencyVerificationRepository(self)
 
     def dids(self):
         from didww.resources.did import DidRepository
@@ -313,6 +328,6 @@ class DidwwClient:
         from didww.resources.proof import ProofRepository
         return ProofRepository(self)
 
-    def requirement_validations(self):
-        from didww.resources.requirement_validation import RequirementValidationRepository
-        return RequirementValidationRepository(self)
+    def address_requirement_validations(self):
+        from didww.resources.address_requirement_validation import AddressRequirementValidationRepository
+        return AddressRequirementValidationRepository(self)

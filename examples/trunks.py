@@ -13,7 +13,7 @@ suffix = uuid.uuid4().hex[:8]
 # --- Create SIP trunk ---
 sip = SipConfiguration()
 sip.username = "username"
-sip.host = "216.58.215.110"
+sip.host = "203.0.113.110"
 sip.port = 5060
 sip.codec_ids = [Codec.PCMU, Codec.PCMA]
 sip.transport_protocol_id = TransportProtocol.UDP
