@@ -1,4 +1,7 @@
-class TrunkConfiguration:
+from didww.mixins import RedactsSensitiveAttributes
+
+
+class TrunkConfiguration(RedactsSensitiveAttributes):
     _type = None
     _type_map = {}
     # Set of attribute keys that are deserialized from server responses
@@ -6,11 +9,9 @@ class TrunkConfiguration:
     # extend this set to mark server-generated read-only fields. The server
     # rejects writes to these keys with 400 Param not allowed.
     _read_only_attrs = frozenset()
-    # Set of attribute keys whose values are credentials/secrets. The wire
-    # format is unchanged — to_jsonapi still emits the real values — but
-    # __repr__ redacts them so default logging / error reports / REPL
-    # echoes never leak credentials downstream. Subclasses extend this set.
-    _sensitive_attrs = frozenset()
+    # Subclasses extend `_sensitive_attrs` (inherited from
+    # RedactsSensitiveAttributes) to mark credential-bearing keys; the
+    # mixin's `__repr__` masks their values with `[FILTERED]`.
 
     def __init__(self, attributes=None):
         self._attributes = attributes or {}
@@ -31,14 +32,6 @@ class TrunkConfiguration:
             "type": self._type,
             "attributes": attrs,
         }
-
-    def __repr__(self):
-        parts = []
-        for key, value in self._attributes.items():
-            if key in self._sensitive_attrs and value is not None:
-                value = "[FILTERED]"
-            parts.append(f"{key}={value!r}")
-        return f"{self.__class__.__name__}({', '.join(parts)})"
 
     @classmethod
     def from_jsonapi(cls, data):

@@ -1,12 +1,13 @@
-class AuthenticationMethod:
+from didww.mixins import RedactsSensitiveAttributes
+
+
+class AuthenticationMethod(RedactsSensitiveAttributes):
     """Base class for polymorphic VoiceOutTrunk authentication methods."""
     _type = None
     _type_map = {}
-    # Attribute keys whose values are credentials. The wire format is
-    # unchanged — to_jsonapi still emits the real values — but __repr__
-    # redacts them so default logging / error reports / REPL echoes never
-    # leak credentials downstream. Subclasses extend this set.
-    _sensitive_attrs = frozenset()
+    # Subclasses extend `_sensitive_attrs` (inherited from
+    # RedactsSensitiveAttributes) to mark credential-bearing keys; the
+    # mixin's `__repr__` masks their values with `[FILTERED]`.
 
     def __init__(self, **kwargs):
         self._attributes = kwargs
@@ -26,14 +27,6 @@ class AuthenticationMethod:
             "type": self._type,
             "attributes": dict(self._attributes),
         }
-
-    def __repr__(self):
-        parts = []
-        for key, value in self._attributes.items():
-            if key in self._sensitive_attrs and value is not None:
-                value = "[FILTERED]"
-            parts.append(f"{key}={value!r}")
-        return f"{self.__class__.__name__}({', '.join(parts)})"
 
     @classmethod
     def from_jsonapi(cls, data):
