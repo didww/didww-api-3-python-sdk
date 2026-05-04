@@ -391,3 +391,27 @@ class TestVoiceInTrunk:
         assert payload["attributes"]["use_did_in_ruri"] is True
         assert "incoming_auth_username" not in payload["attributes"]
         assert "incoming_auth_password" not in payload["attributes"]
+
+    def test_sip_configuration_repr_redacts_credentials(self):
+        # Default __repr__ output is what shows up in default print() /
+        # logging / unhandled exception traces — none of those contexts
+        # should ever expose SIP credentials in plaintext.
+        secret_pass = "s3cret-Pa55"  # NOSONAR python:S2068 -- test fixture
+        secret_inc_pass = "srv-pass-xyz"  # NOSONAR python:S2068
+        config = SipConfiguration(
+            attributes={
+                "username": "alice",
+                "host": "sip.example.com",
+                "auth_password": secret_pass,
+                "enabled_sip_registration": True,
+                "incoming_auth_username": "srv-user-xyz",
+                "incoming_auth_password": secret_inc_pass,
+            }
+        )
+        output = repr(config)
+        assert "alice" in output
+        assert "sip.example.com" in output
+        assert secret_pass not in output
+        assert "srv-user-xyz" not in output
+        assert secret_inc_pass not in output
+        assert "[FILTERED]" in output

@@ -46,6 +46,11 @@ class SipConfiguration(TrunkConfiguration):
         "incoming_auth_username",
         "incoming_auth_password",
     })
+    _sensitive_attrs = frozenset({
+        "auth_password",
+        "incoming_auth_username",
+        "incoming_auth_password",
+    })
 
     username               = _plain("username")
     host                   = _plain("host")
