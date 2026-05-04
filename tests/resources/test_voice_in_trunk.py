@@ -2,7 +2,10 @@ from tests.conftest import my_vcr
 from didww.enums import (
     CliFormat,
     Codec,
+    DiversionInjectMode,
+    DiversionRelayPolicy,
     MediaEncryptionMode,
+    NetworkProtocolPriority,
     ReroutingDisconnectCode,
     RxDtmfFormat,
     SstRefreshMethod,
@@ -194,6 +197,15 @@ class TestVoiceInTrunk:
         config.media_encryption_mode = MediaEncryptionMode.ZRTP
         config.stir_shaken_mode = StirShakenMode.PAI
         config.allowed_rtp_ips = ["203.0.113.1"]
+        # API 2026-04-16 writable attributes
+        config.diversion_relay_policy = DiversionRelayPolicy.AS_IS
+        config.diversion_inject_mode = DiversionInjectMode.DID_NUMBER
+        config.network_protocol_priority = NetworkProtocolPriority.FORCE_IPV4
+        config.cnam_lookup = True
+        # use_did_in_ruri must stay false unless enabled_sip_registration is
+        # also True (server returns 422 otherwise).  Setting it here is
+        # redundant against the default but documents the field.
+        config.use_did_in_ruri = False
 
         trunk = VoiceInTrunk()
         trunk.name = "hello, test sip trunk"
@@ -247,7 +259,221 @@ class TestVoiceInTrunk:
         assert sip_config.username == "new-username"
         assert sip_config.max_transfers == 5
 
+    @my_vcr.use_cassette("voice_in_trunks/create_with_sip_registration.yaml")
+    def test_create_voice_in_trunk_with_sip_registration_returns_populated_credentials(self, client):
+        """End-to-end: when the SDK sends ``enabled_sip_registration: True`` the
+        server returns 201 with server-generated ``incoming_auth_username`` and
+        ``incoming_auth_password``. The SDK must surface those populated values
+        to the caller, not None."""
+        config = SipConfiguration()
+        config.enabled_sip_registration = True
+        config.use_did_in_ruri = True
+        config.cnam_lookup = True
+        config.diversion_relay_policy = DiversionRelayPolicy.AS_IS
+        config.diversion_inject_mode = DiversionInjectMode.DID_NUMBER
+        config.network_protocol_priority = NetworkProtocolPriority.PREFER_IPV4
+
+        trunk = VoiceInTrunk()
+        trunk.name = "sip-registration"
+        trunk.priority = 1
+        trunk.weight = 100
+        trunk.cli_format = CliFormat.E164
+        trunk.ringing_timeout = 30
+        trunk.configuration = config
+
+        response = client.voice_in_trunks().create(trunk)
+        created = response.data
+        sip_config = created.configuration
+        assert isinstance(sip_config, SipConfiguration)
+        assert sip_config.enabled_sip_registration is True
+        # Server-generated credentials are populated, not None.
+        assert sip_config.incoming_auth_username
+        assert sip_config.incoming_auth_password
+
+    @my_vcr.use_cassette("voice_in_trunks/disable_sip_registration.yaml")
+    def test_disable_sip_registration_patch_serializes_all_three_fields(self, client):
+        """Disabling SIP registration is a multi-field PATCH because the
+        server returns 422 for any request that flips
+        ``enabled_sip_registration`` to false without simultaneously
+        providing a non-blank ``host`` and ``use_did_in_ruri: False``.
+        Lock those three fields in the same request body — the cassette
+        matches on body, so a future regression that drops one of them
+        fails the request match."""
+        config = SipConfiguration()
+        config.enabled_sip_registration = False
+        config.use_did_in_ruri = False
+        config.host = "203.0.113.10"
+
+        trunk = VoiceInTrunk()
+        trunk.id = "57a939dd-1600-41a6-80b1-f624e22a1f4c"
+        trunk.configuration = config
+
+        response = client.voice_in_trunks().update(trunk)
+        sip_config = response.data.configuration
+        assert isinstance(sip_config, SipConfiguration)
+        assert sip_config.enabled_sip_registration is False
+        assert sip_config.use_did_in_ruri is False
+        assert sip_config.host == "203.0.113.10"
+        assert sip_config.incoming_auth_username is None
+        assert sip_config.incoming_auth_password is None
+
     @my_vcr.use_cassette("voice_in_trunks/delete.yaml")
     def test_delete_voice_in_trunk(self, client):
         result = client.voice_in_trunks().delete("41b94706-325e-4704-a433-d65105758836")
         assert result is None
+
+    # 2026-04-16 SIP-registration attributes (API 2026-04-16).
+    #
+    # Real wire shape captured from sandbox: when sip_registration is
+    # enabled, host/port/username come back as null and the API rejects
+    # any attempt to set them, so the test fixtures below intentionally
+    # omit them.
+    def test_sip_configuration_writable_registration_attributes_serialize(self):
+        from didww.enums import DiversionInjectMode, NetworkProtocolPriority
+
+        config = SipConfiguration(
+            attributes={
+                "enabled_sip_registration": True,
+                "use_did_in_ruri": True,
+                "cnam_lookup": True,
+                "diversion_inject_mode": "did_number",
+                "network_protocol_priority": "prefer_ipv4",
+            }
+        )
+        assert config.enabled_sip_registration is True
+        assert config.use_did_in_ruri is True
+        assert config.cnam_lookup is True
+        assert config.diversion_inject_mode == DiversionInjectMode.DID_NUMBER
+        assert config.network_protocol_priority == NetworkProtocolPriority.PREFER_IPV4
+
+        payload = config.to_jsonapi()
+        assert payload["type"] == "sip_configurations"
+        assert payload["attributes"]["enabled_sip_registration"] is True
+        assert payload["attributes"]["use_did_in_ruri"] is True
+        assert payload["attributes"]["cnam_lookup"] is True
+        assert payload["attributes"]["diversion_inject_mode"] == "did_number"
+        assert payload["attributes"]["network_protocol_priority"] == "prefer_ipv4"
+
+    def test_sip_configuration_exposes_read_only_incoming_auth_credentials(self):
+        # Test fixture values; not a real credential. NOSONAR-suppressed below.
+        fake_user = "sipreg-user-1"
+        fake_pass = "s3cret-Pa55"  # NOSONAR python:S2068 -- test fixture
+        config = SipConfiguration(
+            attributes={
+                "host": None,
+                "port": None,
+                "username": None,
+                "enabled_sip_registration": True,
+                "incoming_auth_username": fake_user,
+                "incoming_auth_password": fake_pass,
+            }
+        )
+        assert config.incoming_auth_username == fake_user
+        assert config.incoming_auth_password == fake_pass
+
+    def test_sip_configuration_strips_read_only_credentials_from_write_payload(self):
+        # Simulate a caller who loaded a SIP configuration from the server
+        # (with incoming_auth_* populated) and submits it back. The server
+        # returns 400 Param not allowed if these are echoed in the request,
+        # so the SDK MUST strip them from the JSON:API payload.
+        fake_user = "sipreg-user-1"
+        fake_pass = "s3cret-Pa55"  # NOSONAR python:S2068 -- test fixture
+        config = SipConfiguration(
+            attributes={
+                "enabled_sip_registration": True,
+                "use_did_in_ruri": True,
+                "incoming_auth_username": fake_user,
+                "incoming_auth_password": fake_pass,
+            }
+        )
+        payload = config.to_jsonapi()
+        assert payload["attributes"]["enabled_sip_registration"] is True
+        assert payload["attributes"]["use_did_in_ruri"] is True
+        assert "incoming_auth_username" not in payload["attributes"]
+        assert "incoming_auth_password" not in payload["attributes"]
+
+    def test_enabling_sip_registration_clears_host_and_port(self):
+        cfg = SipConfiguration(attributes={"host": "sip.example.com", "port": 5060})
+        cfg.enabled_sip_registration = True
+        assert cfg.host is None
+        assert cfg._attr("port") is None
+        assert cfg.enabled_sip_registration is True
+
+    def test_disabling_sip_registration_forces_use_did_in_ruri_to_false(self):
+        cfg = SipConfiguration(
+            attributes={"enabled_sip_registration": True, "use_did_in_ruri": True}
+        )
+        cfg.enabled_sip_registration = False
+        assert cfg.enabled_sip_registration is False
+        assert cfg.use_did_in_ruri is False
+
+    def test_setting_host_disables_sip_registration_and_use_did_in_ruri(self):
+        cfg = SipConfiguration(
+            attributes={"enabled_sip_registration": True, "use_did_in_ruri": True}
+        )
+        cfg.host = "sip.example.com"
+        assert cfg.host == "sip.example.com"
+        assert cfg.enabled_sip_registration is False
+        assert cfg.use_did_in_ruri is False
+
+    def test_enabling_sip_registration_leaves_use_did_in_ruri_untouched(self):
+        cfg = SipConfiguration(
+            attributes={"enabled_sip_registration": True, "use_did_in_ruri": True}
+        )
+        cfg.enabled_sip_registration = True
+        assert cfg.use_did_in_ruri is True
+
+    def test_sip_configuration_wire_payload_reflects_cascaded_state(self):
+        # Mirror dimension: after the cascade fires from a property setter,
+        # the on-the-wire payload (to_jsonapi output) must contain the
+        # cascaded field values, not just the in-memory state.
+        cfg = SipConfiguration(attributes={
+            "enabled_sip_registration": True,
+            "use_did_in_ruri": True,
+        })
+        cfg.host = "sip.example.com"  # triggers cascade
+        attrs = cfg.to_jsonapi()["attributes"]
+        assert attrs["host"] == "sip.example.com"
+        assert attrs["enabled_sip_registration"] is False
+        assert attrs["use_did_in_ruri"] is False
+
+    def test_constructor_assignment_bypasses_cascade_for_server_response_shapes(self):
+        # Server may return a regular SIP trunk shape (host: present together
+        # with use_did_in_ruri: True). SipConfiguration(attributes=...) sets
+        # _attributes directly, bypassing the property setters — without that
+        # bypass, deserializing already-consistent server data would clobber
+        # the use_did_in_ruri value.
+        cfg = SipConfiguration(attributes={
+            "host": "sip.example.com",
+            "port": 5060,
+            "enabled_sip_registration": False,
+            "use_did_in_ruri": True,
+        })
+        assert cfg.host == "sip.example.com"
+        assert cfg._attr("port") == 5060
+        assert cfg.enabled_sip_registration is False
+        assert cfg.use_did_in_ruri is True
+
+    def test_sip_configuration_repr_redacts_credentials(self):
+        # Default __repr__ output is what shows up in default print() /
+        # logging / unhandled exception traces — none of those contexts
+        # should ever expose SIP credentials in plaintext.
+        secret_pass = "s3cret-Pa55"  # NOSONAR python:S2068 -- test fixture
+        secret_inc_pass = "srv-pass-xyz"  # NOSONAR python:S2068
+        config = SipConfiguration(
+            attributes={
+                "username": "alice",
+                "host": "sip.example.com",
+                "auth_password": secret_pass,
+                "enabled_sip_registration": True,
+                "incoming_auth_username": "srv-user-xyz",
+                "incoming_auth_password": secret_inc_pass,
+            }
+        )
+        output = repr(config)
+        assert "alice" in output
+        assert "sip.example.com" in output
+        assert secret_pass not in output
+        assert "srv-user-xyz" not in output
+        assert secret_inc_pass not in output
+        assert "[FILTERED]" in output
