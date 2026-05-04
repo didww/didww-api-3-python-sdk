@@ -293,12 +293,12 @@ class TestVoiceInTrunk:
     @my_vcr.use_cassette("voice_in_trunks/disable_sip_registration.yaml")
     def test_disable_sip_registration_patch_serializes_all_three_fields(self, client):
         """Disabling SIP registration is a multi-field PATCH because the
-        server's V3 form rejects (422) any request that flips
+        server returns 422 for any request that flips
         ``enabled_sip_registration`` to false without simultaneously
-        providing a non-blank ``host`` (model-level presence) and
-        ``use_did_in_ruri: false`` (form-level). Lock those three fields in
-        the same request body — the cassette matches on body, so a future
-        regression that drops one of them fails the request match."""
+        providing a non-blank ``host`` and ``use_did_in_ruri: False``.
+        Lock those three fields in the same request body — the cassette
+        matches on body, so a future regression that drops one of them
+        fails the request match."""
         config = SipConfiguration()
         config.enabled_sip_registration = False
         config.use_did_in_ruri = False
@@ -328,7 +328,7 @@ class TestVoiceInTrunk:
     # enabled, host/port/username come back as null and the API rejects
     # any attempt to set them, so the test fixtures below intentionally
     # omit them.
-    def test_sip_configuration_v35_writable_attributes_serialize(self):
+    def test_sip_configuration_writable_registration_attributes_serialize(self):
         from didww.enums import DiversionInjectMode, NetworkProtocolPriority
 
         config = SipConfiguration(
@@ -391,6 +391,68 @@ class TestVoiceInTrunk:
         assert payload["attributes"]["use_did_in_ruri"] is True
         assert "incoming_auth_username" not in payload["attributes"]
         assert "incoming_auth_password" not in payload["attributes"]
+
+    def test_enabling_sip_registration_clears_host_and_port(self):
+        cfg = SipConfiguration(attributes={"host": "sip.example.com", "port": 5060})
+        cfg.enabled_sip_registration = True
+        assert cfg.host is None
+        assert cfg._attr("port") is None
+        assert cfg.enabled_sip_registration is True
+
+    def test_disabling_sip_registration_forces_use_did_in_ruri_to_false(self):
+        cfg = SipConfiguration(
+            attributes={"enabled_sip_registration": True, "use_did_in_ruri": True}
+        )
+        cfg.enabled_sip_registration = False
+        assert cfg.enabled_sip_registration is False
+        assert cfg.use_did_in_ruri is False
+
+    def test_setting_host_disables_sip_registration_and_use_did_in_ruri(self):
+        cfg = SipConfiguration(
+            attributes={"enabled_sip_registration": True, "use_did_in_ruri": True}
+        )
+        cfg.host = "sip.example.com"
+        assert cfg.host == "sip.example.com"
+        assert cfg.enabled_sip_registration is False
+        assert cfg.use_did_in_ruri is False
+
+    def test_enabling_sip_registration_leaves_use_did_in_ruri_untouched(self):
+        cfg = SipConfiguration(
+            attributes={"enabled_sip_registration": True, "use_did_in_ruri": True}
+        )
+        cfg.enabled_sip_registration = True
+        assert cfg.use_did_in_ruri is True
+
+    def test_sip_configuration_wire_payload_reflects_cascaded_state(self):
+        # Mirror dimension: after the cascade fires from a property setter,
+        # the on-the-wire payload (to_jsonapi output) must contain the
+        # cascaded field values, not just the in-memory state.
+        cfg = SipConfiguration(attributes={
+            "enabled_sip_registration": True,
+            "use_did_in_ruri": True,
+        })
+        cfg.host = "sip.example.com"  # triggers cascade
+        attrs = cfg.to_jsonapi()["attributes"]
+        assert attrs["host"] == "sip.example.com"
+        assert attrs["enabled_sip_registration"] is False
+        assert attrs["use_did_in_ruri"] is False
+
+    def test_constructor_assignment_bypasses_cascade_for_server_response_shapes(self):
+        # Server may return a regular SIP trunk shape (host: present together
+        # with use_did_in_ruri: True). SipConfiguration(attributes=...) sets
+        # _attributes directly, bypassing the property setters — without that
+        # bypass, deserializing already-consistent server data would clobber
+        # the use_did_in_ruri value.
+        cfg = SipConfiguration(attributes={
+            "host": "sip.example.com",
+            "port": 5060,
+            "enabled_sip_registration": False,
+            "use_did_in_ruri": True,
+        })
+        assert cfg.host == "sip.example.com"
+        assert cfg._attr("port") == 5060
+        assert cfg.enabled_sip_registration is False
+        assert cfg.use_did_in_ruri is True
 
     def test_sip_configuration_repr_redacts_credentials(self):
         # Default __repr__ output is what shows up in default print() /
