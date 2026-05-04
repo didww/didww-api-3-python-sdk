@@ -1,6 +1,11 @@
 class TrunkConfiguration:
     _type = None
     _type_map = {}
+    # Set of attribute keys that are deserialized from server responses
+    # but MUST NOT be sent in POST/PATCH request bodies. Subclasses should
+    # extend this set to mark server-generated read-only fields. The server
+    # rejects writes to these keys with 400 Param not allowed.
+    _read_only_attrs = frozenset()
 
     def __init__(self, attributes=None):
         self._attributes = attributes or {}
@@ -12,9 +17,14 @@ class TrunkConfiguration:
         self._attributes[key] = value
 
     def to_jsonapi(self):
+        attrs = {
+            k: v
+            for k, v in self._attributes.items()
+            if k not in self._read_only_attrs
+        }
         return {
             "type": self._type,
-            "attributes": dict(self._attributes),
+            "attributes": attrs,
         }
 
     @classmethod
