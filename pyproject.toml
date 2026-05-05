@@ -8,11 +8,38 @@ version = "3.0.0"
 description = "Python SDK for DIDWW API v3"
 readme = "README.md"
 requires-python = ">=3.9"
+license = { file = "LICENSE" }
+authors = [
+    { name = "DIDWW", email = "support@didww.com" },
+]
+keywords = ["didww", "voip", "sip", "telephony", "did", "api", "sdk"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Communications :: Telephony",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
 dependencies = [
     "jsonapi-requests>=0.6.2",
     "requests>=2.28.0",
     "cryptography>=41.0.0",
 ]
+
+[project.urls]
+Homepage = "https://github.com/didww/didww-api-3-python-sdk"
+Repository = "https://github.com/didww/didww-api-3-python-sdk"
+Issues = "https://github.com/didww/didww-api-3-python-sdk/issues"
+Documentation = "https://doc.didww.com/api3/index.html"
 
 [project.optional-dependencies]
 dev = [
