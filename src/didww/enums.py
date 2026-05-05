@@ -132,6 +132,21 @@ class DiversionRelayPolicy(str, Enum):
     TEL = "tel"
 
 
+class DiversionInjectMode(str, Enum):
+    """Diversion header injection mode for SIP INVITE. (API 2026-04-16)"""
+    NONE = "none"
+    DID_NUMBER = "did_number"
+
+
+class NetworkProtocolPriority(str, Enum):
+    """SIP network protocol priority. (API 2026-04-16)"""
+    FORCE_IPV4 = "force_ipv4"
+    FORCE_IPV6 = "force_ipv6"
+    ANY = "any"
+    PREFER_IPV4 = "prefer_ipv4"
+    PREFER_IPV6 = "prefer_ipv6"
+
+
 class StirShakenMode(str, Enum):
     DISABLED = "disabled"
     ORIGINAL = "original"

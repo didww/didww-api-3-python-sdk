@@ -1,7 +1,13 @@
-class AuthenticationMethod:
+from didww.mixins import RedactsSensitiveAttributes
+
+
+class AuthenticationMethod(RedactsSensitiveAttributes):
     """Base class for polymorphic VoiceOutTrunk authentication methods."""
     _type = None
     _type_map = {}
+    # Subclasses extend `_sensitive_attrs` (inherited from
+    # RedactsSensitiveAttributes) to mark credential-bearing keys; the
+    # mixin's `__repr__` masks their values with `[FILTERED]`.
 
     def __init__(self, **kwargs):
         self._attributes = kwargs
@@ -61,6 +67,7 @@ class IpOnlyAuthenticationMethod(AuthenticationMethod):
 
 class CredentialsAndIpAuthenticationMethod(AuthenticationMethod):
     _type = "credentials_and_ip"
+    _sensitive_attrs = frozenset({"username", "password"})
 
     allowed_sip_ips = _plain("allowed_sip_ips")
     tech_prefix = _plain("tech_prefix")
