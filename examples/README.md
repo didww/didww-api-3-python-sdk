@@ -34,6 +34,7 @@ DIDWW_API_KEY=your_api_key python examples/balance.py
 | [`trunks.py`](trunks.py) | Creates SIP and PSTN trunks, prints details, then deletes them. |
 | [`regions.py`](regions.py) | Lists regions, filters by country, and fetches a specific region. |
 | [`voice_in_trunks.py`](voice_in_trunks.py) | Lists voice in trunks with their configurations and POP details. |
+| [`voice_in_trunk_sip_registration.py`](voice_in_trunk_sip_registration.py) | End-to-end SIP registration flow: create with `enabled_sip_registration=True`, rename, disable by setting `host`, re-enable by toggling the flag. The SDK keeps the dependent fields (`host`, `port`, `use_did_in_ruri`) aligned with the server's validation rules automatically. |
 | [`orders.py`](orders.py) | Lists orders, creates a DID order, and cancels it. |
 | [`orders_available_dids.py`](orders_available_dids.py) | Orders a specific available DID using included DID group SKU. |
 | [`orders_reservation_dids.py`](orders_reservation_dids.py) | Reserves a DID and then places an order from that reservation. |
