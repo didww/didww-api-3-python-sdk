@@ -716,30 +716,34 @@ Bug reports and pull requests are welcome on GitHub at https://github.com/didww/
 ### Build and Release
 
 #### Preconditions
-- prepare venv
-- install build and twine packages
 
+Install [uv](https://docs.astral.sh/uv/getting-started/installation/).
+
+Prepare venv and install dev dependencies:
 ```shell
-python3 -m pip install twine
-python3 -m pip install build
+uv sync --extra dev
+```
+
+Activate venv:
+```shell
+source .venv/bin/activate
 ```
 
 #### 1. Change version in `pyproject.toml` to the new version (e.g. `1.1.0`)
 
 #### 2. Build the package
 ```shell
-python3 -m build --sdist
-python3 -m build --wheel
+uv build
 ```
 
 #### 3. Check the package
 ```shell
-twine check dist/*
+uvx twine check dist/*
 ```
 
 #### 4. Publish new version to PyPI
 ```shell
-twine upload dist/*
+uvx twine upload dist/*
 ```
 
 #### 5. Commit `pyproject.toml` and create tag
