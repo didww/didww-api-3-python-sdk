@@ -76,7 +76,7 @@ interactions:
         \            \"self\": \"https://sandbox-api.didww.com/v3/proofs/dd2f5f37-0d08-415d-9530-6488e6eb797b/relationships/entity\"\
         ,\n            \"related\": \"https://sandbox-api.didww.com/v3/proofs/dd2f5f37-0d08-415d-9530-6488e6eb797b/entity\"\
         \n          }\n        }\n      }\n    }\n  ],\n  \"meta\": {\n    \"total_records\"\
-        : 1,\n    \"api_version\": \"2021-04-19\"\n  },\n  \"links\": {\n    \"first\"\
+        : 1,\n    \"api_version\": \"2026-04-16\"\n  },\n  \"links\": {\n    \"first\"\
         : \"https://sandbox-api.didww.com/v3/addresses?include=country%2Cidentity%2Cproofs%2Carea%2Ccity&page%5Bnumber%5D=1&page%5Bsize%5D=5\"\
         ,\n    \"last\": \"https://sandbox-api.didww.com/v3/addresses?include=country%2Cidentity%2Cproofs%2Carea%2Ccity&page%5Bnumber%5D=1&page%5Bsize%5D=5\"\
         \n  }\n}"

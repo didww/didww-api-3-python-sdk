@@ -25,7 +25,7 @@ interactions:
         "related": "https://sandbox-api.didww.com/v3/voice_out_trunks/425ce763-a3a9-49b4-af5b-ada1a65c8864/default_did"}},
         "dids": {"links": {"self": "https://sandbox-api.didww.com/v3/voice_out_trunks/425ce763-a3a9-49b4-af5b-ada1a65c8864/relationships/dids",
         "related": "https://sandbox-api.didww.com/v3/voice_out_trunks/425ce763-a3a9-49b4-af5b-ada1a65c8864/dids"}}},
-        "meta": {"spent_amount": "0.0"}}, "meta": {"api_version": "2021-12-15"}}'
+        "meta": {"spent_amount": "0.0"}}, "meta": {"api_version": "2026-04-16"}}'
     headers:
       Content-Type:
       - application/vnd.api+json

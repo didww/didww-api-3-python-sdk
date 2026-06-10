@@ -48,7 +48,7 @@ interactions:
         : 0,\n        \"address_proof_qty\": 0,\n        \"personal_mandatory_fields\"\
         : [],\n        \"business_mandatory_fields\": [],\n        \"service_description_required\"\
         : false,\n        \"restriction_message\": null\n      }\n    }\n  ],\n  \"\
-        meta\": {\n    \"api_version\": \"2022-05-09\"\n  }\n}"
+        meta\": {\n    \"api_version\": \"2026-04-16\"\n  }\n}"
     headers:
       Content-Type:
       - application/vnd.api+json
