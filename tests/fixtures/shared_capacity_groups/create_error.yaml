@@ -12,10 +12,7 @@ interactions:
     uri: https://sandbox-api.didww.com/v3/shared_capacity_groups
   response:
     body:
-      string: "{\n  \"errors\": [\n    {\n      \"title\": \"can't be blank\",\n \
-        \     \"detail\": \"capacity_pool - can't be blank\",\n      \"code\": \"\
-        100\",\n      \"source\": {\n        \"pointer\": \"/data/relationships/capacity_pool\"\
-        \n      },\n      \"status\": \"422\"\n    }\n  ]\n}"
+      string: '{"errors":[{"title":"can''t be blank","detail":"capacity_pool - can''t be blank","code":"100","source":{"pointer":"/data/relationships/capacity_pool"},"status":"422"}]}'
     headers:
       Content-Type:
       - application/vnd.api+json

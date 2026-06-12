@@ -12,9 +12,7 @@ interactions:
     uri: https://sandbox-api.didww.com/v3/emergency_requirement_validations
   response:
     body:
-      string: "{\n  \"data\": {\n    \"id\": \"c1d2e3f4-a5b6-7890-1234-567890abcdef\"\
-        ,\n    \"type\": \"emergency_requirement_validations\"\n  },\n  \"meta\": {\n    \"\
-        api_version\": \"2026-04-16\"\n  }\n}"
+      string: '{"data":{"id":"c1d2e3f4-a5b6-7890-1234-567890abcdef","type":"emergency_requirement_validations"},"meta":{"api_version":"2026-04-16"}}'
     headers:
       Content-Type:
       - application/vnd.api+json

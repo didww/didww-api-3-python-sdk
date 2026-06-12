@@ -12,10 +12,7 @@ interactions:
     uri: https://sandbox-api.didww.com/v3/did_reservations/fd38d3ff-80cf-4e67-a605-609a2884a5c4
   response:
     body:
-      string: "{\n  \"errors\": [\n    {\n      \"title\": \"Record not found\",\n\
-        \      \"detail\": \"The record identified by fd38d3ff-80cf-4e67-a605-609a2884a5c4\
-        \ could not be found.\",\n      \"code\": \"404\",\n      \"status\": \"404\"\
-        \n    }\n  ]\n}"
+      string: '{"errors":[{"title":"Record not found","detail":"The record identified by fd38d3ff-80cf-4e67-a605-609a2884a5c4 could not be found.","code":"404","status":"404"}]}'
     headers:
       Content-Type:
       - application/vnd.api+json
