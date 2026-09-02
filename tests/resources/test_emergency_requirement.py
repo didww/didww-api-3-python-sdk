@@ -14,7 +14,12 @@ class TestEmergencyRequirement:
         assert er.id == "er-001"
         assert er.identity_type == "personal"
         assert er.address_area_level == "city"
+        assert er.personal_area_level == "country"
+        # A country that accepts personal identities only leaves the business level unset.
+        assert er.business_area_level is None
         assert er.estimate_setup_time == "7-14 days"
         assert er.address_mandatory_fields == ["city_name", "address"]
         assert er.personal_mandatory_fields == ["first_name", "last_name"]
         assert er.requirement_restriction_message is None
+        assert er.meta["setup_price"] == "0.0"
+        assert er.meta["monthly_price"] == "1.5"

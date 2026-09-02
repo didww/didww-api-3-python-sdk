@@ -4,7 +4,10 @@ from didww.resources.base import DidwwApiModel, SafeAttributeField, RelationFiel
 class EmergencyRequirement(DidwwApiModel):
     """Emergency requirement resource.
 
-    Resource-level meta: setup_price, monthly_price
+    personal_area_level and business_area_level are None when the country does not
+    accept that kind of identity for emergency calling.
+
+    Resource-level meta: setup_price, monthly_price (decimal strings)
     """
 
     identity_type = SafeAttributeField("identity_type")
