@@ -96,3 +96,30 @@ class TestRequestValidator:
             "type": "orders",
         }
         assert validator.validate(url, payload, expected_signature) is True
+
+
+class TestRequestValidatorArguments:
+    def test_accepts_callback_secret_keyword(self):
+        validator = RequestValidator(callback_secret="SOMEAPIKEY")
+        assert validator.callback_secret == "SOMEAPIKEY"
+
+    def test_api_key_keyword_is_a_deprecated_alias(self):
+        with pytest.warns(DeprecationWarning, match="api_key argument"):
+            validator = RequestValidator(api_key="SOMEAPIKEY")
+        assert validator.callback_secret == "SOMEAPIKEY"
+
+    def test_api_key_attribute_is_a_deprecated_alias(self):
+        validator = RequestValidator("SOMEAPIKEY")
+        with pytest.warns(DeprecationWarning, match="api_key attribute"):
+            assert validator.api_key == "SOMEAPIKEY"
+        with pytest.warns(DeprecationWarning, match="api_key attribute"):
+            validator.api_key = "OTHERAPIKEY"
+        assert validator.callback_secret == "OTHERAPIKEY"
+
+    def test_rejects_both_callback_secret_and_api_key(self):
+        with pytest.raises(TypeError, match="not both"):
+            RequestValidator("SOMEAPIKEY", api_key="OTHERAPIKEY")
+
+    def test_requires_a_callback_secret(self):
+        with pytest.raises(TypeError, match="callback_secret"):
+            RequestValidator()

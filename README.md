@@ -620,10 +620,12 @@ file_ids = client.upload_encrypted_files(
 
 Validate incoming webhook callbacks from DIDWW using HMAC-SHA1 signature verification.
 
+Initialize the validator with the callback secret that is enabled in the DIDWW User Panel (**APIs → DIDWW API 3 → Callback Secrets**). DIDWW signs every callback with it and sends callbacks only while a callback secret is enabled.
+
 ```python
 from didww.callback.request_validator import RequestValidator
 
-validator = RequestValidator("YOUR_API_KEY")
+validator = RequestValidator("YOUR_CALLBACK_SECRET")
 
 # In your webhook handler:
 valid = validator.validate(
