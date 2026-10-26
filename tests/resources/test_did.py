@@ -227,6 +227,7 @@ class TestDidSmsRouting:
         assert isinstance(did.sms_trunk_group, SmsTrunkGroup)
         assert did.sms_trunk_group.id == SMS_TRUNK_GROUP_ID
         assert did.sms_trunk_group.name == "Inbound SMS"
+        assert did.sms_trunk_group.sms_trunks_count == 2
         assert did.sms_trunk is None
         assert did._dirty_attrs == set()
         assert did._dirty_rels == set()

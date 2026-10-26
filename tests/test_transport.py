@@ -1,4 +1,5 @@
 import gzip
+import io
 import json
 import logging
 import socket
@@ -8,6 +9,7 @@ from decimal import Decimal
 import pytest
 import requests
 
+from didww._http import BodyReadError, read_bounded
 from didww.auth import AccessToken, MemoryTokenStore
 from didww.configuration import Scope
 from didww.exceptions import AuthErrorKind, DidwwApiError, DidwwAuthError, DidwwClientError
@@ -344,6 +346,22 @@ class TestTransportErrors:
         e = capture(lambda: make_client(read_timeout=0.2).get("dids"))
         assert isinstance(e, DidwwClientError)
         assert isinstance(e.__cause__, requests.exceptions.ReadTimeout)
+
+
+class _Unsized:
+    def __init__(self, body):
+        self.raw = io.BytesIO(body)
+        self.headers = {}
+
+
+class TestReadBounded:
+    def test_body_not_read_in_time_raises_when_strict(self):
+        with pytest.raises(BodyReadError) as exc:
+            read_bounded(_Unsized(b"partial"), limit=100, timeout=0, strict=True)
+        assert isinstance(exc.value.cause, TimeoutError)
+
+    def test_body_not_read_in_time_is_cut_when_lenient(self):
+        assert read_bounded(_Unsized(b"partial"), limit=100, timeout=0) == b"partial"
 
 
 @pytest.mark.parametrize("method", ["get", "delete"])

@@ -80,6 +80,7 @@ class TestSmsTrunkRead:
         assert isinstance(group, SmsTrunkGroup)
         assert group.id == GROUP_ID
         assert group.name == "Inbound SMS"
+        assert group.sms_trunks_count == 1
 
     @my_vcr.use_cassette("sms_trunks/show.yaml")
     def test_find_http_out_trunk(self, client):
@@ -104,6 +105,7 @@ class TestSmsTrunkRead:
         assert len(verifications) == 1
         assert isinstance(verifications[0], SenderIdVerification)
         assert verifications[0].name == "ACME alerts"
+        assert verifications[0].meta == {"setup_price": "10.0", "monthly_price": "15.0"}
 
     @my_vcr.use_cassette("sms_trunks/show_not_found.yaml")
     def test_find_not_found(self, client):

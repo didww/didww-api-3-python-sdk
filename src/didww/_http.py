@@ -208,26 +208,35 @@ def read_bounded(resp, limit=MAX_ERROR_BODY, timeout=DEFAULT_ERROR_BODY_TIMEOUT,
     deadline = time.monotonic() + timeout
     read = _read1(resp.raw)
     buf = bytearray()
-    first = True
     try:
-        while len(buf) < limit:
-            if not first and time.monotonic() >= deadline:
-                if strict:
-                    raise BodyReadError(TimeoutError("the response body was not read in time"))
-                break
-            first = False
-            chunk = read(min(_CHUNK, limit - len(buf)))
-            if not chunk:
-                break
-            buf += chunk
+        _fill(buf, read, limit, deadline, strict)
     except READ_ERRORS as e:
         if strict:
             raise BodyReadError(e) from e
     if strict:
-        expected = content_length(resp)
-        if expected is not None and len(buf) < min(expected, limit):
-            raise BodyReadError(http.client.IncompleteRead(b"", expected - len(buf)))
+        _check_read_complete(resp, len(buf), limit)
     return bytes(buf)
+
+
+def _fill(buf, read, limit, deadline, strict):
+    # Appends reads to buf until limit bytes, the end of the body or the deadline.
+    first = True
+    while len(buf) < limit:
+        if not first and time.monotonic() >= deadline:
+            if strict:
+                raise BodyReadError(TimeoutError("the response body was not read in time"))
+            return
+        first = False
+        chunk = read(min(_CHUNK, limit - len(buf)))
+        if not chunk:
+            return
+        buf += chunk
+
+
+def _check_read_complete(resp, count, limit):
+    expected = content_length(resp)
+    if expected is not None and count < min(expected, limit):
+        raise BodyReadError(http.client.IncompleteRead(b"", expected - count))
 
 
 def read_error_body(resp, timeout=DEFAULT_ERROR_BODY_TIMEOUT):
@@ -404,7 +413,8 @@ def exception_chain(exc):
     return out
 
 
-_DROPPED_CONNECTION = (ssl.SSLEOFError, ConnectionResetError, ConnectionAbortedError,
+# Python 3.9 with OpenSSL 3 reports a peer closing during the handshake as SSLZeroReturnError.
+_DROPPED_CONNECTION = (ssl.SSLEOFError, ssl.SSLZeroReturnError, ConnectionResetError, ConnectionAbortedError,
                        BrokenPipeError, socket.timeout, TimeoutError)
 _TLS_ERRORS = (ssl.SSLError, urllib3.exceptions.SSLError, requests.exceptions.SSLError)
 

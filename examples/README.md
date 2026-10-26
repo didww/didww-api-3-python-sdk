@@ -31,11 +31,10 @@ DIDWW_API_KEY=your_api_key python examples/balance.py
 
 ### Pass an argument
 
-Some examples take an optional argument:
+`prices_lookup.py` takes an optional number:
 
 ```bash
 DIDWW_API_KEY=your_api_key python examples/prices_lookup.py 18005550123
-DIDWW_API_KEY=your_api_key python examples/prices_download.py /path/to/dir
 ```
 
 ## Available examples
@@ -89,7 +88,7 @@ DIDWW_API_KEY=your_api_key python examples/prices_download.py /path/to/dir
 | Script | Description |
 |---|---|
 | [`prices_lookup.py`](prices_lookup.py) `[number]` | Looks up Voice IN, Voice OUT, SMS OUT (A2P, P2P, OTP) and SMS IN prices for a number with a read-scoped client. |
-| [`prices_download.py`](prices_download.py) `[dir]` | Downloads the Voice IN price file, fetches it again with If-Modified-Since (304), reads the first rows. Default directory: `didww-prices` in the user cache directory, created for the current user only. |
+| [`prices_download.py`](prices_download.py) | Downloads the Voice IN price file, fetches it again with If-Modified-Since (304), reads the first rows. Directory: `didww-prices` in the user cache directory, created for the current user only. |
 
 `sender_id_verifications.py`, `did_sms_routing.py` and `did_trunk_assignment.py` change existing account state and restore it at the end; `voice_in_trunk_groups.py`, `sms_trunks.py` and `sms_trunk_groups.py` delete what they create. Both happen also when a step fails.
 

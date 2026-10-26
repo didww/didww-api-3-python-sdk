@@ -145,6 +145,19 @@ def _parse_minted_at(value):
         return None
 
 
+def _raise_if_final(failure, unread, fatal, last):
+    if fatal is not None:
+        raise DidwwAuthError(f"Token service: the token request {fatal}",
+                             kind=AuthErrorKind.CONNECTION_ERROR)
+    if unread is not None and last:
+        # The cut body of a 200 may hold the token: no cause is kept.
+        raise DidwwAuthError(f"Token service: the token response could not be read ({unread})",
+                             kind=AuthErrorKind.CONNECTION_ERROR, status_code=200)
+    if failure is not None and (last or is_tls_error(failure)):
+        raise DidwwAuthError(f"Token service: {type(failure).__name__}: {failure}",
+                             kind=AuthErrorKind.CONNECTION_ERROR) from detached(failure)
+
+
 class TokenStore(abc.ABC):
     """Where access tokens are kept between calls.
 
@@ -507,36 +520,28 @@ class _TokenProvider:
         attempt = 0
         while True:
             attempt += 1
-            failure = unread = fatal = None
-            try:
-                status, retry_after, body = self._attempt(payload)
-            except BodyReadError as e:
-                unread = type(e.cause).__name__
-            except (requests.exceptions.InvalidURL, requests.exceptions.InvalidHeader,
-                    requests.exceptions.MissingSchema, requests.exceptions.InvalidSchema,
-                    requests.exceptions.URLRequired) as e:
-                fatal = f"could not be sent ({type(e).__name__})"
-            except requests.exceptions.RequestException as e:
-                failure = e
-            except Exception as e:
-                fatal = f"failed ({type(e).__name__})"
-            else:
-                if status < 500 or attempt >= MAX_MINT_ATTEMPTS:
-                    return status, retry_after, body
-
-            if fatal is not None:
-                raise DidwwAuthError(f"Token service: the token request {fatal}",
-                                     kind=AuthErrorKind.CONNECTION_ERROR)
-            if unread is not None and attempt >= MAX_MINT_ATTEMPTS:
-                # The cut body of a 200 may hold the token: no cause is kept.
-                raise DidwwAuthError(f"Token service: the token response could not be read ({unread})",
-                                     kind=AuthErrorKind.CONNECTION_ERROR, status_code=200)
-            if failure is not None and (attempt >= MAX_MINT_ATTEMPTS or is_tls_error(failure)):
-                raise DidwwAuthError(f"Token service: {type(failure).__name__}: {failure}",
-                                     kind=AuthErrorKind.CONNECTION_ERROR) from detached(failure)
-
+            answer, failure, unread, fatal = self._try_attempt(payload)
+            last = attempt >= MAX_MINT_ATTEMPTS
+            if answer is not None and (answer[0] < 500 or last):
+                return answer
+            _raise_if_final(failure, unread, fatal, last)
             self._sleep(self.backoff(attempt))
             self._raise_if_rate_limited()
+
+    def _try_attempt(self, payload):
+        # One attempt as (answer, failure, unread, fatal), only one of them set.
+        try:
+            return self._attempt(payload), None, None, None
+        except BodyReadError as e:
+            return None, None, type(e.cause).__name__, None
+        except (requests.exceptions.InvalidURL, requests.exceptions.InvalidHeader,
+                requests.exceptions.MissingSchema, requests.exceptions.InvalidSchema,
+                requests.exceptions.URLRequired) as e:
+            return None, None, None, f"could not be sent ({type(e).__name__})"
+        except requests.exceptions.RequestException as e:
+            return None, e, None, None
+        except Exception as e:
+            return None, None, None, f"failed ({type(e).__name__})"
 
     def _attempt(self, payload):
         start = self._monotonic()

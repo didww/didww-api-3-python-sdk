@@ -66,25 +66,15 @@ class DidwwClient:
                  api_version=DEFAULT_API_VERSION, scope=None, token_store=None, logger=None,
                  auth_url=None, voice_in_prices_url=None, voice_out_prices_url=None,
                  sms_prices_url=None, connect_timeout=10.0, read_timeout=60.0):
-        if not api_key or not isinstance(api_key, str):
-            raise DidwwClientError("API key is required")
-        if not _API_KEY_RE.fullmatch(api_key):
-            raise DidwwClientError("API key contains characters not allowed in an HTTP header")
+        _check_api_key(api_key)
         if not isinstance(environment, Environment):
             raise DidwwClientError("environment must be Environment.SANDBOX or Environment.PRODUCTION")
         _check_api_version(api_version)
         scope = _check_scope(scope)
         _check_timeout("connect_timeout", connect_timeout)
         _check_timeout("read_timeout", read_timeout)
-        if token_store is None:
-            token_store = _DEFAULT_STORE
-        elif isinstance(token_store, type) or not all(
-                callable(getattr(token_store, m, None)) for m in ("get", "set", "delete")):
-            raise DidwwClientError("token_store must provide get, set and delete")
-        if logger is None:
-            logger = logging.getLogger("didww")
-        elif isinstance(logger, type) or not callable(getattr(logger, "log", None)):
-            raise DidwwClientError("logger must be a logging.Logger or LoggerAdapter")
+        token_store = _token_store(token_store)
+        logger = _logger(logger)
 
         self._api_key = api_key
         self.environment = environment
@@ -336,34 +326,14 @@ class DidwwClient:
 
     def _copy_export(self, resp, write, decompress):
         expected = _http.content_length(resp)
-        if not decompress:
-            try:
-                count = _http.copy_raw(resp, write)
-            except _http.BodyReadError as e:
-                raise _export_read_error(e) from _http.detached(e.cause)
-            _check_complete(count, expected)
+        if decompress:
+            _copy_decompressed_export(resp, write, expected)
             return
-
-        reader = _http.RawReader(resp)
-        with gzip.GzipFile(fileobj=reader, mode="rb") as gz:
-            while True:
-                failure = None
-                try:
-                    chunk = gz.read(_CHUNK)
-                except _http.BodyReadError as e:
-                    raise _export_read_error(e) from _http.detached(e.cause)
-                except (EOFError, OSError, zlib.error) as e:
-                    failure = e
-                if failure is not None:
-                    if reader.eof and expected is not None and reader.count != expected:
-                        raise DidwwClientError(_incomplete_message(reader.count, expected))
-                    raise DidwwClientError("Failed to decompress export data") from failure
-                if not chunk:
-                    break
-                _http.write_all(write, chunk)
-        _check_complete(reader.count, expected)
-        if reader.count == 0:
-            raise DidwwClientError("Failed to decompress export data: the export is empty")
+        try:
+            count = _http.copy_raw(resp, write)
+        except _http.BodyReadError as e:
+            raise _export_read_error(e) from _http.detached(e.cause)
+        _check_complete(count, expected)
 
     def _check_export_url(self, url):
         target = _http.origin(url)
@@ -594,6 +564,30 @@ def _service_url(name, url):
     return url
 
 
+def _check_api_key(api_key):
+    if not api_key or not isinstance(api_key, str):
+        raise DidwwClientError("API key is required")
+    if not _API_KEY_RE.fullmatch(api_key):
+        raise DidwwClientError("API key contains characters not allowed in an HTTP header")
+
+
+def _token_store(token_store):
+    if token_store is None:
+        return _DEFAULT_STORE
+    if isinstance(token_store, type) or not all(
+            callable(getattr(token_store, m, None)) for m in ("get", "set", "delete")):
+        raise DidwwClientError("token_store must provide get, set and delete")
+    return token_store
+
+
+def _logger(logger):
+    if logger is None:
+        return logging.getLogger("didww")
+    if isinstance(logger, type) or not callable(getattr(logger, "log", None)):
+        raise DidwwClientError("logger must be a logging.Logger or LoggerAdapter")
+    return logger
+
+
 def _check_api_version(api_version):
     if not isinstance(api_version, str) or not _API_VERSION_RE.fullmatch(api_version):
         raise DidwwClientError(f"API version must be a YYYY-MM-DD date, got {api_version!r}")
@@ -636,6 +630,31 @@ def _incomplete_message(count, expected):
 def _check_complete(count, expected):
     if expected is not None and count != expected:
         raise DidwwClientError(_incomplete_message(count, expected))
+
+
+def _copy_decompressed_export(resp, write, expected):
+    reader = _http.RawReader(resp)
+    with gzip.GzipFile(fileobj=reader, mode="rb") as gz:
+        while True:
+            chunk = _read_decompressed(gz, reader, expected)
+            if not chunk:
+                break
+            _http.write_all(write, chunk)
+    _check_complete(reader.count, expected)
+    if reader.count == 0:
+        raise DidwwClientError("Failed to decompress export data: the export is empty")
+
+
+def _read_decompressed(gz, reader, expected):
+    try:
+        return gz.read(_CHUNK)
+    except _http.BodyReadError as e:
+        raise _export_read_error(e) from _http.detached(e.cause)
+    except (EOFError, OSError, zlib.error) as e:
+        failure = e
+    if reader.eof and expected is not None and reader.count != expected:
+        raise DidwwClientError(_incomplete_message(reader.count, expected))
+    raise DidwwClientError("Failed to decompress export data") from failure
 
 
 def _export_read_error(error):

@@ -7,12 +7,12 @@ answer's Last-Modified. fetch(path) sends the modification time of the file at
 path as If-Modified-Since, so while the price file is unchanged the second
 call, and any later run against the same file, is answered 304 and keeps it.
 
-The file goes to the directory given as an argument, or to didww-prices in the
-user cache directory (%LOCALAPPDATA% on Windows, ~/Library/Caches on macOS,
-otherwise $XDG_CACHE_HOME or ~/.cache). A missing directory is created for the
-current user only (0700; the mode is ignored on Windows).
+The file goes to didww-prices in the user cache directory (%LOCALAPPDATA% on
+Windows, ~/Library/Caches on macOS, otherwise $XDG_CACHE_HOME or ~/.cache). A
+missing directory is created for the current user only (0700; the mode is
+ignored on Windows).
 
-Usage: DIDWW_API_KEY=xxx python examples/prices_download.py [dir]
+Usage: DIDWW_API_KEY=xxx python examples/prices_download.py
 """
 import itertools
 import os
@@ -41,11 +41,9 @@ def user_cache_dir():
 
 
 def price_dir():
-    if len(sys.argv) > 1:
-        return sys.argv[1]
     cache = user_cache_dir()
     if cache is None:
-        raise SystemExit("No user cache directory; pass a directory: python examples/prices_download.py <dir>")
+        raise SystemExit("No user cache directory: set HOME (LOCALAPPDATA on Windows)")
     return os.path.join(cache, "didww-prices")
 
 

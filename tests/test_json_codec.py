@@ -1,3 +1,4 @@
+import decimal
 import json
 from decimal import Decimal
 
@@ -31,6 +32,14 @@ class TestLoads:
         assert type(exc.value) is ValueError
         assert "9999" not in str(exc.value)
         assert exc.value.__context__ is None or exc.value.__suppress_context__
+
+    @pytest.mark.parametrize("text", ["1e99999999999999999999", '{"x": -1.5e-99999999999999999999}'])
+    def test_numbers_out_of_decimal_range_raise_without_the_invalid_operation_trap(self, text):
+        with decimal.localcontext() as ctx:
+            ctx.traps[decimal.InvalidOperation] = False
+            with pytest.raises(ValueError):
+                _json.loads(text)
+            assert not ctx.flags[decimal.InvalidOperation]
 
     def test_invalid_utf8_raises_value_error(self):
         with pytest.raises(ValueError):

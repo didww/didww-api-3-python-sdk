@@ -133,7 +133,9 @@ class TestCaching:
     def test_token_reused(self, stub, make_client):
         stub.on("POST", "/token", token_reply())
         client = make_client()
-        assert client._tokens.token(API) == client._tokens.token(API)
+        first = client._tokens.token(API)
+        assert client._tokens.token(API) is first
+        assert first.access_token == "test-access-token"
         assert len(mints(stub)) == 1
 
     def test_one_token_per_audience(self, stub, make_client):
@@ -712,6 +714,27 @@ class TestRetries:
         for text in (str(e), repr(e), str(e.__cause__), repr(e.__cause__)):
             assert "secret-api-key-1" not in text
 
+    @pytest.mark.parametrize("error, message", [
+        (requests.exceptions.InvalidHeader("bad header"), "could not be sent (InvalidHeader)"),
+        (RuntimeError("boom"), "failed (RuntimeError)"),
+    ])
+    def test_request_that_cannot_be_sent_is_not_retried(self, make_client, error, message):
+        client = make_client()
+        sleeps = record_sleeps(client)
+        calls = []
+
+        def request(*args, **kwargs):
+            calls.append(args)
+            raise error
+
+        client._tokens._session.request = request
+        e = capture(lambda: client._tokens.token(API))
+        assert isinstance(e, DidwwAuthError)
+        assert e.kind is AuthErrorKind.CONNECTION_ERROR
+        assert str(e) == f"Token service: the token request {message}"
+        assert e.__cause__ is None and e.__context__ is None
+        assert (len(calls), sleeps) == (1, [])
+
 
 class TestTls:
     def _client(self, make_client, server):
@@ -779,6 +802,12 @@ class TestTls:
     def test_plain_ssl_error_for_an_eof_during_the_handshake_is_a_dropped_connection(self, reason, message):
         err = ssl.SSLError(1, message)
         err.reason = reason
+        wrapped = requests.exceptions.SSLError(urllib3.exceptions.MaxRetryError(
+            None, "/token", urllib3.exceptions.SSLError(err)))
+        assert not is_tls_error(wrapped)
+
+    def test_zero_return_during_the_handshake_is_a_dropped_connection(self):
+        err = ssl.SSLZeroReturnError(6, "TLS/SSL connection has been closed (EOF) (_ssl.c:1147)")
         wrapped = requests.exceptions.SSLError(urllib3.exceptions.MaxRetryError(
             None, "/token", urllib3.exceptions.SSLError(err)))
         assert not is_tls_error(wrapped)

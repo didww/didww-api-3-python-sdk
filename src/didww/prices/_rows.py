@@ -123,6 +123,7 @@ class _ParseError(Exception):
 
 
 _DECIMAL = re.compile(r"[+-]?(?:[0-9]+(?:\.[0-9]*)?|\.[0-9]+)(?:[eE][+-]?[0-9]+)?")
+_NOT_DECIMAL = "is not a decimal number"
 _DATETIME = re.compile(
     r"([0-9]{4})-([0-9]{2})-([0-9]{2})[Tt]([0-9]{2}):([0-9]{2}):([0-9]{2})(?:\.([0-9]+))?"
     r"(?:([Zz])|([+-])([0-9]{2}):([0-9]{2}))"
@@ -156,11 +157,11 @@ def _decimal(value):
         try:
             number = Decimal(value)
         except InvalidOperation:
-            raise _ParseError("is not a decimal number") from None
+            raise _ParseError(_NOT_DECIMAL) from None
     else:
-        raise _ParseError("is not a decimal number")
+        raise _ParseError(_NOT_DECIMAL)
     if not number.is_finite():
-        raise _ParseError("is not a decimal number")
+        raise _ParseError(_NOT_DECIMAL)
     return number
 
 

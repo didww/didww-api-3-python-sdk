@@ -164,23 +164,7 @@ class PricesService:
         return parse_lookup(document, self._list.row_class)
 
     def _lookup_params(self, filters):
-        if filters is None:
-            filters = {}
-        if not callable(getattr(filters, "items", None)):
-            raise TypeError("filters must be a dict of filter names to values")
-        given = {}
-        for name, value in filters.items():
-            if not isinstance(name, str):
-                raise TypeError("filter names must be strings")
-            if value is None:
-                continue
-            if isinstance(value, bool) or not isinstance(value, (str, int)):
-                raise TypeError(f"filter {name} must be a string")
-            # str() of a str or int Enum member gives its name, not its value.
-            value = str.__str__(value) if isinstance(value, str) else int.__repr__(value)
-            if value.strip():
-                given[name] = value
-
+        given = _given_filters(filters)
         allowed = self.allowed_filters
         unknown = [name for name in sorted(given) if name not in allowed]
         missing = [name for name in self._list.required if name not in given]
@@ -352,6 +336,30 @@ class PricesService:
             kind = _KINDS.get(status, PricesErrorKind.UNEXPECTED_STATUS)
         return DidwwPricesError(kind=kind, status_code=status, code=code, errors=errors,
                                 retry_after=_http.retry_after_seconds(resp.headers.get("Retry-After")))
+
+
+def _given_filters(filters):
+    if filters is None:
+        filters = {}
+    if not callable(getattr(filters, "items", None)):
+        raise TypeError("filters must be a dict of filter names to values")
+    given = {}
+    for name, value in filters.items():
+        if not isinstance(name, str):
+            raise TypeError("filter names must be strings")
+        value = _filter_value(name, value)
+        if value is not None and value.strip():
+            given[name] = value
+    return given
+
+
+def _filter_value(name, value):
+    if value is None:
+        return None
+    if isinstance(value, bool) or not isinstance(value, (str, int)):
+        raise TypeError(f"filter {name} must be a string")
+    # str() of a str or int Enum member gives its name, not its value.
+    return str.__str__(value) if isinstance(value, str) else int.__repr__(value)
 
 
 def _parse_errors(body):

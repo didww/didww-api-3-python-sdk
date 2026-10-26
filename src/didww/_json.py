@@ -2,8 +2,12 @@
 
 import json
 import math
-from decimal import Decimal, DecimalException
+from decimal import Context, Decimal, DecimalException, InvalidOperation, localcontext
 from enum import Enum
+
+# Numbers are parsed under this context, so a caller's context that does not
+# trap InvalidOperation cannot turn an out-of-range number into NaN.
+_PARSE_CONTEXT = Context(traps=[InvalidOperation])
 
 
 def _reject_constant(name):
@@ -18,7 +22,8 @@ def loads(data):
     if isinstance(data, (bytes, bytearray)):
         data = bytes(data).decode("utf-8")
     try:
-        return json.loads(data, parse_float=Decimal, parse_constant=_reject_constant)
+        with localcontext(_PARSE_CONTEXT):
+            return json.loads(data, parse_float=Decimal, parse_constant=_reject_constant)
     except DecimalException:
         raise ValueError("a JSON number is out of range") from None
 
@@ -37,45 +42,61 @@ def dumps(obj):
 def _encode(obj, out):
     if isinstance(obj, Enum):
         obj = obj.value
-    if obj is None:
-        out.append("null")
-    elif obj is True:
-        out.append("true")
-    elif obj is False:
-        out.append("false")
-    elif isinstance(obj, str):
-        out.append(json.dumps(str(obj)))
-    elif isinstance(obj, int):
-        out.append(int.__repr__(obj))
-    elif isinstance(obj, float):
-        if not math.isfinite(obj):
-            raise ValueError("Out of range float values are not JSON compliant")
-        out.append(float.__repr__(obj))
-    elif isinstance(obj, Decimal):
-        if not obj.is_finite():
-            raise ValueError("Non-finite Decimal values are not JSON compliant")
-        out.append(str(obj))
+    scalar = _encode_scalar(obj)
+    if scalar is not None:
+        out.append(scalar)
     elif isinstance(obj, dict):
-        out.append("{")
-        first = True
-        for key, value in obj.items():
-            if isinstance(key, Enum):
-                key = key.value
-            if not isinstance(key, str):
-                raise TypeError(f"keys must be str, not {type(key).__name__}")
-            if not first:
-                out.append(",")
-            first = False
-            out.append(json.dumps(str(key)))
-            out.append(":")
-            _encode(value, out)
-        out.append("}")
+        _encode_object(obj, out)
     elif isinstance(obj, (list, tuple)):
-        out.append("[")
-        for i, value in enumerate(obj):
-            if i:
-                out.append(",")
-            _encode(value, out)
-        out.append("]")
+        _encode_array(obj, out)
     else:
         raise TypeError(f"Object of type {type(obj).__name__} is not JSON serializable")
+
+
+def _encode_scalar(obj):
+    """The JSON text of a scalar, or None when ``obj`` is not one."""
+    if obj is None:
+        return "null"
+    if obj is True:
+        return "true"
+    if obj is False:
+        return "false"
+    if isinstance(obj, str):
+        return json.dumps(str(obj))
+    if isinstance(obj, int):
+        return int.__repr__(obj)
+    if isinstance(obj, float):
+        if not math.isfinite(obj):
+            raise ValueError("Out of range float values are not JSON compliant")
+        return float.__repr__(obj)
+    if isinstance(obj, Decimal):
+        if not obj.is_finite():
+            raise ValueError("Non-finite Decimal values are not JSON compliant")
+        return str(obj)
+    return None
+
+
+def _encode_object(obj, out):
+    out.append("{")
+    first = True
+    for key, value in obj.items():
+        if isinstance(key, Enum):
+            key = key.value
+        if not isinstance(key, str):
+            raise TypeError(f"keys must be str, not {type(key).__name__}")
+        if not first:
+            out.append(",")
+        first = False
+        out.append(json.dumps(str(key)))
+        out.append(":")
+        _encode(value, out)
+    out.append("}")
+
+
+def _encode_array(obj, out):
+    out.append("[")
+    for i, value in enumerate(obj):
+        if i:
+            out.append(",")
+        _encode(value, out)
+    out.append("]")

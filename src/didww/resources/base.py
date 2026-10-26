@@ -403,6 +403,29 @@ class ReadOnlyRepository:
                     resource._resource_meta = raw["meta"]
         elif isinstance(data, dict) and "meta" in data:
             resources._resource_meta = data["meta"]
+        ReadOnlyRepository._attach_included_meta(body.get("included"), resources)
+
+    @staticmethod
+    def _attach_included_meta(included, resources):
+        """Attach the meta of included objects to the resources reachable through relationships."""
+        if not isinstance(included, list):
+            return
+        metas = {(raw.get("type"), raw.get("id")): raw["meta"]
+                 for raw in included if isinstance(raw, dict) and "meta" in raw}
+        if not metas:
+            return
+        pending = list(resources) if isinstance(resources, list) else [resources]
+        seen = set()
+        while pending:
+            resource = pending.pop()
+            if not isinstance(resource, DidwwApiModel) or id(resource) in seen:
+                continue
+            seen.add(id(resource))
+            meta = metas.get((resource.type, resource.id))
+            if meta is not None:
+                resource._resource_meta = meta
+            for related in resource.relationship_cache.values():
+                pending.extend(related if isinstance(related, list) else [related])
 
     def list(self, params=None):
         query = params.to_dict() if params else None

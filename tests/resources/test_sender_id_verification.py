@@ -73,6 +73,7 @@ class TestSenderIdVerification:
         assert isinstance(verification.sms_trunk, SmsTrunk)
         assert verification.sms_trunk.id == HTTP_OUT_ID
         assert verification.sms_trunk.name == "Outbound HTTP"
+        assert verification.sms_trunk.host == "https://sms-out.example.com/outbound_messages"
 
     @my_vcr.use_cassette("sender_id_verifications/update_name.yaml")
     def test_update_name(self, client):
