@@ -6,6 +6,8 @@ from didww.query_params import QueryParams
 from didww.resources.did import Did
 from didww.resources.capacity_pool import CapacityPool
 from didww.resources.shared_capacity_group import SharedCapacityGroup
+from didww.resources.sms_trunk import SmsTrunk
+from didww.resources.sms_trunk_group import SmsTrunkGroup
 from didww.resources.voice_in_trunk import VoiceInTrunk
 from didww.resources.voice_in_trunk_group import VoiceInTrunkGroup
 
@@ -201,3 +203,89 @@ class TestDid:
         updated = response.data
         assert updated.id == "44957076-778a-4802-b60c-d22db0cda284"
         assert updated.emergency_enabled is False
+
+
+DID_ID = "9df99644-f1a5-4a3c-99a4-559d758eb96b"
+SMS_TRUNK_ID = "1a2b3c4d-0002-4a5b-8c6d-7e8f9a0b1c02"
+SMS_TRUNK_GROUP_ID = "2b3c4d5e-0001-4b6c-9d7e-8f9a0b1c2d01"
+
+
+class TestDidSmsRouting:
+    @my_vcr.use_cassette("dids/show_with_sms_trunk.yaml")
+    def test_find_did_with_sms_trunk(self, client):
+        did = client.dids().find(DID_ID, QueryParams().include("sms_trunk")).data
+        assert isinstance(did.sms_trunk, SmsTrunk)
+        assert did.sms_trunk.id == SMS_TRUNK_ID
+        assert did.sms_trunk.name == "http_in trunk"
+        assert did.sms_trunk_group is None
+        assert did._dirty_attrs == set()
+        assert did._dirty_rels == set()
+
+    @my_vcr.use_cassette("dids/show_with_sms_trunk_group.yaml")
+    def test_find_did_with_sms_trunk_group(self, client):
+        did = client.dids().find(DID_ID, QueryParams().include("sms_trunk_group")).data
+        assert isinstance(did.sms_trunk_group, SmsTrunkGroup)
+        assert did.sms_trunk_group.id == SMS_TRUNK_GROUP_ID
+        assert did.sms_trunk_group.name == "Inbound SMS"
+        assert did.sms_trunk_group.sms_trunks_count == 2
+        assert did.sms_trunk is None
+        assert did._dirty_attrs == set()
+        assert did._dirty_rels == set()
+
+    @my_vcr.use_cassette("dids/update_assign_sms_trunk.yaml")
+    def test_assign_sms_trunk_unassigns_sms_trunk_group(self, client):
+        did = Did.build(DID_ID)
+        did.sms_trunk = SmsTrunk.build(SMS_TRUNK_ID)
+        assert did.sms_trunk_group is None
+        assert client.dids().update(did).data.id == DID_ID
+
+    @my_vcr.use_cassette("dids/update_assign_sms_trunk_group.yaml")
+    def test_assign_sms_trunk_group_unassigns_sms_trunk(self, client):
+        did = Did.build(DID_ID)
+        did.sms_trunk_group = SmsTrunkGroup.build(SMS_TRUNK_GROUP_ID)
+        assert did.sms_trunk is None
+        assert client.dids().update(did).data.id == DID_ID
+
+    @my_vcr.use_cassette("dids/update_unassign_sms_trunk.yaml")
+    def test_unassign_sms_trunk_leaves_sms_trunk_group_alone(self, client):
+        did = Did.build(DID_ID)
+        did.sms_trunk = None
+        assert did.sms_trunk is None
+        assert client.dids().update(did).data.id == DID_ID
+
+    @my_vcr.use_cassette("dids/update_unassign_sms_trunk_group.yaml")
+    def test_unassign_sms_trunk_group_leaves_sms_trunk_alone(self, client):
+        did = Did.build(DID_ID)
+        did.sms_trunk_group = None
+        assert did.sms_trunk_group is None
+        assert client.dids().update(did).data.id == DID_ID
+
+    @my_vcr.use_cassette("dids/update_unassign_sms.yaml")
+    def test_unassign_both_sms_relationships(self, client):
+        did = Did.build(DID_ID)
+        did.sms_trunk = None
+        did.sms_trunk_group = None
+        assert client.dids().update(did).data.id == DID_ID
+
+    @my_vcr.use_cassette("dids/show_with_sms_trunk.yaml")
+    def test_unassign_loaded_sms_trunk_reads_back_as_none(self, client):
+        did = client.dids().find(DID_ID, QueryParams().include("sms_trunk")).data
+        did.sms_trunk = None
+        assert did.sms_trunk is None
+        assert did.to_jsonapi(include_id=True, dirty_only=True) == {
+            "id": DID_ID,
+            "type": "dids",
+            "attributes": {},
+            "relationships": {"sms_trunk": {"data": None}},
+        }
+
+    def test_unassign_voice_in_trunk_sends_only_that_relationship(self):
+        did = Did.build(DID_ID)
+        did.voice_in_trunk = None
+        assert did.voice_in_trunk is None
+        assert did.to_jsonapi(include_id=True, dirty_only=True) == {
+            "id": DID_ID,
+            "type": "dids",
+            "attributes": {},
+            "relationships": {"voice_in_trunk": {"data": None}},
+        }

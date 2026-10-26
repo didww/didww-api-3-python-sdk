@@ -6,7 +6,7 @@ from enum import Enum
 from jsonapi_requests.orm.api import OrmApi
 from jsonapi_requests.orm.api_model import ApiModel
 from jsonapi_requests.orm.fields import AttributeField, RelationField as OrmRelationField
-from jsonapi_requests.data import Dictionary, JsonApiResponse
+from jsonapi_requests.data import Dictionary, JsonApiObject, JsonApiResponse, Relationship
 from didww.enums import enum_value, enum_value_list, to_enum, to_enum_list
 
 # Map of JSON:API types to module:class for lazy loading
@@ -23,12 +23,10 @@ _TYPE_MAP = {
     "emergency_requirement_validations": "didww.resources.emergency_requirement_validation:EmergencyRequirementValidation",
     "emergency_verifications": "didww.resources.emergency_verification:EmergencyVerification",
     "did_groups": "didww.resources.did_group:DidGroup",
-    "did_group_types": "didww.resources.did_group_type:DidGroupType",
     "did_reservations": "didww.resources.did_reservation:DidReservation",
     "identities": "didww.resources.identity:Identity",
     "nanpa_prefixes": "didww.resources.nanpa_prefix:NanpaPrefix",
     "orders": "didww.resources.order:Order",
-    "pops": "didww.resources.pop:Pop",
     "proofs": "didww.resources.proof:Proof",
     "proof_types": "didww.resources.proof_type:ProofType",
     "regions": "didww.resources.region:Region",
@@ -49,6 +47,10 @@ _TYPE_MAP = {
     "public_keys": "didww.resources.public_key:PublicKey",
     "address_requirement_validations": "didww.resources.address_requirement_validation:AddressRequirementValidation",
     "voice_out_trunk_regenerate_credentials": "didww.resources.voice_out_trunk_regenerate_credential:VoiceOutTrunkRegenerateCredential",
+    "sms_trunks": "didww.resources.sms_trunk:SmsTrunk",
+    "sms_trunk_groups": "didww.resources.sms_trunk_group:SmsTrunkGroup",
+    "sms_trunk_regenerate_credentials": "didww.resources.sms_trunk_regenerate_credential:SmsTrunkRegenerateCredential",
+    "sender_id_verifications": "didww.resources.sender_id_verification:SenderIdVerification",
 }
 
 # Shared ORM API instance (no HTTP — we handle that in client.py)
@@ -142,15 +144,34 @@ class EnumListAttributeField(SafeAttributeField):
 
 
 class RelationField(OrmRelationField):
-    """RelationField that tracks dirty relationship writes."""
+    """RelationField that tracks dirty relationship writes.
+
+    ``None`` unassigns a to-one relationship (``{"data": null}``); on a
+    to-many field (``many=True``) it clears the list (``{"data": []}``).
+    """
+
+    def __init__(self, source, many=False):
+        super().__init__(source)
+        self.many = many
 
     def __set__(self, instance, value):
+        if self.many:
+            if value is None:
+                value = []
+            elif hasattr(value, "id"):
+                raise TypeError(f"{self.source} takes a list of resources")
+        elif value is None:
+            instance._null_relationship(self.source)
+            return
         super().__set__(instance, value)
         instance._mark_relationship_dirty(self.source)
 
 
 class ExclusiveRelationField(RelationField):
-    """RelationField that nullifies another relationship when set."""
+    """RelationField that unassigns its pair when a resource is assigned.
+
+    Assigning ``None`` unassigns only this relationship.
+    """
 
     def __init__(self, source, excludes):
         super().__init__(source)
@@ -158,7 +179,25 @@ class ExclusiveRelationField(RelationField):
 
     def __set__(self, instance, value):
         super().__set__(instance, value)
-        instance._null_relationship(self.excludes)
+        if value is not None:
+            instance._null_relationship(self.excludes)
+
+
+class ReadOnlyRelationField(OrmRelationField):
+    """Relationship filled from responses only; assigning it raises AttributeError."""
+
+    def __set__(self, instance, value):
+        raise AttributeError(f"{self.source} is read-only")
+
+
+class _NullRelationship(Relationship):
+    """A relationship that serializes as ``{"data": null}`` and reads back as None."""
+
+    def __init__(self):
+        super().__init__(data=None)
+
+    def as_data(self):
+        return {"data": None}
 
 
 def _touching(fn):
@@ -286,6 +325,11 @@ class DidwwApiModel(ApiModel):
         self._dirty_rels.add(key)
 
     @classmethod
+    def from_id(cls, id):
+        """A resource known only by type and id, e.g. a relationship whose object was not included."""
+        return cls(raw_object=JsonApiObject(type=cls._options.type, id=id))
+
+    @classmethod
     def build(cls, id, **attributes):
         obj = cls()
         obj.id = id
@@ -311,7 +355,8 @@ class DidwwApiModel(ApiModel):
         doc = {"type": self.type, "attributes": attrs}
         if include_id and self.id:
             doc["id"] = self.id
-        rels = self.raw_object.relationships.as_data()
+        read_only = {f.source for f in self._options.fields.values() if isinstance(f, ReadOnlyRelationField)}
+        rels = {k: v for k, v in self.raw_object.relationships.as_data().items() if k not in read_only}
         if dirty_only:
             rels = {k: v for k, v in rels.items() if k in self._dirty_rels}
         if rels:
@@ -325,7 +370,8 @@ class DidwwApiModel(ApiModel):
 
     def _null_relationship(self, key):
         """Write null data into the ORM relationship, like Java's field = null."""
-        self.raw_object.relationships[key] = {"data": None}
+        self.raw_object.relationships[key] = _NullRelationship()
+        self.relationship_cache[key] = None
         self._mark_relationship_dirty(key)
 
 
@@ -346,6 +392,8 @@ class ReadOnlyRepository:
     @staticmethod
     def _attach_resource_meta(body, resources):
         """Attach per-resource meta from the raw JSON:API body to parsed resources."""
+        if not isinstance(body, dict):
+            return
         data = body.get("data")
         if data is None:
             return
@@ -355,6 +403,29 @@ class ReadOnlyRepository:
                     resource._resource_meta = raw["meta"]
         elif isinstance(data, dict) and "meta" in data:
             resources._resource_meta = data["meta"]
+        ReadOnlyRepository._attach_included_meta(body.get("included"), resources)
+
+    @staticmethod
+    def _attach_included_meta(included, resources):
+        """Attach the meta of included objects to the resources reachable through relationships."""
+        if not isinstance(included, list):
+            return
+        metas = {(raw.get("type"), raw.get("id")): raw["meta"]
+                 for raw in included if isinstance(raw, dict) and "meta" in raw}
+        if not metas:
+            return
+        pending = list(resources) if isinstance(resources, list) else [resources]
+        seen = set()
+        while pending:
+            resource = pending.pop()
+            if not isinstance(resource, DidwwApiModel) or id(resource) in seen:
+                continue
+            seen.add(id(resource))
+            meta = metas.get((resource.type, resource.id))
+            if meta is not None:
+                resource._resource_meta = meta
+            for related in resource.relationship_cache.values():
+                pending.extend(related if isinstance(related, list) else [related])
 
     def list(self, params=None):
         query = params.to_dict() if params else None
@@ -383,6 +454,7 @@ class Repository(ReadOnlyRepository):
         resource._clear_dirty_state()
         response = JsonApiResponse.from_data(body)
         created = self._resource_class.from_response_content(response)
+        self._attach_resource_meta(body, created)
         return ApiResponse(data=created, meta=body.get("meta", {}))
 
     def update(self, resource, params=None):
@@ -392,6 +464,7 @@ class Repository(ReadOnlyRepository):
         resource._clear_dirty_state()
         response = JsonApiResponse.from_data(body)
         updated = self._resource_class.from_response_content(response)
+        self._attach_resource_meta(body, updated)
         return ApiResponse(data=updated, meta=body.get("meta", {}))
 
     def delete(self, resource_id):
@@ -406,6 +479,7 @@ class CreateOnlyRepository(ReadOnlyRepository):
         resource._clear_dirty_state()
         response = JsonApiResponse.from_data(body)
         created = self._resource_class.from_response_content(response)
+        self._attach_resource_meta(body, created)
         return ApiResponse(data=created, meta=body.get("meta", {}))
 
     def delete(self, resource_id):

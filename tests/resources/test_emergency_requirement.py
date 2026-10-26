@@ -1,4 +1,5 @@
 from tests.conftest import my_vcr
+from didww.enums import NumberType
 
 
 class TestEmergencyRequirement:
@@ -21,5 +22,6 @@ class TestEmergencyRequirement:
         assert er.address_mandatory_fields == ["city_name", "address"]
         assert er.personal_mandatory_fields == ["first_name", "last_name"]
         assert er.requirement_restriction_message is None
+        assert er.number_type == NumberType.LOCAL
         assert er.meta["setup_price"] == "0.0"
         assert er.meta["monthly_price"] == "1.5"

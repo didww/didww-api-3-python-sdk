@@ -1,7 +1,7 @@
 import os
 import tempfile
 from tests.conftest import my_vcr
-from didww.enums import ExportStatus, ExportType
+from didww.enums import ExportStatus, ExportTrunkType, ExportType
 from didww.resources.export import Export
 
 
@@ -52,6 +52,44 @@ class TestExport:
         created = response.data
         assert created.id == "da15f006-5da4-45ca-b0df-735baeadf423"
         assert created.status == ExportStatus.PENDING
+
+    @my_vcr.use_cassette("exports/create_sms_in.yaml")
+    def test_create_sms_in_export(self, client):
+        export = Export()
+        export.export_type = ExportType.SMS_IN
+        export.filters = {
+            "from": "2026-10-01 00:00:00",
+            "to": "2026-10-15 00:00:00",
+            "trunk_type": [ExportTrunkType.SMPP_SMSC, ExportTrunkType.HTTP_IN],
+            "destination_address_eq": "12125550100",
+        }
+        created = client.exports().create(export).data
+        assert created.id == "5a2d3e4f-6b7c-4d8e-9f0a-1b2c3d4e5f60"
+        assert created.export_type == ExportType.SMS_IN
+        assert created.filters["trunk_type"] == ["SMPP SMSC", "HTTP IN"]
+
+    @my_vcr.use_cassette("exports/create_sms_out.yaml")
+    def test_create_sms_out_export(self, client):
+        export = Export()
+        export.export_type = ExportType.SMS_OUT
+        export.filters = {
+            "from": "2026-10-01 00:00:00",
+            "to": "2026-10-15 00:00:00",
+            "sms_trunk.id": ["b2c3d4e5-0000-4000-8000-000000000001", "b2c3d4e5-0000-4000-8000-000000000003"],
+            "service_type": "a2p",
+            "sender_id_verification.id": "c3d4e5f6-0000-4000-8000-000000000002",
+        }
+        created = client.exports().create(export).data
+        assert created.id == "4f1c2d3e-5a6b-4c7d-8e9f-0a1b2c3d4e5f"
+        assert created.export_type == ExportType.SMS_OUT
+        assert created.filters["service_type"] == "a2p"
+
+    def test_filters_assignment_is_dirty(self):
+        export = Export.build("da15f006-5da4-45ca-b0df-735baeadf423")
+        export.filters = {"from": "2026-10-01 00:00:00"}
+        assert export.to_jsonapi(include_id=True, dirty_only=True)["attributes"] == {
+            "filters": {"from": "2026-10-01 00:00:00"},
+        }
 
     def test_patch_external_reference_id_request_body(self):
         """PATCH must send exactly the id, type, and only the dirty attribute."""
