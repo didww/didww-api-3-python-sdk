@@ -1,19 +1,20 @@
-from didww.enums import Feature
-from didww.resources.base import DidwwApiModel, EnumListAttributeField, SafeAttributeField, RelationField, ReadOnlyRepository
+from didww.enums import Feature, NumberType
+from didww.resources.base import DidwwApiModel, EnumAttributeField, EnumListAttributeField, SafeAttributeField, RelationField, ReadOnlyRepository
 
 
 class DidGroup(DidwwApiModel):
     prefix = SafeAttributeField("prefix")
     features = EnumListAttributeField("features", Feature)
     is_metered = SafeAttributeField("is_metered")
+    is_demo = SafeAttributeField("is_demo")
     area_name = SafeAttributeField("area_name")
     allow_additional_channels = SafeAttributeField("allow_additional_channels")
     service_restrictions = SafeAttributeField("service_restrictions")
+    number_type = EnumAttributeField("number_type", NumberType)
 
     country = RelationField("country")
     region = RelationField("region")
     city = RelationField("city")
-    did_group_type = RelationField("did_group_type")
     stock_keeping_units = RelationField("stock_keeping_units")
     address_requirement = RelationField("address_requirement")
 

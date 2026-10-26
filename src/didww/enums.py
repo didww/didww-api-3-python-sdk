@@ -42,6 +42,16 @@ class AddressVerificationStatus(str, Enum):
 class ExportType(str, Enum):
     CDR_IN = "cdr_in"
     CDR_OUT = "cdr_out"
+    SMS_IN = "sms_in"
+    SMS_OUT = "sms_out"
+
+
+class ExportTrunkType(str, Enum):
+    """Values of the ``trunk_type`` filter of an ``sms_in`` export."""
+    SMPP_SMSC = "SMPP SMSC"
+    SMPP_ESME = "SMPP ESME"
+    EMAIL = "Email"
+    HTTP_IN = "HTTP IN"
 
 
 class ExportStatus(str, Enum):
@@ -94,6 +104,61 @@ class EmergencyCallingServiceStatus(str, Enum):
     IN_PROCESS = "in_process"
     NEW = "new"
     PENDING_UPDATE = "pending_update"
+
+
+class NumberType(str, Enum):
+    LOCAL = "local"
+    NATIONAL = "national"
+    MOBILE = "mobile"
+    TOLL_FREE = "toll_free"
+    SHARED_COST = "shared_cost"
+    GLOBAL = "global"
+
+
+class Pop(str, Enum):
+    """Point of presence a Voice IN trunk is served from."""
+    NYC = "NYC"
+    FRA = "FRA"
+    LAC = "LAC"
+    MIA = "MIA"
+    SG = "SG"
+    HK = "HK"
+    AMS = "AMS"
+
+
+class SenderIdVerificationStatus(str, Enum):
+    ACTIVE = "active"
+    CHANGES_REQUIRED = "changes_required"
+    CLOSED = "closed"
+    CLOSING_IN_PROCESS = "closing_in_process"
+    IN_PROCESS = "in_process"
+    NEW = "new"
+
+
+class SenderType(str, Enum):
+    ALPHANUMERIC = "alphanumeric"
+    CARRIER = "carrier"
+    LONG_CODE = "long_code"
+    SHORT_CODE = "short_code"
+    TOLL_FREE = "toll_free"
+
+
+class SmsHttpMethod(str, Enum):
+    GET = "get"
+    POST = "post"
+    PUT = "put"
+
+
+class SmsBodyType(str, Enum):
+    JSON = "json"
+    HTML_MULTIPART = "html_multipart"
+    HTML_URL_ENCODED = "html_url_encoded"
+    RAW = "raw"
+
+
+class SmsServerLocation(str, Enum):
+    NYC = "nyc"
+    AMS = "ams"
 
 
 class VoiceOutTrunkStatus(str, Enum):

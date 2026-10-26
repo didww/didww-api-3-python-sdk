@@ -80,3 +80,47 @@ def test_export_type_accepts_string_for_backward_compatibility():
     export = Export()
     export.export_type = "cdr_in"
     assert export.export_type == ExportType.CDR_IN
+
+
+def test_new_enum_values():
+    import didww
+    from didww.enums import (
+        ExportTrunkType,
+        NumberType,
+        Pop,
+        SenderIdVerificationStatus,
+        SenderType,
+        SmsBodyType,
+        SmsHttpMethod,
+        SmsServerLocation,
+    )
+
+    assert [e.value for e in NumberType] == ["local", "national", "mobile", "toll_free", "shared_cost", "global"]
+    assert [e.value for e in Pop] == ["NYC", "FRA", "LAC", "MIA", "SG", "HK", "AMS"]
+    assert didww.Pop is Pop
+    assert ExportType.SMS_IN.value == "sms_in"
+    assert ExportType.SMS_OUT.value == "sms_out"
+    assert [e.value for e in ExportTrunkType] == ["SMPP SMSC", "SMPP ESME", "Email", "HTTP IN"]
+    assert [e.value for e in SenderIdVerificationStatus] == [
+        "active", "changes_required", "closed", "closing_in_process", "in_process", "new"]
+    assert [e.value for e in SenderType] == ["alphanumeric", "carrier", "long_code", "short_code", "toll_free"]
+    assert [e.value for e in SmsHttpMethod] == ["get", "post", "put"]
+    assert [e.value for e in SmsBodyType] == ["json", "html_multipart", "html_url_encoded", "raw"]
+    assert [e.value for e in SmsServerLocation] == ["nyc", "ams"]
+
+
+def test_number_type_and_pop_round_trip():
+    from didww.enums import NumberType, Pop
+
+    group = DidGroup.from_jsonapi({"id": "1", "type": "did_groups", "attributes": {"number_type": "toll_free"}})
+    assert group.number_type == NumberType.TOLL_FREE
+    future = DidGroup.from_jsonapi({"id": "1", "type": "did_groups", "attributes": {"number_type": "future"}})
+    assert future.number_type == "future"
+
+    trunk = VoiceInTrunk()
+    trunk.pop = Pop.AMS
+    assert trunk.to_jsonapi()["attributes"]["pop"] == "AMS"
+    trunk.pop = "FRA"
+    assert trunk.pop == Pop.FRA
+    unknown = VoiceInTrunk.from_jsonapi({"id": "1", "type": "voice_in_trunks", "attributes": {"pop": "XYZ"}})
+    assert unknown.pop == "XYZ"

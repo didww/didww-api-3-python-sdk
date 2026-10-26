@@ -1,4 +1,5 @@
-from didww.resources.base import DidwwApiModel, SafeAttributeField, RelationField, ReadOnlyRepository
+from didww.enums import NumberType
+from didww.resources.base import DidwwApiModel, SafeAttributeField, EnumAttributeField, RelationField, ReadOnlyRepository
 
 
 class EmergencyRequirement(DidwwApiModel):
@@ -19,9 +20,9 @@ class EmergencyRequirement(DidwwApiModel):
     business_mandatory_fields = SafeAttributeField("business_mandatory_fields")
     estimate_setup_time = SafeAttributeField("estimate_setup_time")
     requirement_restriction_message = SafeAttributeField("requirement_restriction_message")
+    number_type = EnumAttributeField("number_type", NumberType)
 
     country = RelationField("country")
-    did_group_type = RelationField("did_group_type")
 
     class Meta:
         type = "emergency_requirements"

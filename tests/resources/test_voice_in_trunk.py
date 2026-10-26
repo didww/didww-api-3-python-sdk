@@ -6,6 +6,7 @@ from didww.enums import (
     DiversionRelayPolicy,
     MediaEncryptionMode,
     NetworkProtocolPriority,
+    Pop,
     ReroutingDisconnectCode,
     RxDtmfFormat,
     SstRefreshMethod,
@@ -30,7 +31,7 @@ class TestVoiceInTrunk:
 
     @my_vcr.use_cassette("voice_in_trunks/list.yaml")
     def test_list_voice_in_trunks(self, client):
-        params = QueryParams().include("trunk_group", "pop")
+        params = QueryParams().include("voice_in_trunk_group")
         response = client.voice_in_trunks().list(params)
         trunks = response.data
         assert len(trunks) > 0
@@ -43,8 +44,7 @@ class TestVoiceInTrunk:
         assert first.voice_in_trunk_group is None
         assert first.pop is None
         second = trunks[1]
-        assert second.pop is not None
-        assert second.pop.name == "DE, FRA"
+        assert second.pop == Pop.FRA
 
     @my_vcr.use_cassette("voice_in_trunks/list.yaml")
     def test_list_sip_configuration_attributes(self, client):
@@ -104,6 +104,47 @@ class TestVoiceInTrunk:
         config_obj = created.configuration
         assert isinstance(config_obj, PstnConfiguration)
         assert config_obj.dst == "558540420024"
+
+    @my_vcr.use_cassette("voice_in_trunks/create_with_pop.yaml")
+    def test_create_voice_in_trunk_with_pop(self, client):
+        config = PstnConfiguration()
+        config.dst = "558540420024"
+        trunk = VoiceInTrunk()
+        trunk.name = "hello, test pstn trunk"
+        trunk.configuration = config
+        trunk.pop = Pop.FRA
+
+        created = client.voice_in_trunks().create(trunk).data
+        assert created.pop == Pop.FRA
+
+    def test_create_omits_unset_pop(self):
+        trunk = VoiceInTrunk()
+        trunk.name = "no pop"
+        trunk.pop = None
+        assert "pop" not in trunk.to_jsonapi()["attributes"]
+
+    @my_vcr.use_cassette("voice_in_trunks/update_clear_pop.yaml")
+    def test_update_clears_pop(self, client):
+        trunk = VoiceInTrunk.build("41b94706-325e-4704-a433-d65105758836")
+        trunk.pop = None
+        assert trunk.to_jsonapi(include_id=True, dirty_only=True) == {
+            "type": "voice_in_trunks",
+            "id": "41b94706-325e-4704-a433-d65105758836",
+            "attributes": {"pop": None},
+        }
+
+        updated = client.voice_in_trunks().update(trunk).data
+        assert updated.pop is None
+
+    def test_unknown_pop_reads_as_raw_string_and_is_not_resent(self):
+        trunk = VoiceInTrunk.from_jsonapi({
+            "id": "t1",
+            "type": "voice_in_trunks",
+            "attributes": {"name": "n", "pop": "XYZ"},
+        })
+        assert trunk.pop == "XYZ"
+        trunk.name = "renamed"
+        assert trunk.to_jsonapi(include_id=True, dirty_only=True)["attributes"] == {"name": "renamed"}
 
     def test_pstn_configuration_serialization(self):
         config = PstnConfiguration()

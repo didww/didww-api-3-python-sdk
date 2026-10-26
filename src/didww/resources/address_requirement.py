@@ -1,4 +1,4 @@
-from didww.enums import IdentityType, AreaLevel
+from didww.enums import IdentityType, AreaLevel, NumberType
 from didww.resources.base import DidwwApiModel, SafeAttributeField, EnumAttributeField, RelationField, ReadOnlyRepository
 
 
@@ -14,9 +14,9 @@ class AddressRequirement(DidwwApiModel):
     business_mandatory_fields = SafeAttributeField("business_mandatory_fields")
     service_description_required = SafeAttributeField("service_description_required")
     restriction_message = SafeAttributeField("restriction_message")
+    number_type = EnumAttributeField("number_type", NumberType)
 
     country = RelationField("country")
-    did_group_type = RelationField("did_group_type")
     personal_permanent_document = RelationField("personal_permanent_document")
     business_permanent_document = RelationField("business_permanent_document")
     personal_onetime_document = RelationField("personal_onetime_document")

@@ -3,10 +3,17 @@ from didww.resources.base import DidwwApiModel, DatetimeAttributeField, SafeAttr
 
 
 class Identity(DidwwApiModel):
+    """Identity resource.
+
+    ``company_website`` applies to business identities and is rejected on a
+    personal one; assigning ``None`` clears it on update.
+    """
+
     _writable_attrs = {
         "first_name", "last_name", "phone_number", "id_number", "birth_date",
         "company_name", "company_reg_number", "vat_id", "description",
         "personal_tax_id", "identity_type", "external_reference_id", "contact_email",
+        "company_website",
     }
 
     first_name = SafeAttributeField("first_name")
@@ -15,6 +22,7 @@ class Identity(DidwwApiModel):
     id_number = SafeAttributeField("id_number")
     birth_date = SafeAttributeField("birth_date")
     company_name = SafeAttributeField("company_name")
+    company_website = SafeAttributeField("company_website")
     company_reg_number = SafeAttributeField("company_reg_number")
     vat_id = SafeAttributeField("vat_id")
     description = SafeAttributeField("description")
