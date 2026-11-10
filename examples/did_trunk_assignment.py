@@ -67,7 +67,7 @@ try:
     sip = SipConfiguration()
     sip.host = "sip.example.com"
     sip.port = 5060
-    sip.codec_ids = [Codec.PCMU, Codec.PCMA]
+    sip.codecs = [Codec.PCMU, Codec.PCMA]
     sip.transport_protocol_id = TransportProtocol.UDP
 
     trunk = VoiceInTrunk()

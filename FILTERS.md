@@ -217,7 +217,7 @@ Pass values URL-encoded as strings. Where the server accepts arrays, comma-separ
 
 ## ProofType — `GET /v3/proof_types`
 
-- `filter[entity_type]`
+- `filter[entity_type]` — `address`, `business` or `personal`
 
 ## Region — `GET /v3/regions`
 
@@ -300,11 +300,11 @@ Set them as a `dict` on `Export.filters`. `from` and `to` are required for every
 | `source_address_cont` | `sms_in`, `sms_out` |
 | `destination_address_eq` | `sms_in`, `sms_out` |
 | `destination_address_cont` | `sms_in`, `sms_out` |
-| `status` | `sms_in` (`Success`, `Failed`, `Queued`), `sms_out` (`Routing Error`, `In Progress`, `Queued`, `Failed`, `Success`) |
+| `status` | `sms_in` (`success`, `failed`, `queued`), `sms_out` (`routing_error`, `in_progress`, `queued`, `failed`, `success`) |
 | `sms_id` | `sms_in`, `sms_out` |
 | `sms_trunk.id` | `sms_in`, `sms_out` — one id or a list of ids |
-| `trunk_type` | `sms_in` — one or a list of `ExportTrunkType` values (their `.value`), e.g. `HTTP IN` |
-| `service_type` | `sms_out` — `a2p` or `p2p` |
+| `trunk_type` | `sms_in` — one or a list of `ExportTrunkType` values (`smpp_smsc`, `smpp_esme`, `sms_to_email`, `http_in`) |
+| `service_type` | `sms_out` — an `ExportServiceType` value (`a2p` or `p2p`) |
 | `sender_id_verification.id` | `sms_out` — one id or a list of ids |
 
 ## Price lookups — `GET /v3/…/lookup/prices`

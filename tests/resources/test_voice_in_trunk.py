@@ -4,10 +4,13 @@ from didww.enums import (
     Codec,
     DiversionInjectMode,
     DiversionRelayPolicy,
+    IceMode,
     MediaEncryptionMode,
     NetworkProtocolPriority,
     Pop,
     ReroutingDisconnectCode,
+    RtcpFeedbackMode,
+    RtcpMuxMode,
     RxDtmfFormat,
     SstRefreshMethod,
     StirShakenMode,
@@ -18,6 +21,17 @@ from didww.query_params import QueryParams
 from didww.resources.voice_in_trunk import VoiceInTrunk
 from didww.resources.configuration.pstn import PstnConfiguration
 from didww.resources.configuration.sip import SipConfiguration
+from tests.support.http_stub import jsonapi_reply, token_reply
+
+TRUNK_ID = "a80006b6-4183-4865-8b99-7ebbd359a762"
+
+
+def _sip_trunk_reply(trunk_id, sip_attributes):
+    return jsonapi_reply(200, {"data": {
+        "id": trunk_id,
+        "type": "voice_in_trunks",
+        "attributes": {"name": "sip", "configuration": {"type": "sip_configurations", "attributes": sip_attributes}},
+    }})
 
 
 class TestVoiceInTrunk:
@@ -44,7 +58,7 @@ class TestVoiceInTrunk:
         assert first.voice_in_trunk_group is None
         assert first.pop is None
         second = trunks[1]
-        assert second.pop == Pop.FRA
+        assert second.pop is Pop.FRA
 
     @my_vcr.use_cassette("voice_in_trunks/list.yaml")
     def test_list_sip_configuration_attributes(self, client):
@@ -62,7 +76,11 @@ class TestVoiceInTrunk:
         assert config.username == "username"
         assert config.host == "203.0.113.78"
         assert config.port == 8060
-        assert config.codec_ids == [Codec.PCMU, Codec.PCMA, Codec.G729]
+        assert config.codecs == [Codec.PCMU, Codec.PCMA, Codec.G729]
+        assert all(type(codec) is Codec for codec in config.codecs)
+        assert config.ice_mode is IceMode.ACCEPT
+        assert config.rtcp_mux_mode is RtcpMuxMode.INITIATE
+        assert config.rtcp_feedback_mode is RtcpFeedbackMode.DISABLED
         assert config.transport_protocol_id == TransportProtocol.UDP
         assert config.auth_enabled is True
         assert config.auth_user == "auth_user"
@@ -115,7 +133,7 @@ class TestVoiceInTrunk:
         trunk.pop = Pop.FRA
 
         created = client.voice_in_trunks().create(trunk).data
-        assert created.pop == Pop.FRA
+        assert created.pop is Pop.FRA
 
     def test_create_omits_unset_pop(self):
         trunk = VoiceInTrunk()
@@ -160,12 +178,71 @@ class TestVoiceInTrunk:
         config.username = "user"
         config.host = "example.com"
         config.port = 5060
-        config.codec_ids = [Codec.PCMU, Codec.PCMA, Codec.G729]
+        config.codecs = [Codec.G729, Codec.PCMU, Codec.PCMA]
         data = config.to_jsonapi()
         assert data["type"] == "sip_configurations"
         assert data["attributes"]["username"] == "user"
         assert data["attributes"]["host"] == "example.com"
-        assert data["attributes"]["codec_ids"] == [9, 10, 8]
+        assert data["attributes"]["codecs"] == ["g729", "pcmu", "pcma"]
+
+    def test_create_sip_trunk_with_codecs_and_modes_request_body(self, stub, make_client):
+        stub.on("POST", "/token", token_reply())
+        stub.on("POST", "/v3/voice_in_trunks", _sip_trunk_reply(TRUNK_ID, {}))
+        config = SipConfiguration()
+        config.host = "sip.example.com"
+        config.codecs = [Codec.AMR_WB, Codec.PCMA, "g729", Codec.TELEPHONE_EVENT]
+        config.ice_mode = IceMode.INITIATE
+        config.rtcp_mux_mode = RtcpMuxMode.ACCEPT
+        config.rtcp_feedback_mode = "disabled"
+        trunk = VoiceInTrunk()
+        trunk.name = "sip"
+        trunk.configuration = config
+
+        make_client().voice_in_trunks().create(trunk)
+
+        (hit,) = stub.hits("POST", "/v3/voice_in_trunks")
+        assert hit.json() == {"data": {"type": "voice_in_trunks", "attributes": {
+            "name": "sip",
+            "configuration": {"type": "sip_configurations", "attributes": {
+                "enabled_sip_registration": False,
+                "use_did_in_ruri": False,
+                "host": "sip.example.com",
+                "codecs": ["amr_wb", "pcma", "g729", "telephone_event"],
+                "ice_mode": "initiate",
+                "rtcp_mux_mode": "accept",
+                "rtcp_feedback_mode": "disabled",
+            }},
+        }}}
+
+    def test_update_sip_trunk_codecs_and_modes_request_body(self, stub, make_client):
+        stub.on("POST", "/token", token_reply())
+        stub.on("PATCH", f"/v3/voice_in_trunks/{TRUNK_ID}", _sip_trunk_reply(TRUNK_ID, {}))
+        config = SipConfiguration()
+        config.codecs = [Codec.SPEEX, Codec.L16]
+        config.ice_mode = IceMode.DISABLED
+        config.rtcp_mux_mode = RtcpMuxMode.INITIATE
+        config.rtcp_feedback_mode = RtcpFeedbackMode.ACCEPT
+        trunk = VoiceInTrunk.build(TRUNK_ID)
+        trunk.configuration = config
+
+        make_client().voice_in_trunks().update(trunk)
+
+        (hit,) = stub.hits("PATCH", f"/v3/voice_in_trunks/{TRUNK_ID}")
+        assert hit.json() == {"data": {"type": "voice_in_trunks", "id": TRUNK_ID, "attributes": {
+            "configuration": {"type": "sip_configurations", "attributes": {
+                "codecs": ["speex", "l16"],
+                "ice_mode": "disabled",
+                "rtcp_mux_mode": "initiate",
+                "rtcp_feedback_mode": "accept",
+            }},
+        }}}
+
+    def test_unknown_codec_and_mode_read_as_raw_strings(self):
+        config = SipConfiguration(attributes={"codecs": ["pcmu", "future_codec"], "ice_mode": "future_mode"})
+        assert config.codecs[0] is Codec.PCMU
+        assert type(config.codecs[1]) is str
+        assert config.codecs == ["pcmu", "future_codec"]
+        assert type(config.ice_mode) is str
 
     def test_configuration_deserialization(self):
         from didww.resources.configuration.base import TrunkConfiguration
@@ -187,7 +264,7 @@ class TestVoiceInTrunk:
         config.host = "203.0.113.110"
         config.sst_refresh_method_id = SstRefreshMethod.INVITE
         config.port = 5060
-        config.codec_ids = [Codec.PCMU, Codec.PCMA, Codec.G729, Codec.G723, Codec.TELEPHONE_EVENT]
+        config.codecs = [Codec.PCMU, Codec.PCMA, Codec.G729, Codec.G723, Codec.TELEPHONE_EVENT]
         config.rerouting_disconnect_code_ids = [
             ReroutingDisconnectCode.SIP_400_BAD_REQUEST,
             ReroutingDisconnectCode.SIP_402_PAYMENT_REQUIRED,

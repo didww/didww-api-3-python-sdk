@@ -46,7 +46,7 @@ DIDWW_API_KEY=your_api_key python examples/prices_lookup.py 18005550123
 | [`did_groups.py`](did_groups.py) | Fetches DID groups with included SKUs, number type, demo flag and group details. |
 | [`trunks.py`](trunks.py) | Creates SIP and PSTN trunks, prints details, then deletes them. |
 | [`regions.py`](regions.py) | Lists regions, filters by country, and fetches a specific region. |
-| [`voice_in_trunks.py`](voice_in_trunks.py) | Lists voice in trunks with their configurations and point of presence (`pop`). |
+| [`voice_in_trunks.py`](voice_in_trunks.py) | Lists voice in trunks with their configurations (codecs and ICE / RTCP modes of SIP ones) and point of presence (`pop`). |
 | [`voice_in_trunk_sip_registration.py`](voice_in_trunk_sip_registration.py) | End-to-end SIP registration flow: create with `enabled_sip_registration=True`, rename, disable by setting `host`, re-enable by toggling the flag. The SDK keeps the dependent fields (`host`, `port`, `use_did_in_ruri`) aligned with the server's validation rules automatically. |
 | [`orders.py`](orders.py) | Lists orders, creates a DID order, and cancels it. |
 | [`orders_available_dids.py`](orders_available_dids.py) | Orders a specific available DID using included DID group SKU. |
@@ -58,7 +58,7 @@ DIDWW_API_KEY=your_api_key python examples/prices_lookup.py 18005550123
 | [`upload_file.py`](upload_file.py) | Reads a file, encrypts it, and uploads it to `encrypted_files` with `upload_encrypted_file`. |
 | [`identity_address_proofs.py`](identity_address_proofs.py) | Creates identity and address, encrypts and uploads files, attaches proofs to both. |
 | [`voice_in_trunk_groups.py`](voice_in_trunk_groups.py) | Creates trunks and a trunk group, lists groups with includes, updates, and deletes (cascade); cleans up when a step fails. |
-| [`voice_out_trunks.py`](voice_out_trunks.py) | Creates, lists, updates, and deletes a voice out trunk. Requires account configuration. |
+| [`voice_out_trunks.py`](voice_out_trunks.py) | Creates (with codecs and ICE mode), lists, updates, and deletes a voice out trunk. Requires account configuration. |
 | [`did_trunk_assignment.py`](did_trunk_assignment.py) | Demonstrates exclusive DID trunk/trunk group assignment and re-assignment, then restores the DID's original routing. |
 | [`did_reservations.py`](did_reservations.py) | Creates, lists, finds, and deletes a DID reservation. |
 | [`exports.py`](exports.py) | Creates a CDR export with from/to datetime range filters (UTC) and lists all exports. |

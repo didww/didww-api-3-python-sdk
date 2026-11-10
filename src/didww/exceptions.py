@@ -10,9 +10,20 @@ class DidwwClientError(DidwwError):
 
 
 class DidwwApiError(DidwwError):
-    def __init__(self, errors, status_code=None):
+    """The API answered a JSON:API call, an export download or an upload with an error status.
+
+    Attributes:
+        errors: the error objects of the answer, as dicts.
+        status_code: the HTTP status of the answer.
+        retry_after: the Retry-After of the answer in seconds, when given in
+            seconds, or None. A 429 (``too_many_requests``) carries it; the SDK
+            does not retry the call.
+    """
+
+    def __init__(self, errors, status_code=None, *, retry_after=None):
         self.errors = errors
         self.status_code = status_code
+        self.retry_after = retry_after
         detail = "; ".join(
             str(e.get("detail", e.get("title", "Unknown error"))) for e in errors
         )

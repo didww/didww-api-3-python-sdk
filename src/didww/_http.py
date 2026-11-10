@@ -336,17 +336,21 @@ class RawReader:
 class AtomicFile:
     """A temporary file next to ``path`` that replaces it only on ``commit``.
 
-    It is created with mode 0666 minus the umask, as a new file opened with
+    The temporary file is ``.didww-<16 hex digits>.tmp`` in the directory of
+    ``path``, so its name fits wherever the name of ``path`` does. It is
+    created with mode 0666 minus the umask, as a new file opened with
     ``open(path, "wb")`` would be; it replaces a file or symlink at ``path``,
-    which does not keep that file's permissions. Leaving the context without
-    a commit removes it.
+    which does not keep that file's permissions. A ``path`` that cannot be
+    looked up, such as one with a NUL byte or too long a name, raises at
+    once; a name the file system refuses only on create fails in ``commit``.
+    Leaving the context without a commit removes it.
     """
 
     def __init__(self, path):
         path = os.fsdecode(os.fspath(path))
-        directory, name = os.path.split(path)
+        _check_path(path)
         self.path = path
-        self.temp_path = os.path.join(directory, f".{name}.{secrets.token_hex(8)}.tmp")
+        self.temp_path = os.path.join(os.path.dirname(path), f".didww-{secrets.token_hex(8)}.tmp")
         flags = os.O_WRONLY | os.O_CREAT | os.O_EXCL | getattr(os, "O_BINARY", 0) | getattr(os, "O_CLOEXEC", 0)
         fd = os.open(self.temp_path, flags, 0o666)
         try:
@@ -382,6 +386,15 @@ class AtomicFile:
         if not self._committed:
             self.discard()
         return False
+
+
+def _check_path(path):
+    # The temporary name leaves out the name of path, so the system checks
+    # path here, before the temporary file is created.
+    try:
+        os.lstat(path)
+    except FileNotFoundError:
+        pass
 
 
 def _unlink(path):

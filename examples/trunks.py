@@ -15,7 +15,7 @@ sip = SipConfiguration()
 sip.username = "username"
 sip.host = "203.0.113.110"
 sip.port = 5060
-sip.codec_ids = [Codec.PCMU, Codec.PCMA]
+sip.codecs = [Codec.PCMU, Codec.PCMA]  # priority order, the first is the highest
 sip.transport_protocol_id = TransportProtocol.UDP
 sip.rerouting_disconnect_code_ids = [
     ReroutingDisconnectCode.SIP_480_TEMPORARILY_UNAVAILABLE,

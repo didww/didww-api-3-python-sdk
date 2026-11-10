@@ -88,6 +88,16 @@ class SafeAttributeField(AttributeField):
         instance.attributes[self.source] = value
 
 
+class ListAttributeField(SafeAttributeField):
+    """Returns an empty list for a missing or null list attribute."""
+
+    def __get__(self, instance, type=None):
+        if instance is None:
+            return self
+        value = super().__get__(instance, type)
+        return [] if value is None else value
+
+
 class DatetimeAttributeField(SafeAttributeField):
     """AttributeField that parses ISO 8601 datetime strings to datetime objects.
 
@@ -127,20 +137,38 @@ class EnumAttributeField(SafeAttributeField):
 
 
 class EnumListAttributeField(SafeAttributeField):
-    """AttributeField that serializes/deserializes lists of Enum values."""
+    """AttributeField that serializes/deserializes lists of Enum values.
+
+    The list read is a view: changing it in place writes the new list back
+    as wire values, so that an update sends it. Reads share one view while
+    the stored list stays the same, also when the view itself is assigned
+    back (``trunk.codecs += [...]``); a view whose list was replaced since,
+    for example by assigning a new list, no longer writes back.
+    """
 
     def __init__(self, source, enum_cls):
         super().__init__(source)
         self.enum_cls = enum_cls
 
     def __get__(self, instance, type=None):
-        raw = super().__get__(instance, type)
         if instance is None:
             return self
-        return to_enum_list(self.enum_cls, raw)
+        stored = instance.attributes.get(self.source)
+        if stored is None:
+            return None
+        views = vars(instance).setdefault("_enum_list_views", {})
+        view = views.get(self.source)
+        if view is None or not view.reads(stored):
+            view = _EnumListView(self.enum_cls, self.source, instance, stored)
+            views[self.source] = view
+        else:
+            view.sync()
+        return view
 
     def __set__(self, instance, value):
         instance.attributes[self.source] = enum_value_list(value)
+        if value is not None and vars(instance).get("_enum_list_views", {}).get(self.source) is value:
+            value.follow(instance.attributes.get(self.source))
 
 
 class RelationField(OrmRelationField):
@@ -230,6 +258,71 @@ class _DirtyTrackingList(list):
     clear   = _touching(list.clear)
     sort    = _touching(list.sort)
     reverse = _touching(list.reverse)
+
+
+def _syncing(fn):
+    """Decorator that calls self.sync() before the wrapped list method."""
+    @functools.wraps(fn)
+    def wrapper(self, *args, **kwargs):
+        self.sync()
+        return fn(self, *args, **kwargs)
+    return wrapper
+
+
+class _EnumListView(_DirtyTrackingList):
+    """The list an EnumListAttributeField reads; a change is written back to the resource.
+
+    Before each change it takes the items of the stored list again, so a
+    change made to the stored list directly is not undone. Copies and
+    pickles of it are plain lists.
+    """
+
+    def __init__(self, enum_cls, key, instance, stored):
+        super().__init__(to_enum_list(enum_cls, stored), key, self._write_back)
+        self._enum_cls = enum_cls
+        self._instance = instance
+        self._stored = stored
+
+    def reads(self, stored):
+        """Whether this view shows ``stored``, the list the resource holds now."""
+        return self._stored is stored
+
+    def follow(self, stored):
+        """Makes this view show ``stored``, a copy of it the resource holds now."""
+        self._stored = stored
+
+    def sync(self):
+        """Takes the items of the stored list again while this view shows it, untracked."""
+        if self._instance.attributes.get(self._key) is self._stored:
+            self._show(self._stored)
+
+    def _show(self, values):
+        # Known values read as members, also when they were added as strings.
+        list.__setitem__(self, slice(None), to_enum_list(self._enum_cls, values))
+
+    def _write_back(self, key):
+        attributes = self._instance.attributes
+        if attributes.get(key) is not self._stored:
+            return
+        attributes[key] = enum_value_list(self)
+        self._stored = attributes.get(key)
+        self._show(self._stored)
+
+    __setitem__ = _syncing(_DirtyTrackingList.__setitem__)
+    __delitem__ = _syncing(_DirtyTrackingList.__delitem__)
+    __iadd__    = _syncing(_DirtyTrackingList.__iadd__)
+    __imul__    = _syncing(_DirtyTrackingList.__imul__)
+    append  = _syncing(_DirtyTrackingList.append)
+    extend  = _syncing(_DirtyTrackingList.extend)
+    insert  = _syncing(_DirtyTrackingList.insert)
+    remove  = _syncing(_DirtyTrackingList.remove)
+    pop     = _syncing(_DirtyTrackingList.pop)
+    clear   = _syncing(_DirtyTrackingList.clear)
+    sort    = _syncing(_DirtyTrackingList.sort)
+    reverse = _syncing(_DirtyTrackingList.reverse)
+
+    def __reduce_ex__(self, protocol):
+        return list, (list(self),)
 
 
 class DirtyTrackingDictionary(Dictionary):

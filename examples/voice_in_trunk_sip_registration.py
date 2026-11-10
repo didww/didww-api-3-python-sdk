@@ -23,7 +23,7 @@ sip = SipConfiguration()
 sip.enabled_sip_registration = True
 sip.use_did_in_ruri = True
 sip.cnam_lookup = False
-sip.codec_ids = [Codec.PCMU, Codec.PCMA]
+sip.codecs = [Codec.PCMU, Codec.PCMA]
 sip.transport_protocol_id = TransportProtocol.UDP
 
 trunk = VoiceInTrunk()

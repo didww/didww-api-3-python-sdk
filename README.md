@@ -398,6 +398,14 @@ if group.number_type == NumberType.TOLL_FREE and not group.is_demo:
     print(group.number_type.value)  # "toll_free"
 ```
 
+`AddressRequirement.personal_mandatory_fields` and `business_mandatory_fields` list the identity fields that must be filled in, by the field names as the API spells them. A personal identity's list is drawn from `birth_date`, `country`, `birth_country`, `id_number`, `personal_tax_id` and `contact_email`, a business identity's from `id_number`, `tax_id`, `country`, `company_reg_number`, `personal_tax_id` and `contact_email`; `tax_id` is the VAT number of the identity (`Identity.vat_id`). Each is a list, empty when no field is mandatory, never `None`. `EmergencyRequirement` has the same attributes, also by API field name, with its own sets: `birth_date`, `country`, `id_number`, `personal_tax_id` and `contact_email` for a personal identity, `id_number`, `tax_id`, `country`, `company_reg_number`, `personal_tax_id`, `contact_email` and `birth_date` for a business one, and `address_mandatory_fields` with `area`. `ProofType.entity_type` is `address`, `business` or `personal`, as in the `entity_type` filter of proof types.
+
+```python
+requirement = client.address_requirements().find("uuid").data
+if "tax_id" in requirement.business_mandatory_fields:
+    print("The business identity needs its vat_id")
+```
+
 ### DIDs
 
 ```python
@@ -488,7 +496,7 @@ client.voice_in_trunks().update(trunk)
 ### Voice In Trunks
 
 ```python
-from didww.enums import CliFormat, Codec, Pop, TransportProtocol
+from didww.enums import CliFormat, Codec, IceMode, Pop, TransportProtocol
 from didww.resources.voice_in_trunk import VoiceInTrunk
 from didww.resources.configuration.sip import SipConfiguration
 
@@ -504,7 +512,8 @@ trunk.pop = Pop.FRA  # optional; None lets DIDWW choose
 sip = SipConfiguration()
 sip.host = "sip.example.com"
 sip.port = 5060
-sip.codec_ids = [Codec.PCMU, Codec.PCMA]
+sip.codecs = [Codec.PCMA, Codec.PCMU, Codec.TELEPHONE_EVENT]  # priority order
+sip.ice_mode = IceMode.ACCEPT
 sip.transport_protocol_id = TransportProtocol.UDP
 trunk.configuration = sip
 
@@ -518,7 +527,21 @@ client.voice_in_trunks().update(created)
 client.voice_in_trunks().delete(created.id)
 ```
 
-`pop` is a plain attribute, one of the `didww.enums.Pop` values (`NYC`, `FRA`, `LAC`, `MIA`, `SG`, `HK`, `AMS`). Leave it unset to let DIDWW choose; `trunk.pop = None` on a built or fetched trunk sends `"pop": null`. A value this SDK does not know reads as a plain `str`. It is no longer a relationship and cannot be included.
+`codecs` lists the codecs offered on calls to the trunk by name, in priority order: the first has the highest priority. It replaces `codec_ids`; the names are the `didww.enums.Codec` members, such as `Codec.PCMU` (`pcmu`), and a name this SDK does not know reads as a plain `str`. Set it by assigning a whole list: a change to the list read from a configuration is not kept. On a fetched trunk, a change to `trunk.configuration` is sent only once the configuration is assigned back; until then a later read shows it, but the update does not send it:
+
+```python
+from didww.enums import Codec
+
+trunk = client.voice_in_trunks().find("trunk-uuid").data
+sip = trunk.configuration
+sip.codecs = [Codec.G729, Codec.PCMA]
+trunk.configuration = sip
+client.voice_in_trunks().update(trunk)
+```
+
+Left out, the trunk offers `pcmu`, `pcma`, `g729`, `g723` and `telephone_event`. `ice_mode`, `rtcp_mux_mode` and `rtcp_feedback_mode` take `disabled` (the default), `accept` or `initiate` (`IceMode`, `RtcpMuxMode` and `RtcpFeedbackMode`).
+
+`pop` is a plain attribute, one of the `didww.enums.Pop` members `Pop.NYC`, `Pop.FRA`, `Pop.LAC`, `Pop.MIA`, `Pop.SG`, `Pop.HK` and `Pop.AMS`, whose wire values are `nyc`, `fra`, `lac`, `mia`, `sg`, `hk` and `ams`. Leave it unset to let DIDWW choose; `trunk.pop = None` on a built or fetched trunk sends `"pop": null`. A value this SDK does not know reads as a plain `str`. It is no longer a relationship and cannot be included.
 
 ```python
 from didww.enums import Pop
@@ -601,7 +624,7 @@ Voice Out Trunks use a polymorphic `authentication_method` (2026-04-16). Three t
 - **`ip_only`** -- read-only; can only be configured by DIDWW staff upon request. Cannot be set via the API.
 
 ```python
-from didww.enums import DefaultDstAction, OnCliMismatchAction
+from didww.enums import DefaultDstAction, OnCliMismatchAction, VoiceOutCodec
 from didww.resources.voice_out_trunk import VoiceOutTrunk
 from didww.resources.authentication_method import CredentialsAndIpAuthenticationMethod
 
@@ -614,10 +637,13 @@ trunk.authentication_method = CredentialsAndIpAuthenticationMethod(
 )
 trunk.default_dst_action = DefaultDstAction.ALLOW_ALL
 trunk.on_cli_mismatch_action = OnCliMismatchAction.REJECT_CALL
+trunk.codecs = [VoiceOutCodec.OPUS, VoiceOutCodec.PCMA, VoiceOutCodec.TELEPHONE_EVENT]
 created = client.voice_out_trunks().create(trunk).data
 # created.authentication_method.username -- server-generated
 # created.authentication_method.password -- server-generated
 ```
+
+`codecs` lists the codecs offered on calls from the trunk by name, in priority order: the first has the highest priority. The names are the `didww.enums.VoiceOutCodec` members, which differ from those of an inbound SIP trunk (`Codec`); a name this SDK does not know reads as a plain `str`. A change to the list read, such as `trunk.codecs.insert(0, VoiceOutCodec.OPUS)`, is sent on update, like a whole list assigned. Left out, the trunk offers `pcma`, `pcmu` and `telephone_event`. `ice_mode`, `rtcp_mux_mode` and `rtcp_feedback_mode` take `disabled`, `accept` (the default) or `initiate` (`IceMode`, `RtcpMuxMode` and `RtcpFeedbackMode`).
 
 ### SMS Trunks
 
@@ -806,6 +832,7 @@ item.qty = 1
 ### DID Reservations
 
 ```python
+from didww.query_params import QueryParams
 from didww.resources.did_reservation import DidReservation
 from didww.resources.available_did import AvailableDid
 
@@ -813,6 +840,10 @@ reservation = DidReservation()
 reservation.description = "Reserved for client"
 reservation.available_did = AvailableDid.build("available-did-uuid")
 created = client.did_reservations().create(reservation).data
+print(created.expires_at)  # datetime
+
+# The reservations that expire first
+reservations = client.did_reservations().list(QueryParams().sort("expires_at")).data
 
 # Delete reservation
 client.did_reservations().delete(created.id)
@@ -959,7 +990,7 @@ created = client.addresses().create(address).data
 ```python
 from datetime import datetime, timedelta, timezone
 
-from didww.enums import ExportType
+from didww.enums import ExportServiceType, ExportType
 from didww.resources.export import Export
 
 # Dates are "YYYY-MM-DD HH:MM:SS" in UTC: from is inclusive, to is exclusive and not in the future
@@ -978,7 +1009,7 @@ sms_out.export_type = ExportType.SMS_OUT
 sms_out.filters = {
     "from": date_from,
     "to": date_to,
-    "service_type": "a2p",
+    "service_type": ExportServiceType.A2P,
     "sms_trunk.id": ["sms-trunk-uuid"],
 }
 created_sms = client.exports().create(sms_out).data
@@ -995,17 +1026,17 @@ if completed.is_completed:
 
 The export downloads send the token only to the origin (scheme, host and port) of the JSON:API base URL or of the environment, so export URLs, which the API builds on the environment's host, are still downloaded when `base_url` points elsewhere. A URL on any other origin raises a `DidwwClientError` and nothing is sent. Only a 200 answer is written, as it arrives, without holding the file in memory; redirects are not followed, and any other status, a 3xx or a 204 included, raises a `DidwwApiError` (see [Error Handling](#error-handling)). A file whose size differs from its `Content-Length`, a transfer that breaks off and gzip data that cannot be decompressed raise a `DidwwClientError`.
 
-A path destination is written to a temporary file next to it, which replaces it (`os.replace`) only once the whole file has arrived (or has been decompressed); after a failure an existing file is left as it was. The new file gets the permissions of a new file (the umask on POSIX systems), not those of the file it replaces, and a symlink at the path is replaced, not followed. To keep an existing file's permissions, pass a binary file object opened on it. A binary file object destination is written as the data arrives and is not closed, so it may hold part of the file after a failure. A destination that cannot be written raises the `OSError` as is.
+A path destination is written to a temporary file `.didww-<16 hex digits>.tmp` in its directory, which replaces it (`os.replace`) only once the whole file has arrived (or has been decompressed); after a failure an existing file is left as it was. The new file gets the permissions of a new file (the umask on POSIX systems), not those of the file it replaces, and a symlink at the path is replaced, not followed. To keep an existing file's permissions, pass a binary file object opened on it. A binary file object destination is written as the data arrives and is not closed, so it may hold part of the file after a failure. A destination that cannot be written raises the `OSError` as is.
 
 `from` and `to` are required for every export type (`cdr_in`, `cdr_out`, `sms_in`, `sms_out`). The other filter keys depend on the type:
 
 - `cdr_in`: `did_number`, `source_number`, `source_number_out`, `source_country_iso`;
 - `cdr_out`: `voice_out_trunk.id`, `source`, `cli`, `destination`;
 - `sms_in` and `sms_out`: `source_address_eq`, `source_address_cont`, `destination_address_eq`, `destination_address_cont`, `status`, `sms_id`, `sms_trunk.id` (a string or a list of strings);
-- `sms_in` only: `trunk_type`, one or more of the `ExportTrunkType` values (`SMPP SMSC`, `SMPP ESME`, `Email`, `HTTP IN`);
-- `sms_out` only: `service_type` (`a2p` or `p2p`) and `sender_id_verification.id` (a string or a list of strings).
+- `sms_in` only: `trunk_type`, one or more of the `ExportTrunkType` values (`smpp_smsc`, `smpp_esme`, `sms_to_email`, `http_in`);
+- `sms_out` only: `service_type`, an `ExportServiceType` value (`a2p` or `p2p`), and `sender_id_verification.id` (a string or a list of strings).
 
-The docstring of `Export.filters` lists the keys of every type. Enum members in `filters`, such as `ExportTrunkType.HTTP_IN`, are sent as their value.
+The values of `service_type`, `trunk_type` and `status` are lowercase: `status` is `success`, `failed` or `queued` for `sms_in`, and `routing_error`, `in_progress`, `queued`, `failed` or `success` for `sms_out`. The docstring of `Export.filters` lists the keys of every type. Enum members in `filters`, such as `ExportTrunkType.HTTP_IN`, are sent as their value.
 
 ## Prices
 
@@ -1075,7 +1106,7 @@ else:
 # Read the rows, keyed by the header line
 with PriceFileReader(path) as rows:
     for row in itertools.islice(rows, 5):
-        print(f"{row['Destination']}: {row['Rate (USD, excl. VAT)']}")
+        print(f"{row['Destination']}: {row['Rate']}")
 
 # Lower-level calls
 status = prices.head(file.last_modified)  # sent as If-Modified-Since; None sends none
@@ -1090,11 +1121,11 @@ with open("copy_of_voice_in_prices.csv.gz", "wb") as out:
 
 - `fetch(path)` sends the modification time of the file at `path` as `If-Modified-Since`, when the file is there; an unchanged price file is answered 304 and the file is kept. A file written by `download_to_file` or `fetch` gets the `Last-Modified` of the response as its modification time, so the date matches the copy on disk. `fetch` trusts the modification time of any file at `path`: a file copied or changed by other means can be answered 304 and kept, so replace such a file with `download_to_file`.
 - `if_modified_since` of `head` and `download` must be a timezone-aware `datetime` (a naive one, or one whose UTC time falls outside years 1 to 9999, raises `ValueError`) or `None`; it is sent in whole seconds as an HTTP date in GMT.
-- `download_to_file` and `fetch` stream the body into a temporary file next to `path`, unique to the call, which gets the permissions of a new file (the umask on POSIX systems), is flushed to the disk and replaces `path` atomically (`os.replace`) only on a complete 200. A 304 or an error leaves an existing file untouched, the temporary file is always removed, and concurrent downloads to one path do not mix their bytes. A directory that does not exist raises a `FileNotFoundError` without a request. **On Windows the replacement fails while `path` is open**, for example by a `PriceFileReader` that has not been closed.
+- `download_to_file` and `fetch` stream the body into a temporary file `.didww-<16 hex digits>.tmp` in the directory of `path`, unique to the call, which gets the permissions of a new file (the umask on POSIX systems), is flushed to the disk and replaces `path` atomically (`os.replace`) only on a complete 200. A 304 or an error leaves an existing file untouched, the temporary file is always removed, and concurrent downloads to one path do not mix their bytes. A directory that does not exist raises a `FileNotFoundError`, and a path that cannot be looked up, such as one with a NUL byte or too long a name, a `ValueError` or an `OSError`, without a request. A name the file system refuses only when the file is created, such as one with bytes it does not allow, fails at the replacement after the download, and the temporary file is removed. **On Windows the replacement fails while `path` is open**, for example by a `PriceFileReader` that has not been closed.
 - `download(fileobj)` and `download(fileobj, if_modified_since)` write the body into the binary file object only on a 200, as it arrives, so after a transfer error it may hold part of it. The file object is not closed. An `OSError` of the file object is raised as is.
 - A body whose size differs from its `Content-Length` raises `PricesErrorKind.CONNECTION_ERROR`; it never replaces a file.
 - `head` and the downloads return a `PriceFile`: `status_code`, `last_modified` (an aware UTC `datetime`, or `None` when absent), `content_length`, `filename` (as sent: check it before using it as a path), `bytes_written` and `not_modified`.
-- `PriceFileReader(path)` and `PriceFileReader(fileobj)` gunzip a downloaded file and iterate over its rows, each a `dict` keyed by the header line, as served (for example `Rate (USD, excl. VAT)`), in header order. A UTF-8 byte order mark and empty lines are skipped, and invalid UTF-8 reads as U+FFFD. A file of several gzip members is read in full. While the rows are read, input that is not valid gzip (a bad checksum, corrupt compressed data or other data after the gzip data) raises `gzip.BadGzipFile`; gzip data cut short, an empty input included, raises `EOFError` or `gzip.BadGzipFile`; bad quoting or a row whose field count differs from the header raises `csv.Error`. Rows before the error have already been passed on. Use it as a context manager, or call `close()`: a reader of a path closes the file, a reader of a file object leaves it open.
+- `PriceFileReader(path)` and `PriceFileReader(fileobj)` gunzip a downloaded file and iterate over its rows, each a `dict` keyed by the header line, as served, in header order. Prices are in USD with VAT excluded. Voice IN: `Country`, `Src country name`, `Source type`, `Destination`, `Rate`, `Connection fee`, `Initial interval`, `Next interval` and `Reject calls`. Voice OUT: `Category`, `Country`, `Network`, `Prefix` (one prefix per row), `Rate`, `Connection fee`, `Initial increment`, `Recurring increment`, `Reject calls`, `Next rate`, `Next connection fee`, `Next initial increment`, `Next recurring increment`, `Effective date` and `Comment`. SMS OUT: `Source prefix`, `Destination prefix`, `Country`, `MCC`, `MCC name`, `MNC`, `MNC name`, `Reject SMS` (`true` or `false`) and `Price`. SMS IN: `Source prefix`, `Source number length min`, `Source number length max`, `Destination prefix`, `Destination number length min`, `Destination number length max`, `Country` and `Price`. A UTF-8 byte order mark and empty lines are skipped, and invalid UTF-8 reads as U+FFFD. A file of several gzip members is read in full. While the rows are read, input that is not valid gzip (a bad checksum, corrupt compressed data or other data after the gzip data) raises `gzip.BadGzipFile`; gzip data cut short, an empty input included, raises `EOFError` or `gzip.BadGzipFile`; bad quoting or a row whose field count differs from the header raises `csv.Error`. Rows before the error have already been passed on. Use it as a context manager, or call `close()`: a reader of a path closes the file, a reader of a file object leaves it open.
 - Only `Last-Modified` and `If-Modified-Since` are used, in whole seconds. The service sends no `ETag`, and the SDK never sends `If-None-Match`, which would make the service ignore `If-Modified-Since`.
 - A 503 on a price file is retried up to 2 times when its `Retry-After` is 60 seconds or less, after waiting that long (at least 1 s) plus a small random delay so that clients do not retry in step. Otherwise it raises `PricesErrorKind.SERVICE_UNAVAILABLE` with `retry_after`. Lookups and other statuses, 429 included, are not retried.
 - A 404 `price_not_found` raises `PRICE_NOT_FOUND`; any other 404, `price_plan_not_assigned` included, and any 404 on `head`, which has no body, raises `PRICE_PLAN_NOT_ASSIGNED`. `DidwwPricesError.code` holds the code of the answer, or `price_plan_not_assigned` for a 404 without one.
@@ -1141,7 +1172,7 @@ The SDK distinguishes between date-only and datetime fields:
   - `EmergencyRequirement.requirement_restriction_message` — nullable
 
 **Important changes from previous API versions:**
-- `expire_at` renamed to `expires_at` on `DidReservation` and `EncryptedFile`
+- `expire_at` renamed to `expires_at` on `DidReservation` and `EncryptedFile`, also as their sort key
 - `renew_date` is a date-only string, NOT a datetime
 - `estimate_setup_time` is a string, NOT an integer
 
@@ -1167,14 +1198,14 @@ The SDK provides enum classes in `didww.enums` for all API option fields:
 `CallbackMethod`, `IdentityType`, `OrderStatus`, `ExportType`, `ExportStatus`, `CliFormat`,
 `OnCliMismatchAction`\*, `MediaEncryptionMode`, `DefaultDstAction`, `VoiceOutTrunkStatus`,
 `EmergencyCallingServiceStatus`, `EmergencyVerificationStatus`, `DiversionRelayPolicy`,
-`TransportProtocol`, `Codec`, `RxDtmfFormat`, `TxDtmfFormat`, `SstRefreshMethod`,
-`ReroutingDisconnectCode`, `Feature`, `AreaLevel`, `AddressVerificationStatus`, `StirShakenMode`,
-`NumberType`, `Pop`, `SenderIdVerificationStatus`, `SenderType`, `SmsHttpMethod`, `SmsBodyType`,
-`SmsServerLocation`, `ExportTrunkType`
+`TransportProtocol`, `Codec`, `VoiceOutCodec`, `IceMode`, `RtcpMuxMode`, `RtcpFeedbackMode`,
+`RxDtmfFormat`, `TxDtmfFormat`, `SstRefreshMethod`, `ReroutingDisconnectCode`, `Feature`, `AreaLevel`,
+`AddressVerificationStatus`, `StirShakenMode`, `NumberType`, `Pop`, `SenderIdVerificationStatus`,
+`SenderType`, `SmsHttpMethod`, `SmsBodyType`, `SmsServerLocation`, `ExportTrunkType`, `ExportServiceType`
 
 \* `REPLACE_CLI` and `RANDOMIZE_CLI` require additional account configuration. Contact DIDWW support to enable these values.
 
-`ExportType` includes `SMS_IN` and `SMS_OUT`. `VoiceOutPriceCategory` is in `didww.prices`, `Scope` in `didww.configuration`, and `AuthErrorKind` and `PricesErrorKind` in `didww.exceptions`. A value the API sends that this SDK does not know reads as a plain `str`.
+`ExportType` includes `SMS_IN` and `SMS_OUT`. `Codec` names the codecs of an inbound SIP trunk and `VoiceOutCodec` those of a Voice OUT trunk; the two sets differ. `VoiceOutPriceCategory` is in `didww.prices`, `Scope` in `didww.configuration`, and `AuthErrorKind` and `PricesErrorKind` in `didww.exceptions`. A value the API sends that this SDK does not know reads as a plain `str`.
 
 ```python
 from didww.enums import CallbackMethod, ExportType, IdentityType
@@ -1260,10 +1291,23 @@ except DidwwClientError as e:
 
 | Exception | Raised for |
 |-----------|------------|
-| `DidwwApiError` | An error status of the JSON:API repositories, of `upload_encrypted_file` and of the export downloads, with `status_code` and `errors` (a list of dicts; `[{"title": "HTTP <status>"}]` when the answer has none). |
+| `DidwwApiError` | An error status of the JSON:API repositories, of `upload_encrypted_file` and of the export downloads, with `status_code`, `errors` (a list of dicts; `[{"title": "HTTP <status>"}]` when the answer has none) and `retry_after`. |
 | `DidwwClientError` | A failure on the client side: an invalid constructor argument (see [Configuration](#configuration)), a JSON:API, upload or export call that fails in transport (a connection failure, a timeout or a TLS error; the `requests` exception is the `__cause__`), an answer that is not valid JSON, a refused export URL, an export download that breaks off, is incomplete or cannot be decompressed, a price lookup answer that cannot be parsed or holds no prices. |
 | `DidwwAuthError` | The token service, from any call that needs a new token. |
 | `DidwwPricesError` | The prices services. |
+
+A 429 (`too_many_requests`) means the request budget of the account for the current window is spent. The JSON:API repositories, `upload_encrypted_file` and the export downloads raise it as a `DidwwApiError` with `status_code` 429, and the SDK does not retry it, as a write may not be safe to send twice: wait `retry_after` seconds before sending the request again. `retry_after` is the `Retry-After` of an error answer in seconds, whatever its status, and `None` when it is missing or not a number of seconds. The adapters of a `session` you pass keep their `max_retries` for these calls (see [HTTP session](#http-session-proxy-tls-timeouts)): a `urllib3` `Retry` there can resend a GET or DELETE answered 429 or 503 with `Retry-After` before the SDK sees the answer. When such a `Retry` raises a `RetryError` (it runs out of retries on a status it retries), the call raises a `DidwwClientError` with the `RetryError` as its `__cause__` and no `retry_after`; with `raise_on_status=False` the last answer raises a `DidwwApiError` as usual.
+
+```python
+from didww.exceptions import DidwwApiError
+
+try:
+    client.dids().list()
+except DidwwApiError as e:
+    if e.status_code != 429:
+        raise
+    print(f"API rate limit, retry after {e.retry_after} s")
+```
 
 `DidwwApiError` also reports the authentication failures of the API: a 401 still answered after the token was replaced once (`status_code` 401), and a 403 such as `insufficient_scope` for a write with a `READ` token, which is never retried. Redirects are not followed: a 3xx answer of the JSON:API raises a `DidwwApiError` with that status, and the export downloads raise one for any status other than 200, such as a 3xx or a 204.
 
@@ -1413,14 +1457,16 @@ Most code keeps working: `DidwwClient(api_key, environment)` is unchanged, and t
 - **API key.** `client.api_key` is read-only: the key is used when tokens are minted, so build a new `DidwwClient` to use another key.
 - **Validation.** The constructor raises a `DidwwClientError` for an invalid API key, API version, scope, timeout or service URL (see [Configuration](#configuration)), which 3.x accepted.
 - **Removed resources.** `client.pops()`, `client.did_group_types()` and the modules `didww.resources.pop` and `didww.resources.did_group_type` are removed, with the `did_group_type` relationship and include. `DidGroup`, `AddressRequirement`, `EmergencyRequirement` and `EmergencyCallingService` have `number_type` instead of `did_group_type`; filter with `number_type` instead of `did_group_type.id`, and with `did_group.number_type` on available DIDs.
-- **Point of presence.** `VoiceInTrunk.pop` is the enum `didww.enums.Pop` (for example `Pop.FRA`), an attribute, no longer a relationship, and cannot be included.
+- **Point of presence.** `VoiceInTrunk.pop` is the enum `didww.enums.Pop` (for example `Pop.FRA`, sent as `fra`), an attribute, no longer a relationship, and cannot be included.
+- **Codecs.** The SIP configuration of a Voice IN trunk takes codec names: `SipConfiguration.codecs` replaces `codec_ids`, and `didww.enums.Codec` is a string enum of the names (`Codec.PCMU` is `"pcmu"`) instead of an `IntEnum` of ids (`9`). Left out, the server chooses the codecs of a new trunk.
+- **API values.** `ProofType.entity_type` and the `entity_type` filter of proof types are lowercase: `address`, `business` and `personal`. The mandatory fields of `AddressRequirement` and `EmergencyRequirement` are lists of API field names, such as `tax_id` (for `Identity.vat_id`) and `area`, not labels such as `Birth Date`; a list is empty, not `None`, when no field is mandatory.
 - **Exact numbers.** Fractional JSON numbers in answers are `decimal.Decimal`, not `float` (see [Numbers](#numbers)), for example in `meta`, export `filters` and the attributes of unknown configurations or authentication methods. Integers are unchanged.
 - **HTTP defaults.** 3.x set no timeouts, followed redirects and stored cookies. 4.x opens connections within 10 s, waits up to 60 s for each read, follows no redirects (a 3xx is an error), sends and stores no cookies, and ignores `~/.netrc` (see [HTTP session](#http-session-proxy-tls-timeouts)). Of a session you pass, `auth` and `max_redirects` are no longer copied, and `trust_env` now is.
 - **Transport errors.** A connection failure, timeout or TLS error is no longer raised as a `requests` exception: the JSON:API, upload and export calls raise a `DidwwClientError` with the `requests` exception as its `__cause__`, the token service a `DidwwAuthError` and the prices services a `DidwwPricesError`.
 - **Export download and file upload.** `download_export` and `download_and_decompress_export` take `dest` (a path or a binary file object) where 3.x named the parameter `file_path`. They download only from the API origin or the environment origin (a `DidwwClientError` otherwise, without a request), succeed only on a 200 (any other status, a 2xx or 3xx included, raises a `DidwwApiError` with the status and the parsed errors), write the file exactly as served, check it against its `Content-Length`, stream the decompression, and replace a destination path only once the file is complete. The new file gets the permissions of a new file and replaces a symlink at the path instead of following it, where 3.x wrote into the existing file at the path; to keep an existing file's permissions, pass a binary file object opened on it. `upload_encrypted_file` reports the errors of the answer in its `DidwwApiError` and also accepts a binary file object.
 - **Exceptions.** `DidwwApiError` and `DidwwClientError` still derive from `DidwwError`, which is also the base of the new `DidwwAuthError` and `DidwwPricesError`.
 
-New in 4.0.0: [SMS trunks](#sms-trunks), [SMS trunk groups](#sms-trunk-groups), [Sender ID verifications](#sender-id-verifications), [DID SMS routing](#sms-routing), `sms_in` and `sms_out` [exports](#exports), [prices](#prices), `DidGroup.is_demo`, `Identity.company_website`, unassigning a to-one relationship with `None`, and the `api_version`, `scope`, `token_store`, `logger`, timeout and service URL arguments of `DidwwClient`.
+New in 4.0.0: [SMS trunks](#sms-trunks), [SMS trunk groups](#sms-trunk-groups), [Sender ID verifications](#sender-id-verifications), [DID SMS routing](#sms-routing), `sms_in` and `sms_out` [exports](#exports), [prices](#prices), `DidGroup.is_demo`, `Identity.company_website`, the `codecs`, `ice_mode`, `rtcp_mux_mode` and `rtcp_feedback_mode` of [Voice OUT trunks](#voice-out-trunks) and of the SIP configuration of [Voice IN trunks](#voice-in-trunks) (`VoiceOutCodec`, `IceMode`, `RtcpMuxMode` and `RtcpFeedbackMode`), `ExportServiceType`, the `retry_after` of a `DidwwApiError` (see [Error Handling](#error-handling)), unassigning a to-one relationship with `None`, and the `api_version`, `scope`, `token_store`, `logger`, timeout and service URL arguments of `DidwwClient`.
 
 ## Development
 

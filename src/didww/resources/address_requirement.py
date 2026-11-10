@@ -1,8 +1,26 @@
 from didww.enums import IdentityType, AreaLevel, NumberType
-from didww.resources.base import DidwwApiModel, SafeAttributeField, EnumAttributeField, RelationField, ReadOnlyRepository
+from didww.resources.base import (
+    DidwwApiModel,
+    EnumAttributeField,
+    ListAttributeField,
+    ReadOnlyRepository,
+    RelationField,
+    SafeAttributeField,
+)
 
 
 class AddressRequirement(DidwwApiModel):
+    """Address requirement resource.
+
+    ``personal_mandatory_fields`` and ``business_mandatory_fields`` list the
+    identity fields that must be filled in, by the field names as the API
+    spells them, and are empty when none are. Personal: ``birth_date``,
+    ``country``, ``birth_country``, ``id_number``, ``personal_tax_id``,
+    ``contact_email``. Business: ``id_number``, ``tax_id``, ``country``,
+    ``company_reg_number``, ``personal_tax_id``, ``contact_email``.
+    ``tax_id`` is ``Identity.vat_id``.
+    """
+
     identity_type = EnumAttributeField("identity_type", IdentityType)
     personal_area_level = EnumAttributeField("personal_area_level", AreaLevel)
     business_area_level = EnumAttributeField("business_area_level", AreaLevel)
@@ -10,8 +28,8 @@ class AddressRequirement(DidwwApiModel):
     personal_proof_qty = SafeAttributeField("personal_proof_qty")
     business_proof_qty = SafeAttributeField("business_proof_qty")
     address_proof_qty = SafeAttributeField("address_proof_qty")
-    personal_mandatory_fields = SafeAttributeField("personal_mandatory_fields")
-    business_mandatory_fields = SafeAttributeField("business_mandatory_fields")
+    personal_mandatory_fields = ListAttributeField("personal_mandatory_fields")
+    business_mandatory_fields = ListAttributeField("business_mandatory_fields")
     service_description_required = SafeAttributeField("service_description_required")
     restriction_message = SafeAttributeField("restriction_message")
     number_type = EnumAttributeField("number_type", NumberType)

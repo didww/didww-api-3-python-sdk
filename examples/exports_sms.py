@@ -9,7 +9,10 @@ Filters on SMS exports (Export.filters, a dict):
     "destination_address_cont", "status", "sms_id"
   - "sms_trunk.id": one id or a list of ids
   - sms_in only: "trunk_type", one or a list of ExportTrunkType values (.value)
-  - sms_out only: "service_type" ("a2p" or "p2p"), "sender_id_verification.id"
+  - sms_out only: "service_type" (an ExportServiceType value), "sender_id_verification.id"
+
+The values of trunk_type, service_type and status are lowercase, e.g. "http_in",
+"a2p" or "routing_error".
 
 Usage: DIDWW_API_KEY=xxx python examples/exports_sms.py
 """
@@ -18,7 +21,7 @@ import uuid
 from datetime import datetime, timedelta, timezone
 
 from client_factory import create_client
-from didww.enums import ExportStatus, ExportTrunkType, ExportType, enum_value
+from didww.enums import ExportServiceType, ExportStatus, ExportTrunkType, ExportType, enum_value
 from didww.exceptions import DidwwApiError
 from didww.query_params import QueryParams
 from didww.resources.export import Export
@@ -47,14 +50,14 @@ def create(export_type, filters, external_reference_id):
 
 
 print("=== Creating SMS-Out Export (A2P, yesterday) ===")
-create(ExportType.SMS_OUT, {"from": date_from, "to": date_to, "service_type": "a2p"},
+create(ExportType.SMS_OUT, {"from": date_from, "to": date_to, "service_type": ExportServiceType.A2P.value},
        f"python-sms-out-{suffix}")
 
-print("\n=== Creating SMS-In Export (HTTP IN and email trunks, yesterday) ===")
+print("\n=== Creating SMS-In Export (HTTP IN and SMS to email trunks, yesterday) ===")
 in_filters = {
     "from": date_from,
     "to": date_to,
-    "trunk_type": [ExportTrunkType.HTTP_IN.value, ExportTrunkType.EMAIL.value],
+    "trunk_type": [ExportTrunkType.HTTP_IN.value, ExportTrunkType.SMS_TO_EMAIL.value],
 }
 # "sms_trunk.id" takes one id or a list of ids
 trunk_ids = [t.id for t in client.sms_trunks().list(QueryParams().page(number=1, size=2)).data]
