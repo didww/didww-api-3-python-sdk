@@ -161,6 +161,8 @@ class EnumListAttributeField(SafeAttributeField):
         if view is None or not view.reads(stored):
             view = _EnumListView(self.enum_cls, self.source, instance, stored)
             views[self.source] = view
+        else:
+            view.sync()
         return view
 
     def __set__(self, instance, value):
@@ -258,10 +260,21 @@ class _DirtyTrackingList(list):
     reverse = _touching(list.reverse)
 
 
+def _syncing(fn):
+    """Decorator that calls self.sync() before the wrapped list method."""
+    @functools.wraps(fn)
+    def wrapper(self, *args, **kwargs):
+        self.sync()
+        return fn(self, *args, **kwargs)
+    return wrapper
+
+
 class _EnumListView(_DirtyTrackingList):
     """The list an EnumListAttributeField reads; a change is written back to the resource.
 
-    Copies and pickles of it are plain lists.
+    Before each change it takes the items of the stored list again, so a
+    change made to the stored list directly is not undone. Copies and
+    pickles of it are plain lists.
     """
 
     def __init__(self, enum_cls, key, instance, stored):
@@ -278,14 +291,35 @@ class _EnumListView(_DirtyTrackingList):
         """Makes this view show ``stored``, a copy of it the resource holds now."""
         self._stored = stored
 
+    def sync(self):
+        """Takes the items of the stored list again while this view shows it, untracked."""
+        if self._instance.attributes.get(self._key) is self._stored:
+            self._show(self._stored)
+
+    def _show(self, values):
+        # Known values read as members, also when they were added as strings.
+        list.__setitem__(self, slice(None), to_enum_list(self._enum_cls, values))
+
     def _write_back(self, key):
         attributes = self._instance.attributes
         if attributes.get(key) is not self._stored:
             return
         attributes[key] = enum_value_list(self)
         self._stored = attributes.get(key)
-        # Known values added as strings read back as members, untracked.
-        list.__setitem__(self, slice(None), to_enum_list(self._enum_cls, self))
+        self._show(self._stored)
+
+    __setitem__ = _syncing(_DirtyTrackingList.__setitem__)
+    __delitem__ = _syncing(_DirtyTrackingList.__delitem__)
+    __iadd__    = _syncing(_DirtyTrackingList.__iadd__)
+    __imul__    = _syncing(_DirtyTrackingList.__imul__)
+    append  = _syncing(_DirtyTrackingList.append)
+    extend  = _syncing(_DirtyTrackingList.extend)
+    insert  = _syncing(_DirtyTrackingList.insert)
+    remove  = _syncing(_DirtyTrackingList.remove)
+    pop     = _syncing(_DirtyTrackingList.pop)
+    clear   = _syncing(_DirtyTrackingList.clear)
+    sort    = _syncing(_DirtyTrackingList.sort)
+    reverse = _syncing(_DirtyTrackingList.reverse)
 
     def __reduce_ex__(self, protocol):
         return list, (list(self),)

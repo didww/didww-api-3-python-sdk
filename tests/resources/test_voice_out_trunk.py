@@ -198,6 +198,50 @@ class TestVoiceOutTrunk:
         (hit,) = stub.hits("PATCH", f"/v3/voice_out_trunks/{TRUNK_ID}")
         assert hit.json()["data"]["attributes"] == {"codecs": ["amr", "opus"]}
 
+    def test_direct_change_of_the_stored_list_is_kept(self, stub, make_client):
+        stub.on("POST", "/token", token_reply())
+        stub.on("PATCH", f"/v3/voice_out_trunks/{TRUNK_ID}", TRUNK_REPLY)
+        trunk = VoiceOutTrunk.from_jsonapi({
+            "id": TRUNK_ID, "type": "voice_out_trunks", "attributes": {"codecs": ["pcma", "pcmu"]},
+        })
+        assert trunk.codecs == [VoiceOutCodec.PCMA, VoiceOutCodec.PCMU]
+
+        trunk.attributes["codecs"].append("opus")
+        assert trunk.codecs[2] is VoiceOutCodec.OPUS
+        trunk.codecs.append("g722")
+        make_client().voice_out_trunks().update(trunk)
+
+        (hit,) = stub.hits("PATCH", f"/v3/voice_out_trunks/{TRUNK_ID}")
+        assert hit.json()["data"]["attributes"] == {"codecs": ["pcma", "pcmu", "opus", "g722"]}
+
+    def test_list_read_earlier_keeps_a_direct_change_of_the_stored_list(self, stub, make_client):
+        stub.on("POST", "/token", token_reply())
+        stub.on("PATCH", f"/v3/voice_out_trunks/{TRUNK_ID}", TRUNK_REPLY)
+        trunk = VoiceOutTrunk.from_jsonapi({
+            "id": TRUNK_ID, "type": "voice_out_trunks", "attributes": {"codecs": ["pcma", "pcmu"]},
+        })
+        earlier = trunk.codecs
+
+        trunk.attributes["codecs"].append("opus")
+        earlier.append(VoiceOutCodec.G722)
+        make_client().voice_out_trunks().update(trunk)
+
+        (hit,) = stub.hits("PATCH", f"/v3/voice_out_trunks/{TRUNK_ID}")
+        assert hit.json()["data"]["attributes"] == {"codecs": ["pcma", "pcmu", "opus", "g722"]}
+
+    def test_list_replaced_by_an_assignment_keeps_its_own_items(self):
+        trunk = VoiceOutTrunk.from_jsonapi({
+            "id": TRUNK_ID, "type": "voice_out_trunks", "attributes": {"codecs": ["pcma"]},
+        })
+        earlier = trunk.codecs
+        trunk.codecs = [VoiceOutCodec.AMR]
+
+        earlier.append(VoiceOutCodec.G722)
+        earlier.append(VoiceOutCodec.OPUS)
+
+        assert earlier == [VoiceOutCodec.PCMA, VoiceOutCodec.G722, VoiceOutCodec.OPUS]
+        assert trunk.codecs == [VoiceOutCodec.AMR]
+
     def test_assigning_the_list_read_to_itself_keeps_it_live(self, stub, make_client):
         stub.on("POST", "/token", token_reply())
         stub.on("PATCH", f"/v3/voice_out_trunks/{TRUNK_ID}", TRUNK_REPLY)
@@ -237,10 +281,11 @@ class TestVoiceOutTrunk:
         trunk = VoiceOutTrunk.from_jsonapi({
             "id": TRUNK_ID, "type": "voice_out_trunks", "attributes": {"codecs": ["pcma"]},
         })
-        trunk.codecs.append("opus")
-        trunk.codecs.append("future_codec")
-        assert trunk.codecs[1] is VoiceOutCodec.OPUS
-        assert type(trunk.codecs[2]) is str
+        codecs = trunk.codecs
+        codecs.append("opus")
+        assert codecs[1] is VoiceOutCodec.OPUS
+        codecs.append("future_codec")
+        assert type(codecs[2]) is str
 
     def test_copies_of_the_codec_list_are_plain_lists(self):
         trunk = VoiceOutTrunk.from_jsonapi({
