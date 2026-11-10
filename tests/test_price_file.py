@@ -1,5 +1,6 @@
 import io
 import os
+import re
 import time
 from datetime import datetime, timedelta, timezone
 
@@ -529,13 +530,49 @@ class TestDownloadToFile:
         monkeypatch.setattr(_http.secrets, "token_hex", lambda n: "0" * (2 * n))
         dest = tmp_path / "prices.csv.gz"
         dest.write_bytes(b"old")
-        taken = tmp_path / ".prices.csv.gz.0000000000000000.tmp"
+        taken = tmp_path / ".didww-0000000000000000.tmp"
         taken.write_bytes(b"another writer")
 
         assert isinstance(capture(lambda: service.download_to_file(dest)), FileExistsError)
         assert taken.read_bytes() == b"another writer"
         assert dest.read_bytes() == b"old"
         assert stub.hits("GET") == []
+
+    def test_long_destination_name_uses_a_short_temporary_name(self, stub, service, tmp_path, monkeypatch):
+        from didww import _http
+
+        stub.on("GET", PATH, file_reply())
+        dest = tmp_path / ("p" * 243 + ".csv.gz")
+        write_all = _http.write_all
+        during = []
+
+        def look(write, chunk):
+            during.append(sorted(os.listdir(tmp_path)))
+            write_all(write, chunk)
+
+        monkeypatch.setattr(_http, "write_all", look)
+        service.download_to_file(dest)
+
+        assert len(during[0]) == 1
+        assert re.fullmatch(r"\.didww-[0-9a-f]{16}\.tmp", during[0][0])
+        assert os.listdir(tmp_path) == [dest.name]
+        assert dest.read_bytes() == GZ
+
+    @pytest.mark.parametrize("name", ["prices\0.csv.gz", "p" * 256])
+    def test_destination_the_system_refuses_fails_without_a_request(self, stub, service, tmp_path, name):
+        e = capture(lambda: service.download_to_file(os.path.join(str(tmp_path), name)))
+        assert isinstance(e, (ValueError, OSError))
+        assert stub.hits("GET") == []
+        assert os.listdir(tmp_path) == []
+
+    def test_failed_replacement_removes_the_temporary_file(self, stub, service, tmp_path):
+        stub.on("GET", PATH, file_reply())
+        dest = tmp_path / "prices.csv.gz"
+        dest.mkdir()
+
+        assert isinstance(capture(lambda: service.download_to_file(dest)), OSError)
+        assert len(stub.hits("GET", PATH)) == 1
+        assert os.listdir(tmp_path) == [dest.name]
 
     def test_missing_directory_fails_without_a_request(self, stub, service, tmp_path):
         e = capture(lambda: service.download_to_file(tmp_path / "missing" / "prices.csv.gz"))

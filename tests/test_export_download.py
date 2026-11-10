@@ -2,6 +2,7 @@ import gzip
 import io
 import json
 import os
+import re
 import time
 
 import pytest
@@ -109,6 +110,47 @@ class TestDownload:
         assert dest.read_bytes() == GZ
         assert leftovers(tmp_path) == []
         assert len(stub.hits("GET", PATH)) == 2
+
+    @pytest.mark.parametrize("decompress", [False, True])
+    def test_long_destination_name_uses_a_short_temporary_name(self, stub, client, tmp_path, monkeypatch, decompress):
+        stub.on("GET", PATH, Reply(200, GZ))
+        dest = tmp_path / ("e" * 243 + ".csv.gz")
+        write_all = _http.write_all
+        during = []
+
+        def look(write, chunk):
+            during.append(sorted(os.listdir(tmp_path)))
+            write_all(write, chunk)
+
+        monkeypatch.setattr(_http, "write_all", look)
+        download = client.download_and_decompress_export if decompress else client.download_export
+        download(export_url(stub), dest)
+
+        assert len(during[0]) == 1
+        assert re.fullmatch(r"\.didww-[0-9a-f]{16}\.tmp", during[0][0])
+        assert os.listdir(tmp_path) == [dest.name]
+        assert dest.read_bytes() == (CSV if decompress else GZ)
+
+    @pytest.mark.parametrize("name", ["export\0.csv.gz", "e" * 256])
+    def test_destination_the_system_refuses_fails_before_writing(self, stub, client, tmp_path, monkeypatch, name):
+        stub.on("GET", PATH, Reply(200, GZ))
+        written = []
+        monkeypatch.setattr(_http, "write_all", lambda write, chunk: written.append(chunk))
+        e = capture(lambda: client.download_export(export_url(stub), os.path.join(str(tmp_path), name)))
+        assert isinstance(e, (ValueError, OSError))
+        assert written == []
+        assert os.listdir(tmp_path) == []
+
+    @pytest.mark.parametrize("decompress", [False, True])
+    def test_failed_replacement_removes_the_temporary_file(self, stub, client, tmp_path, decompress):
+        stub.on("GET", PATH, Reply(200, GZ))
+        dest = tmp_path / "export.csv.gz"
+        dest.mkdir()
+        download = client.download_and_decompress_export if decompress else client.download_export
+
+        assert isinstance(capture(lambda: download(export_url(stub), dest)), OSError)
+        assert len(stub.hits("GET", PATH)) == 1
+        assert os.listdir(tmp_path) == [dest.name]
 
     def test_missing_directory(self, stub, client, tmp_path):
         stub.on("GET", PATH, Reply(200, GZ))

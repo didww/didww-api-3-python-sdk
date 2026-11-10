@@ -48,10 +48,16 @@ class ExportType(str, Enum):
 
 class ExportTrunkType(str, Enum):
     """Values of the ``trunk_type`` filter of an ``sms_in`` export."""
-    SMPP_SMSC = "SMPP SMSC"
-    SMPP_ESME = "SMPP ESME"
-    EMAIL = "Email"
-    HTTP_IN = "HTTP IN"
+    SMPP_SMSC = "smpp_smsc"
+    SMPP_ESME = "smpp_esme"
+    SMS_TO_EMAIL = "sms_to_email"
+    HTTP_IN = "http_in"
+
+
+class ExportServiceType(str, Enum):
+    """Values of the ``service_type`` filter of an ``sms_out`` export."""
+    A2P = "a2p"
+    P2P = "p2p"
 
 
 class ExportStatus(str, Enum):
@@ -117,13 +123,13 @@ class NumberType(str, Enum):
 
 class Pop(str, Enum):
     """Point of presence a Voice IN trunk is served from."""
-    NYC = "NYC"
-    FRA = "FRA"
-    LAC = "LAC"
-    MIA = "MIA"
-    SG = "SG"
-    HK = "HK"
-    AMS = "AMS"
+    NYC = "nyc"
+    FRA = "fra"
+    LAC = "lac"
+    MIA = "mia"
+    SG = "sg"
+    HK = "hk"
+    AMS = "ams"
 
 
 class SenderIdVerificationStatus(str, Enum):
@@ -245,20 +251,58 @@ class SstRefreshMethod(IntEnum):
     UPDATE_FALLBACK_INVITE = 3
 
 
-class Codec(IntEnum):
-    TELEPHONE_EVENT = 6
-    G723 = 7
-    G729 = 8
-    PCMU = 9
-    PCMA = 10
-    SPEEX = 12
-    GSM = 13
-    G726_32 = 14
-    G721 = 15
-    G726_24 = 16
-    G726_40 = 17
-    G726_16 = 18
-    L16 = 19
+class Codec(str, Enum):
+    """Codecs of the SIP configuration of a Voice IN trunk."""
+    TELEPHONE_EVENT = "telephone_event"
+    G723 = "g723"
+    G729 = "g729"
+    PCMU = "pcmu"
+    PCMA = "pcma"
+    SPEEX = "speex"
+    GSM = "gsm"
+    G726_32 = "g726_32"
+    G721 = "g721"
+    G726_24 = "g726_24"
+    G726_40 = "g726_40"
+    G726_16 = "g726_16"
+    L16 = "l16"
+    AMR = "amr"
+    AMR_WB = "amr_wb"
+
+
+class VoiceOutCodec(str, Enum):
+    """Codecs of a Voice OUT trunk; not the same set as ``Codec``."""
+    TELEPHONE_EVENT = "telephone_event"
+    G723 = "g723"
+    G729 = "g729"
+    PCMU = "pcmu"
+    PCMA = "pcma"
+    GSM = "gsm"
+    G722 = "g722"
+    OPUS = "opus"
+    AMR = "amr"
+    AMR_WB = "amr_wb"
+
+
+class IceMode(str, Enum):
+    """ICE (Interactive Connectivity Establishment) of a trunk's calls."""
+    DISABLED = "disabled"
+    ACCEPT = "accept"
+    INITIATE = "initiate"
+
+
+class RtcpMuxMode(str, Enum):
+    """RTP and RTCP multiplexed on one port."""
+    DISABLED = "disabled"
+    ACCEPT = "accept"
+    INITIATE = "initiate"
+
+
+class RtcpFeedbackMode(str, Enum):
+    """RTCP feedback (AVPF)."""
+    DISABLED = "disabled"
+    ACCEPT = "accept"
+    INITIATE = "initiate"
 
 
 class ReroutingDisconnectCode(IntEnum):

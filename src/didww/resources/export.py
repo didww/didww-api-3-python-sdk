@@ -35,10 +35,15 @@ class Export(DidwwApiModel):
         - ``sms_in`` and ``sms_out``: ``source_address_eq``,
           ``source_address_cont``, ``destination_address_eq``,
           ``destination_address_cont``, ``status``, ``sms_id``, ``sms_trunk.id``
-          (a string or a list).
+          (a string or a list). ``status`` is ``success``, ``failed`` or
+          ``queued`` for ``sms_in``, and ``routing_error``, ``in_progress``,
+          ``queued``, ``failed`` or ``success`` for ``sms_out``.
         - ``sms_in`` only: ``trunk_type`` (ExportTrunkType, a value or a list).
-        - ``sms_out`` only: ``service_type`` (``"a2p"`` or ``"p2p"``),
-          ``sender_id_verification.id`` (a string or a list).
+        - ``sms_out`` only: ``service_type`` (ExportServiceType: ``a2p`` or
+          ``p2p``), ``sender_id_verification.id`` (a string or a list).
+
+        Enum members are sent as their value. The values of ``service_type``,
+        ``trunk_type`` and ``status`` are lowercase.
 
         The API rejects any other key. ``year``, ``month`` and ``day`` only
         appear on exports created with earlier API versions.

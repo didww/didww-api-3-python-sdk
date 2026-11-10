@@ -211,7 +211,8 @@ class DidwwClient:
             errors = [e for e in document["errors"] if isinstance(e, dict)]
         if not errors:
             errors = [{"title": f"HTTP {status}"}]
-        return DidwwApiError(errors, status_code=status)
+        return DidwwApiError(errors, status_code=status,
+                             retry_after=_http.retry_after_seconds(resp.headers.get("Retry-After")))
 
     # --- File upload / download ---
 

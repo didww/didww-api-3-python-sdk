@@ -7,7 +7,7 @@ Usage: DIDWW_API_KEY=xxx python examples/voice_out_trunks.py
 import uuid
 
 from client_factory import create_client
-from didww.enums import DefaultDstAction, OnCliMismatchAction
+from didww.enums import DefaultDstAction, IceMode, OnCliMismatchAction, VoiceOutCodec, enum_value, enum_value_list
 from didww.resources.voice_out_trunk import VoiceOutTrunk
 from didww.resources.authentication_method import (
     IpOnlyAuthenticationMethod,
@@ -32,6 +32,9 @@ for t in trunks[:5]:
     print(f"    External Reference ID: {t.external_reference_id}")
     print(f"    Emergency Enable All: {t.emergency_enable_all}")
     print(f"    RTP Timeout: {t.rtp_timeout}")
+    print(f"    Codecs: {enum_value_list(t.codecs)}")
+    print(f"    ICE: {enum_value(t.ice_mode)}, RTCP mux: {enum_value(t.rtcp_mux_mode)},"
+          f" RTCP feedback: {enum_value(t.rtcp_feedback_mode)}")
     print()
 
 # Create a voice out trunk with credentials_and_ip authentication
@@ -47,6 +50,9 @@ trunk.default_dst_action = DefaultDstAction.ALLOW_ALL
 trunk.on_cli_mismatch_action = OnCliMismatchAction.REJECT_CALL
 trunk.external_reference_id = f"python-example-{suffix}"
 trunk.rtp_timeout = 60
+# Codec names in priority order, the first is the highest; left out, the server picks them
+trunk.codecs = [VoiceOutCodec.OPUS, VoiceOutCodec.PCMA, VoiceOutCodec.TELEPHONE_EVENT]
+trunk.ice_mode = IceMode.INITIATE
 created = client.voice_out_trunks().create(trunk).data
 print(f"Created voice out trunk: {created.id}")
 print(f"  Name: {created.name}")
@@ -56,6 +62,7 @@ if isinstance(auth, CredentialsAndIpAuthenticationMethod):
     print(f"  Username: {auth.username}")
 print(f"  Status: {created.status}")
 print(f"  External Reference: {created.external_reference_id}")
+print(f"  Codecs: {enum_value_list(created.codecs)}, ICE: {enum_value(created.ice_mode)}")
 
 # Update - change name and tech_prefix
 print("\n=== Updating Voice Out Trunk ===")

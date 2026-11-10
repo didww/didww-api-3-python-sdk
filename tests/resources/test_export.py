@@ -1,7 +1,7 @@
 import os
 import tempfile
 from tests.conftest import my_vcr
-from didww.enums import ExportStatus, ExportTrunkType, ExportType
+from didww.enums import ExportServiceType, ExportStatus, ExportTrunkType, ExportType
 from didww.resources.export import Export
 
 
@@ -66,7 +66,7 @@ class TestExport:
         created = client.exports().create(export).data
         assert created.id == "5a2d3e4f-6b7c-4d8e-9f0a-1b2c3d4e5f60"
         assert created.export_type == ExportType.SMS_IN
-        assert created.filters["trunk_type"] == ["SMPP SMSC", "HTTP IN"]
+        assert created.filters["trunk_type"] == ["smpp_smsc", "http_in"]
 
     @my_vcr.use_cassette("exports/create_sms_out.yaml")
     def test_create_sms_out_export(self, client):
@@ -76,7 +76,7 @@ class TestExport:
             "from": "2026-10-01 00:00:00",
             "to": "2026-10-15 00:00:00",
             "sms_trunk.id": ["b2c3d4e5-0000-4000-8000-000000000001", "b2c3d4e5-0000-4000-8000-000000000003"],
-            "service_type": "a2p",
+            "service_type": ExportServiceType.A2P,
             "sender_id_verification.id": "c3d4e5f6-0000-4000-8000-000000000002",
         }
         created = client.exports().create(export).data

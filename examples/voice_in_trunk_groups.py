@@ -23,7 +23,7 @@ try:
     sip_a = SipConfiguration()
     sip_a.host = "sip-a.example.com"
     sip_a.port = 5060
-    sip_a.codec_ids = [Codec.PCMU, Codec.PCMA]
+    sip_a.codecs = [Codec.PCMU, Codec.PCMA]
     sip_a.transport_protocol_id = TransportProtocol.UDP
 
     trunk_a = VoiceInTrunk()
@@ -37,7 +37,7 @@ try:
     sip_b = SipConfiguration()
     sip_b.host = "sip-b.example.com"
     sip_b.port = 5060
-    sip_b.codec_ids = [Codec.PCMU]
+    sip_b.codecs = [Codec.PCMU]
     sip_b.transport_protocol_id = TransportProtocol.UDP
 
     trunk_b = VoiceInTrunk()

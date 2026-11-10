@@ -1,14 +1,35 @@
 from didww.enums import (
     DefaultDstAction,
+    IceMode,
     MediaEncryptionMode,
     OnCliMismatchAction,
+    RtcpFeedbackMode,
+    RtcpMuxMode,
+    VoiceOutCodec,
     VoiceOutTrunkStatus,
 )
-from didww.resources.base import DidwwApiModel, DatetimeAttributeField, SafeAttributeField, EnumAttributeField, RelationField, Repository
+from didww.resources.base import (
+    DatetimeAttributeField,
+    DidwwApiModel,
+    EnumAttributeField,
+    EnumListAttributeField,
+    RelationField,
+    Repository,
+    SafeAttributeField,
+)
 from didww.resources.authentication_method import AuthenticationMethod
 
 
 class VoiceOutTrunk(DidwwApiModel):
+    """Voice OUT trunk resource.
+
+    ``codecs`` lists ``VoiceOutCodec`` names in priority order, the first
+    with the highest priority; a change to the list read, such as
+    ``trunk.codecs.insert(0, VoiceOutCodec.OPUS)``, is sent on update.
+    ``ice_mode``, ``rtcp_mux_mode`` and
+    ``rtcp_feedback_mode`` take ``disabled``, ``accept`` or ``initiate``.
+    """
+
     _writable_attrs = {
         "name", "on_cli_mismatch_action",
         "allow_any_did_as_cli", "status", "capacity_limit", "threshold_amount",
@@ -16,6 +37,7 @@ class VoiceOutTrunk(DidwwApiModel):
         "force_symmetric_rtp", "rtp_ping", "callback_url",
         "authentication_method", "allowed_rtp_ips", "external_reference_id",
         "emergency_enable_all", "rtp_timeout",
+        "codecs", "ice_mode", "rtcp_mux_mode", "rtcp_feedback_mode",
     }
 
     name = SafeAttributeField("name")
@@ -36,6 +58,10 @@ class VoiceOutTrunk(DidwwApiModel):
     external_reference_id = SafeAttributeField("external_reference_id")
     emergency_enable_all = SafeAttributeField("emergency_enable_all")
     rtp_timeout = SafeAttributeField("rtp_timeout")
+    codecs = EnumListAttributeField("codecs", VoiceOutCodec)
+    ice_mode = EnumAttributeField("ice_mode", IceMode)
+    rtcp_mux_mode = EnumAttributeField("rtcp_mux_mode", RtcpMuxMode)
+    rtcp_feedback_mode = EnumAttributeField("rtcp_feedback_mode", RtcpFeedbackMode)
 
     default_did = RelationField("default_did")
     dids = RelationField("dids")

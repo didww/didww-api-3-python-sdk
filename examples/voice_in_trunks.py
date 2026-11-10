@@ -3,8 +3,9 @@ Voice In Trunks: list trunks and display their configurations.
 Usage: DIDWW_API_KEY=xxx python examples/voice_in_trunks.py
 """
 from client_factory import create_client
-from didww.enums import enum_value
+from didww.enums import enum_value, enum_value_list
 from didww.query_params import QueryParams
+from didww.resources.configuration.sip import SipConfiguration
 
 client = create_client()
 
@@ -24,6 +25,12 @@ for trunk in trunks[:10]:
     print(f"  Ringing Timeout: {trunk.ringing_timeout}")
     # pop is an attribute (a Pop value); None lets DIDWW choose
     print(f"  POP: {enum_value(trunk.pop) or 'chosen by DIDWW'}")
+    if isinstance(trunk.configuration, SipConfiguration):
+        sip = trunk.configuration
+        # Codec names in priority order, the first is the highest
+        print(f"  Codecs: {enum_value_list(sip.codecs)}")
+        print(f"  ICE: {enum_value(sip.ice_mode)}, RTCP mux: {enum_value(sip.rtcp_mux_mode)},"
+              f" RTCP feedback: {enum_value(sip.rtcp_feedback_mode)}")
     print()
 
 # Find a specific trunk by ID

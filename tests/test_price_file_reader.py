@@ -38,8 +38,8 @@ class TestRows:
             "Src country name": "United Kingdom",
             "Source type": "fixed",
             "Destination": "4480012",
-            "Rate (USD, excl. VAT)": "0.0125",
-            "Connection fee (USD, excl. VAT)": "0.0",
+            "Rate": "0.0125",
+            "Connection fee": "0.0",
             "Initial interval": "60",
             "Next interval": "60",
             "Reject calls": "false",
@@ -47,10 +47,11 @@ class TestRows:
 
     def test_voice_out_fixture(self):
         rows = read_all(VOICE_OUT)
-        assert len(rows) == 4
+        assert len(rows) == 6
         assert rows[0]["Effective date"] == "2026-11-01T00:00:00Z"
-        assert rows[2]["Prefix"] == "99950,99951,99952"
-        assert rows[3]["Rate"] == ""
+        assert rows[0]["Initial increment"] == "1"
+        assert rows[0]["Recurring increment"] == "1"
+        assert rows[5]["Rate"] == ""
 
     def test_fixtures_have_no_name_and_mtime_zero(self):
         for data in (VOICE_IN, VOICE_OUT):
@@ -146,7 +147,7 @@ class TestSources:
         path = tmp_path / "prices.csv.gz"
         path.write_bytes(VOICE_OUT)
         with PriceFileReader(path) as rows:
-            assert len(list(rows)) == 4
+            assert len(list(rows)) == 6
 
     def test_missing_file_fails_at_construction(self, tmp_path):
         assert isinstance(capture(lambda: PriceFileReader(tmp_path / "missing.csv.gz")), FileNotFoundError)
@@ -180,5 +181,5 @@ class TestSources:
         path = tmp_path / "voice_out.csv.gz"
         make_client().voice_out_prices().download_to_file(path)
         with PriceFileReader(path) as rows:
-            assert [row["Category"] for row in rows] == ["International", "Origin based", "International",
-                                                         "International"]
+            assert [row["Category"] for row in rows] == ["International", "Origin based", "International", "International",
+                                                         "International", "International"]

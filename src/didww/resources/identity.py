@@ -6,7 +6,9 @@ class Identity(DidwwApiModel):
     """Identity resource.
 
     ``company_website`` applies to business identities and is rejected on a
-    personal one; assigning ``None`` clears it on update.
+    personal one; assigning ``None`` clears it on update. ``vat_id`` is listed
+    as ``tax_id`` in the mandatory fields of the address and emergency
+    requirements.
     """
 
     _writable_attrs = {
