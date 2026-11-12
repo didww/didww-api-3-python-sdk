@@ -12,11 +12,10 @@ permissions:
 
 jobs:
   test:
-    # setup-python has no Python 3.9 build for ubuntu-26.04, the image ubuntu-latest moved to.
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ['3.9', '3.10', '3.11', '3.12', '3.13']
+        python-version: ['3.11', '3.12', '3.13', '3.14']
     name: Tests with Python ${{ matrix.python-version }}
 
     steps:

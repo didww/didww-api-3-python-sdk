@@ -2,7 +2,7 @@ Python client for DIDWW API v3.
 
 ![Tests](https://github.com/didww/didww-api-3-python-sdk/actions/workflows/ci.yml/badge.svg)
 ![Coverage](https://img.shields.io/endpoint?url=https://didww.github.io/didww-api-3-python-sdk/badge.json)
-![Python](https://img.shields.io/badge/python-3.9%2B-blue)
+![Python](https://img.shields.io/badge/python-3.11%2B-blue)
 
 ## About DIDWW API v3
 
@@ -28,7 +28,7 @@ This SDK targets DIDWW API version `2026-10-22` (`DidwwClient.DEFAULT_API_VERSIO
 
 ## Requirements
 
-- Python 3.9+
+- Python 3.11+
 
 The SDK depends on [requests](https://requests.readthedocs.io/), [urllib3](https://urllib3.readthedocs.io/) 1.26 or later, [jsonapi-requests](https://github.com/socialwifi/jsonapi-requests) and [cryptography](https://cryptography.io/). urllib3 already came with requests; 4.0.0 only names it, since the SDK uses it directly. Logging, exact numbers and gzip handling use the standard library (see [Logging](#logging)).
 
@@ -1221,7 +1221,7 @@ identity.identity_type = IdentityType.BUSINESS
 print(ExportType.CDR_IN.value)  # "cdr_in"
 ```
 
-The string enums are `str` subclasses, so they compare equal to their wire value and can be passed to `QueryParams().filter(...)`. Print or format their `.value`: `str()` and f-strings show the member name on some Python versions.
+The string enums are `str` subclasses, so they compare equal to their wire value and can be passed to `QueryParams().filter(...)`. Print or format their `.value`: `str()` and f-strings show the member name, such as `Codec.PCMU`.
 
 ## File Encryption
 
@@ -1450,6 +1450,7 @@ For the SMS trunk configuration types, see [SMS Trunks](#sms-trunks).
 
 Most code keeps working: `DidwwClient(api_key, environment)` is unchanged, and the SDK mints the access tokens itself. The breaking changes:
 
+- **Python.** 4.0.0 needs Python 3.11 or later; 3.x also runs on 3.9 and 3.10.
 - **Authentication.** Every request carries a bearer token minted from the API key (see [Authentication](#authentication)). The `Api-Key` header is sent only to the token service, so outgoing traffic must reach `auth.didww.com` (`auth-sandbox.didww.com` in the sandbox), and the price hosts when you use prices. The token service can raise a `DidwwAuthError` from any call; an API key that is refused now raises `DidwwAuthError` with `AuthErrorKind.INVALID_CLIENT` instead of a `DidwwApiError` with status 401.
 - **API version.** `X-DIDWW-API-Version` is no longer sent: the version is requested in the token. `DidwwClient.API_VERSION` is removed; use `DidwwClient.DEFAULT_API_VERSION` (also `didww.configuration.DEFAULT_API_VERSION`) or `client.api_version`. The default is `2026-10-22`, and an earlier version makes the constructor raise a `DidwwClientError`.
 - **Pickling.** A `DidwwClient` can no longer be pickled or deep-copied: it holds locks and its token cache. Build a client in each process or worker instead of passing one to it.
