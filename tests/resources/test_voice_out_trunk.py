@@ -257,6 +257,55 @@ class TestVoiceOutTrunk:
         (hit,) = stub.hits("PATCH", f"/v3/voice_out_trunks/{TRUNK_ID}")
         assert hit.json()["data"]["attributes"] == {"codecs": ["pcma", "pcmu", "g722"]}
 
+    @pytest.mark.parametrize("read_in_between", [
+        lambda trunk: None,
+        lambda trunk: trunk.codecs,
+    ], ids=["no_read", "read_in_between"])
+    def test_list_read_earlier_is_live_again_once_assigned_back(self, stub, make_client, read_in_between):
+        stub.on("POST", "/token", token_reply())
+        stub.on("PATCH", f"/v3/voice_out_trunks/{TRUNK_ID}", TRUNK_REPLY)
+        trunk = VoiceOutTrunk.from_jsonapi({
+            "id": TRUNK_ID, "type": "voice_out_trunks", "attributes": {"codecs": ["pcma", "pcmu"]},
+        })
+        earlier = trunk.codecs
+        trunk.codecs = [VoiceOutCodec.AMR]
+        read_in_between(trunk)
+
+        trunk.codecs = earlier
+        earlier.append(VoiceOutCodec.OPUS)
+        make_client().voice_out_trunks().update(trunk)
+
+        (hit,) = stub.hits("PATCH", f"/v3/voice_out_trunks/{TRUNK_ID}")
+        assert hit.json()["data"]["attributes"] == {"codecs": ["pcma", "pcmu", "opus"]}
+
+    def test_list_read_in_between_no_longer_writes_back_once_an_earlier_one_is_assigned_back(self):
+        trunk = VoiceOutTrunk.from_jsonapi({
+            "id": TRUNK_ID, "type": "voice_out_trunks", "attributes": {"codecs": ["pcma"]},
+        })
+        earlier = trunk.codecs
+        trunk.codecs = [VoiceOutCodec.AMR]
+        in_between = trunk.codecs
+
+        trunk.codecs = earlier
+        in_between.append(VoiceOutCodec.G722)
+
+        assert trunk.attributes["codecs"] == ["pcma"]
+        assert trunk.codecs is earlier
+
+    def test_list_read_from_another_trunk_is_copied_not_shared(self):
+        source = VoiceOutTrunk.from_jsonapi({
+            "id": TRUNK_ID, "type": "voice_out_trunks", "attributes": {"codecs": ["pcma"]},
+        })
+        target = VoiceOutTrunk()
+        codecs = source.codecs
+
+        target.codecs = codecs
+        codecs.append(VoiceOutCodec.OPUS)
+        target.codecs.append(VoiceOutCodec.G722)
+
+        assert source.attributes["codecs"] == ["pcma", "opus"]
+        assert target.attributes["codecs"] == ["pcma", "g722"]
+
     def test_augmented_assignment_keeps_the_list_read_live(self, stub, make_client):
         stub.on("POST", "/token", token_reply())
         stub.on("PATCH", f"/v3/voice_out_trunks/{TRUNK_ID}", TRUNK_REPLY)
