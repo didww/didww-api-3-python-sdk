@@ -426,7 +426,7 @@ def exception_chain(exc):
     return out
 
 
-# Python 3.9 with OpenSSL 3 reports a peer closing during the handshake as SSLZeroReturnError.
+# SSLZeroReturnError is the peer closing the connection with close_notify, during the handshake too.
 _DROPPED_CONNECTION = (ssl.SSLEOFError, ssl.SSLZeroReturnError, ConnectionResetError, ConnectionAbortedError,
                        BrokenPipeError, socket.timeout, TimeoutError)
 _TLS_ERRORS = (ssl.SSLError, urllib3.exceptions.SSLError, requests.exceptions.SSLError)
@@ -438,17 +438,9 @@ def is_tls_error(exc):
     A connection dropped or timed out during the handshake is not one.
     """
     chain = exception_chain(exc)
-    if any(isinstance(e, _DROPPED_CONNECTION) or _is_unexpected_eof(e) for e in chain):
+    if any(isinstance(e, _DROPPED_CONNECTION) for e in chain):
         return False
     return any(isinstance(e, _TLS_ERRORS) for e in chain)
-
-
-def _is_unexpected_eof(e):
-    # Python 3.9 with OpenSSL 3 raises a plain SSLError where 3.10+ raises SSLEOFError.
-    if not isinstance(e, ssl.SSLError):
-        return False
-    return (getattr(e, "reason", None) == "UNEXPECTED_EOF_WHILE_READING"
-            or "unexpected eof while reading" in str(e).lower())
 
 
 def detached(exc):

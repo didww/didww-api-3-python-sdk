@@ -795,17 +795,6 @@ class TestTls:
             None, "/token", urllib3.exceptions.SSLError(ssl.SSLEOFError(8, "EOF"))))
         assert not is_tls_error(eof)
 
-    @pytest.mark.parametrize("reason, message", [
-        ("UNEXPECTED_EOF_WHILE_READING", "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol"),
-        (None, "[SSL] unexpected eof while reading (_ssl.c:1129)"),
-    ])
-    def test_plain_ssl_error_for_an_eof_during_the_handshake_is_a_dropped_connection(self, reason, message):
-        err = ssl.SSLError(1, message)
-        err.reason = reason
-        wrapped = requests.exceptions.SSLError(urllib3.exceptions.MaxRetryError(
-            None, "/token", urllib3.exceptions.SSLError(err)))
-        assert not is_tls_error(wrapped)
-
     def test_zero_return_during_the_handshake_is_a_dropped_connection(self):
         err = ssl.SSLZeroReturnError(6, "TLS/SSL connection has been closed (EOF) (_ssl.c:1147)")
         wrapped = requests.exceptions.SSLError(urllib3.exceptions.MaxRetryError(
