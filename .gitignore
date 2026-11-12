@@ -15,3 +15,6 @@ venv/
 .idea/
 .vscode/
 .claude/
+
+# uv is not used; pip installs from pyproject.toml
+uv.lock
