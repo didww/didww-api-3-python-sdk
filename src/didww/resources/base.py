@@ -141,9 +141,10 @@ class EnumListAttributeField(SafeAttributeField):
 
     The list read is a view: changing it in place writes the new list back
     as wire values, so that an update sends it. Reads share one view while
-    the stored list stays the same, also when the view itself is assigned
-    back (``trunk.codecs += [...]``); a view whose list was replaced since,
-    for example by assigning a new list, no longer writes back.
+    the stored list stays the same, also when the view is assigned back
+    (``trunk.codecs += [...]``). A view whose list was replaced since, for
+    example by assigning a new list, no longer writes back until it is
+    assigned back itself (``trunk.codecs = view``).
     """
 
     def __init__(self, source, enum_cls):
@@ -167,8 +168,9 @@ class EnumListAttributeField(SafeAttributeField):
 
     def __set__(self, instance, value):
         instance.attributes[self.source] = enum_value_list(value)
-        if value is not None and vars(instance).get("_enum_list_views", {}).get(self.source) is value:
+        if isinstance(value, _EnumListView) and value.reads_field(instance, self.source):
             value.follow(instance.attributes.get(self.source))
+            vars(instance).setdefault("_enum_list_views", {})[self.source] = value
 
 
 class RelationField(OrmRelationField):
@@ -282,6 +284,10 @@ class _EnumListView(_DirtyTrackingList):
         self._enum_cls = enum_cls
         self._instance = instance
         self._stored = stored
+
+    def reads_field(self, instance, key):
+        """Whether this view was read from the ``key`` field of ``instance``."""
+        return self._instance is instance and self._key == key
 
     def reads(self, stored):
         """Whether this view shows ``stored``, the list the resource holds now."""
