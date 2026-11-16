@@ -45,7 +45,7 @@ class DidwwClient:
             export and upload calls only). The SDK mounts plain ``HTTPAdapter``
             objects, so custom adapter subclasses are not used; the session
             is never changed or used directly.
-        api_version: The API version requested for tokens, ``2026-10-22`` or later.
+        api_version: The API version requested for tokens, ``2026-11-19`` or later.
         scope: ``Scope.READ``, ``Scope.FULL`` or None (no scope is requested and
             the token service grants ``full``).
         token_store: Where tokens are kept; defaults to one in-memory store

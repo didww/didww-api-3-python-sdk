@@ -2,7 +2,7 @@ import re
 from enum import Enum
 from urllib.parse import urlsplit
 
-DEFAULT_API_VERSION = "2026-10-22"
+DEFAULT_API_VERSION = "2026-11-19"
 
 _AUDIENCE_API = "api.didww.com"
 _AUDIENCE_VOICE_IN = "api-vin.didww.com"

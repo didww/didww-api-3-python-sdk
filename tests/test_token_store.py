@@ -11,7 +11,7 @@ from didww._http import _BearerAuth
 
 def _token(value="secret-access-token", **kwargs):
     return AccessToken(access_token=value, expires_in=900, aud=("api.didww.com",), scope="full",
-                       api_version="2026-10-22", **kwargs)
+                       api_version="2026-11-19", **kwargs)
 
 
 class TestAccessToken:
@@ -42,7 +42,7 @@ class TestAccessToken:
             "expires_in": 900,
             "aud": ["api.didww.com"],
             "scope": "full",
-            "api_version": "2026-10-22",
+            "api_version": "2026-11-19",
             "minted_at": "2026-10-22T08:05:03.120000Z",
         }
         assert AccessToken.from_dict(data) == token

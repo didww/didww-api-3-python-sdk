@@ -16,15 +16,15 @@ Read more https://doc.didww.com/api
 
 ## API Version
 
-This SDK targets DIDWW API version `2026-10-22` (`DidwwClient.DEFAULT_API_VERSION`). The version is not sent as a header: it is requested in the `api_version` of every access token the SDK mints (see [Authentication](#authentication)).
+This SDK targets DIDWW API version `2026-11-19` (`DidwwClient.DEFAULT_API_VERSION`). The version is not sent as a header: it is requested in the `api_version` of every access token the SDK mints (see [Authentication](#authentication)).
 
 | Package Version | Branch | DIDWW API Version |
 |-----------------|--------|-------------------|
-| **4.x** | [`main`](https://github.com/didww/didww-api-3-python-sdk) | [`2026-10-22`](https://doc.didww.com/api3/2026-10-22/index.html) |
+| **4.x** | [`main`](https://github.com/didww/didww-api-3-python-sdk) | [`2026-11-19`](https://doc.didww.com/api3/2026-11-19/index.html) |
 | **3.x** | [`release-3`](https://github.com/didww/didww-api-3-python-sdk/tree/release-3) | [`2026-04-16`](https://doc.didww.com/api3/2026-04-16/index.html) |
 | **2.x** | [`2022-05-10`](https://github.com/didww/didww-api-3-python-sdk/tree/2022-05-10) | [`2022-05-10`](https://doc.didww.com/api3/2022-05-10/index.html) |
 
-`DidwwClient(..., api_version="YYYY-MM-DD")` requests a later version. The constructor raises a `DidwwClientError` for a value that is not a `YYYY-MM-DD` date and for a version earlier than `2026-10-22`. The resources of earlier API versions are not in this release: use 3.x from the [`release-3`](https://github.com/didww/didww-api-3-python-sdk/tree/release-3) branch for API `2026-04-16` (see [Migrating from 3.x](#migrating-from-3x)).
+`DidwwClient(..., api_version="YYYY-MM-DD")` requests a later version. The constructor raises a `DidwwClientError` for a value that is not a `YYYY-MM-DD` date and for a version earlier than `2026-11-19`. The resources of earlier API versions are not in this release: use 3.x from the [`release-3`](https://github.com/didww/didww-api-3-python-sdk/tree/release-3) branch for API `2026-04-16` (see [Migrating from 3.x](#migrating-from-3x)).
 
 ## Requirements
 
@@ -114,7 +114,7 @@ sandbox = DidwwClient(
 | `environment` | `Environment.SANDBOX` | `Environment.PRODUCTION` or `Environment.SANDBOX`. It selects the API, token service and price hosts. See [Environments](#environments). |
 | `base_url` | API URL of the environment | JSON:API base URL only, including `/v3`. |
 | `session` | none | A `requests.Session` whose proxy and TLS settings the SDK copies. See [HTTP session](#http-session-proxy-tls-timeouts). |
-| `api_version` | `DidwwClient.DEFAULT_API_VERSION` (`"2026-10-22"`) | API version requested in every token. See [API Version](#api-version). |
+| `api_version` | `DidwwClient.DEFAULT_API_VERSION` (`"2026-11-19"`) | API version requested in every token. See [API Version](#api-version). |
 | `scope` | `None` | `Scope.READ` or `Scope.FULL` (or `"read"`, `"full"`). With `None` no scope is requested and the token service grants `full`. See [Scope](#scope). |
 | `token_store` | one `MemoryTokenStore` shared by every client of the process built without its own | Cache for access tokens. See [Token cache](#token-cache). |
 | `logger` | `logging.getLogger("didww")` | A `logging.Logger` or `logging.LoggerAdapter` for the token warnings and debug events. See [Logging](#logging). |
@@ -129,7 +129,7 @@ The constructor raises a `DidwwClientError` (see [Error Handling](#error-handlin
 
 - an empty API key, or one with a character outside printable ASCII or a space (a control character, such as a trailing newline or a tab, or a non-ASCII character, such as a non-breaking space);
 - an `environment` that is not an `Environment` member;
-- an API version that is not a `YYYY-MM-DD` date, or that is earlier than `2026-10-22`;
+- an API version that is not a `YYYY-MM-DD` date, or that is earlier than `2026-11-19`;
 - a `scope` other than `Scope.READ`, `Scope.FULL`, `"read"`, `"full"` or `None`;
 - a timeout that is not a positive number of seconds up to 1,000,000, or `None`;
 - a `token_store` without callable `get`, `set` and `delete`, or a `logger` without a callable `log`, or either one passed as a class instead of an instance;
@@ -388,7 +388,7 @@ templates = client.supporting_document_templates().list().data
 balance = client.balance().find().data
 ```
 
-`DidGroup`, `AddressRequirement`, `EmergencyRequirement` and `EmergencyCallingService` carry `number_type`, one of the `NumberType` values (`LOCAL`, `NATIONAL`, `MOBILE`, `TOLL_FREE`, `SHARED_COST`, `GLOBAL`; in filters use the wire value, such as `toll_free`). `DidGroup.is_demo` flags demo groups. `NumberType` replaces the `DidGroupType` resource and the `did_group_type` relationship, which API `2026-10-22` no longer has. The `pops` resource is gone too: a Voice IN trunk carries its point of presence in the `pop` attribute (see [Voice In Trunks](#voice-in-trunks)).
+`DidGroup`, `AddressRequirement`, `EmergencyRequirement` and `EmergencyCallingService` carry `number_type`, one of the `NumberType` values (`LOCAL`, `NATIONAL`, `MOBILE`, `TOLL_FREE`, `SHARED_COST`, `GLOBAL`; in filters use the wire value, such as `toll_free`). `DidGroup.is_demo` flags demo groups. `NumberType` replaces the `DidGroupType` resource and the `did_group_type` relationship, which API `2026-11-19` no longer has. The `pops` resource is gone too: a Voice IN trunk carries its point of presence in the `pop` attribute (see [Voice In Trunks](#voice-in-trunks)).
 
 ```python
 from didww.enums import NumberType
@@ -1133,7 +1133,7 @@ with open("copy_of_voice_in_prices.csv.gz", "wb") as out:
 
 ## Filtering, Sorting, and Pagination
 
-> See [`FILTERS.md`](FILTERS.md) for the list of `filter[KEY]` keys accepted by every list endpoint at API version `2026-10-22`.
+> See [`FILTERS.md`](FILTERS.md) for the list of `filter[KEY]` keys accepted by every list endpoint at API version `2026-11-19`.
 
 ```python
 from didww.query_params import QueryParams
@@ -1446,13 +1446,13 @@ For the SMS trunk configuration types, see [SMS Trunks](#sms-trunks).
 
 ## Migrating from 3.x
 
-4.0.0 targets API `2026-10-22` only. To stay on API `2026-04-16`, keep 3.x (`pip install "didww>=3,<4"`, branch [`release-3`](https://github.com/didww/didww-api-3-python-sdk/tree/release-3)).
+4.0.0 targets API `2026-11-19` only. To stay on API `2026-04-16`, keep 3.x (`pip install "didww>=3,<4"`, branch [`release-3`](https://github.com/didww/didww-api-3-python-sdk/tree/release-3)).
 
 Most code keeps working: `DidwwClient(api_key, environment)` is unchanged, and the SDK mints the access tokens itself. The breaking changes:
 
 - **Python.** 4.0.0 needs Python 3.11 or later; 3.x also runs on 3.9 and 3.10.
 - **Authentication.** Every request carries a bearer token minted from the API key (see [Authentication](#authentication)). The `Api-Key` header is sent only to the token service, so outgoing traffic must reach `auth.didww.com` (`auth-sandbox.didww.com` in the sandbox), and the price hosts when you use prices. The token service can raise a `DidwwAuthError` from any call; an API key that is refused now raises `DidwwAuthError` with `AuthErrorKind.INVALID_CLIENT` instead of a `DidwwApiError` with status 401.
-- **API version.** `X-DIDWW-API-Version` is no longer sent: the version is requested in the token. `DidwwClient.API_VERSION` is removed; use `DidwwClient.DEFAULT_API_VERSION` (also `didww.configuration.DEFAULT_API_VERSION`) or `client.api_version`. The default is `2026-10-22`, and an earlier version makes the constructor raise a `DidwwClientError`.
+- **API version.** `X-DIDWW-API-Version` is no longer sent: the version is requested in the token. `DidwwClient.API_VERSION` is removed; use `DidwwClient.DEFAULT_API_VERSION` (also `didww.configuration.DEFAULT_API_VERSION`) or `client.api_version`. The default is `2026-11-19`, and an earlier version makes the constructor raise a `DidwwClientError`.
 - **Pickling.** A `DidwwClient` can no longer be pickled or deep-copied: it holds locks and its token cache. Build a client in each process or worker instead of passing one to it.
 - **Environment.** `environment` also selects the token service and the price hosts, and is not derived from `base_url`: to reach production, pass `environment=Environment.PRODUCTION` (a production `base_url` alone mints at the sandbox token service and fails with `DidwwAuthError`).
 - **API key.** `client.api_key` is read-only: the key is used when tokens are minted, so build a new `DidwwClient` to use another key.

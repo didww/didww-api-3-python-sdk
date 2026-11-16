@@ -119,7 +119,7 @@ def test_environment_must_be_an_environment():
 
 def test_default_api_version():
     client = DidwwClient(api_key="test")
-    assert client.api_version == DEFAULT_API_VERSION == DidwwClient.DEFAULT_API_VERSION == "2026-10-22"
+    assert client.api_version == DEFAULT_API_VERSION == DidwwClient.DEFAULT_API_VERSION == "2026-11-19"
     assert not hasattr(DidwwClient, "API_VERSION")
 
 
@@ -141,13 +141,13 @@ def test_older_api_version_points_to_release_3():
     with pytest.raises(DidwwClientError) as exc:
         DidwwClient(api_key="test", api_version="2026-04-16")
     assert str(exc.value) == (
-        "API version 2026-04-16 is not supported: this SDK requires 2026-10-22 or later; "
+        "API version 2026-04-16 is not supported: this SDK requires 2026-11-19 or later; "
         "use didww 3.x (branch release-3) for 2026-04-16"
     )
 
 
 @pytest.mark.parametrize("api_version", [
-    "2026-4-1", "abc", "2026-10-22\n", "２０２６-10-22", "", None, 20261022,
+    "2026-4-1", "abc", "2026-11-19\n", "２０２６-11-19", "", None, 20261119,
 ])
 def test_malformed_api_version_rejected(api_version):
     with pytest.raises(DidwwClientError, match="YYYY-MM-DD"):
