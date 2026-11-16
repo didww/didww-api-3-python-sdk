@@ -40,7 +40,7 @@ class Reply:
 
 
 def token_reply(access_token="test-access-token", aud=("api.didww.com",), scope="full",
-                api_version="2026-10-22", expires_in=900, **extra):
+                api_version="2026-11-19", expires_in=900, **extra):
     body = {"access_token": access_token, "token_type": "Bearer", "expires_in": expires_in,
             "aud": list(aud), "scope": scope, "api_version": api_version, **extra}
     return Reply(200, body)

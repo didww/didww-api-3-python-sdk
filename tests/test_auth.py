@@ -125,7 +125,7 @@ class TestMintRequest:
         assert token.expires_in == 900
         assert token.aud == (API,)
         assert token.scope == "full"
-        assert token.api_version == "2026-10-22"
+        assert token.api_version == "2026-11-19"
         assert token.minted_at.tzinfo is not None
 
 
@@ -173,7 +173,7 @@ class TestCaching:
             return DidwwClient(api_key, **options)._tokens.cache_key
 
         base = key()(API)
-        assert base == "didww:token:v1:2e1c5435f0e67f91d34497fabf69840a945923a47982fad172c353b3f26be539"
+        assert base == "didww:token:v1:7f410b6b26861d5df39c9b3d800faec7f2feefa0c6949246c8d0cd3580714f57"
         assert "key-1" not in base
         assert key(auth_url="https://auth.example.com/")(API) == base
         assert key()(SMS) != base
@@ -870,9 +870,9 @@ class TestLogging:
 
     def test_api_version_mismatch_warning(self, stub, make_client, caplog):
         caplog.set_level(logging.WARNING, logger="didww")
-        stub.on("POST", "/token", token_reply(api_version="2026-10-22"))
+        stub.on("POST", "/token", token_reply(api_version="2026-11-19"))
         make_client(api_version="2027-01-01")._tokens.token(API)
-        assert "DIDWW token api_version mismatch: requested 2027-01-01, granted 2026-10-22" \
+        assert "DIDWW token api_version mismatch: requested 2027-01-01, granted 2026-11-19" \
             in self._messages(caplog)
 
     def test_no_warning_when_grant_matches(self, stub, make_client, caplog):
@@ -893,7 +893,7 @@ class TestLogging:
         make_client(api_key="secret-api-key-1")._tokens.token(API)
         messages = self._messages(caplog)
         assert any(m.startswith("DIDWW token minted: aud ['api.didww.com'], scope full, "
-                                "api_version 2026-10-22, expires_in 900, duration_ms ") for m in messages)
+                                "api_version 2026-11-19, expires_in 900, duration_ms ") for m in messages)
         assert all("test-access-token" not in m and "secret-api-key-1" not in m for m in messages)
 
     def test_custom_logger_receives_warnings(self, stub, make_client, caplog):

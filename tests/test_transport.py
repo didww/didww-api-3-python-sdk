@@ -122,7 +122,7 @@ class TestHeaders:
 
     def test_client_options_reach_the_mint(self, stub, make_client, caplog):
         caplog.set_level(logging.WARNING)
-        stub.on("POST", "/token", token_reply(scope="full", api_version="2026-10-22"))
+        stub.on("POST", "/token", token_reply(scope="full", api_version="2026-11-19"))
         stub.on("GET", "/v3/balance", jsonapi_reply())
         make_client(scope=Scope.READ, api_version="2027-01-01", logger=logging.getLogger("my.app")).get("balance")
 
