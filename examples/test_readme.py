@@ -8,14 +8,17 @@ of a Sender ID verification), also when it fails. Orders and exports cannot be
 deleted: the order checks buy DIDs. Neither can address and emergency
 verifications: their checks print a line starting with "REVIEW" with the ID
 and reference of each, for DIDWW staff to approve or reject it. The emergency
-calling service check cancels a service of the account. Only the production
-client snippets send nothing: those clients are built and not used.
+calling service check cancels a service of the account. The production client
+snippet is the only check that reaches production, and it only reads: with a
+read-only token it reads the balance, the countries and one price.
 
 Some snippets need more than the API key; without it their check is skipped:
-  DIDWW_README_REDIS_URL   a Redis server URL, e.g. redis://localhost:6379/0, and
-                           the redis package (pip install redis)
-  DIDWW_README_PROXY_URL   an HTTP(S) forward proxy URL, e.g. http://localhost:3128
-  DIDWW_README_CA_BUNDLE   a CA bundle file, e.g. /etc/ssl/certs/ca-certificates.crt
+  DIDWW_README_REDIS_URL           a Redis server URL, e.g. redis://localhost:6379/0,
+                                   and the redis package (pip install redis)
+  DIDWW_README_PROXY_URL           an HTTP(S) forward proxy URL, e.g. http://localhost:3128
+  DIDWW_README_CA_BUNDLE           a CA bundle file, e.g. /etc/ssl/certs/ca-certificates.crt
+  DIDWW_README_PRODUCTION_API_KEY  a production API key, used by the production
+                                   client check only
 
 The shell snippets (installation, development, release) are not run.
 
@@ -606,12 +609,51 @@ def _():
 section("Configuration")
 
 
-@check("Configuration: production client (built only) and read-only sandbox client")
+@check("Configuration: production client, read-only")
 def _():
-    # Production: built to check its settings, no request is sent
-    production = DidwwClient(api_key="YOUR_API_KEY", environment=Environment.PRODUCTION)
-    expect(production.base_url == "https://api.didww.com/v3", f"base_url is {production.base_url}")
-    expect(production.auth_url == "https://auth.didww.com", f"auth_url is {production.auth_url}")
+    production_key = env_or_skip("DIDWW_README_PRODUCTION_API_KEY", "a production API key; the check only reads")
+    # A logger of its own receives the mint event; a token store of its own keeps the
+    # production token away from the other clients
+    logger = logging.getLogger("test_readme.production")
+    captured = ListHandler()
+    logger.addHandler(captured)
+    logger.setLevel(logging.DEBUG)
+    logger.propagate = False
+    try:
+        # Production, always with a read-only token: the API refuses any write with 403
+        with DidwwClient(
+            api_key=production_key,
+            environment=Environment.PRODUCTION,
+            scope=Scope.READ,
+            token_store=MemoryTokenStore(),
+            logger=logger,
+        ) as production:
+            expect(production.base_url == "https://api.didww.com/v3", f"base_url is {production.base_url}")
+            expect(production.auth_url == "https://auth.didww.com", f"auth_url is {production.auth_url}")
+
+            # The balance and the countries, read with a token minted for scope read
+            production.balance().find()
+            minted = [m for m in captured.messages if m.startswith("DIDWW token minted")]
+            expect(minted and "scope read," in minted[0], "no read-only token was minted")
+            countries = production.countries().list().data
+            expect(countries, "no countries")
+
+            # One price lookup, on the Voice IN prices host
+            try:
+                prices = production.voice_in_prices().lookup({"number": "12125551234"})
+                price_result = f"price lookup ok ({len(prices)} row(s))"
+            except DidwwPricesError as e:
+                if e.kind not in (PricesErrorKind.PRICE_PLAN_NOT_ASSIGNED, PricesErrorKind.PRICE_NOT_FOUND):
+                    raise
+                price_result = f"price lookup answered {e.kind.value}"
+    finally:
+        logger.removeHandler(captured)
+    expect(not any("scope mismatch" in m for m in captured.messages), "the token service granted another scope")
+    print(f"    production: token minted (scope read), balance read, {len(countries)} countries, {price_result}")
+
+
+@check("Configuration: read-only sandbox client")
+def _():
     sandbox = create_client(
         scope=Scope.READ,
         logger=logging.getLogger("myapp.didww"),

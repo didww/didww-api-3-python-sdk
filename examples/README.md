@@ -13,6 +13,7 @@ All examples read the API key from the `DIDWW_API_KEY` environment variable and 
 - `FILE_PATH` (optional for `upload_file.py`): file to encrypt and upload. Defaults to `sample.pdf`
 - `XDG_CACHE_HOME` (optional for `prices_download.py`, Linux and other Unix systems): user cache directory, `~/.cache` if not set
 - `DIDWW_README_REDIS_URL`, `DIDWW_README_PROXY_URL`, `DIDWW_README_CA_BUNDLE` (optional for `test_readme.py`): a Redis server URL (with the `redis` package installed), an HTTP(S) forward proxy URL and a CA bundle file for the token cache and proxy snippets; without them those checks are skipped
+- `DIDWW_README_PRODUCTION_API_KEY` (optional for `test_readme.py`): a production API key for the production client snippet, which only reads with a read-only token (balance, countries, one price lookup); without it that check is skipped
 
 ## Install
 
