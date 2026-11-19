@@ -6,6 +6,7 @@ fails.
 Usage: DIDWW_API_KEY=xxx python examples/trunks.py
 """
 import uuid
+from contextlib import ExitStack
 
 from client_factory import create_client
 from didww.enums import (
@@ -37,6 +38,11 @@ def print_configuration(config):
         print(f"  DST: {config.dst}")
 
 
+def delete_trunk(trunk_id):
+    client.voice_in_trunks().delete(trunk_id)
+    print(f"Deleted trunk {trunk_id}")
+
+
 # --- List trunks with their trunk group ---
 print("=== Existing Trunks ===")
 params = QueryParams().include("voice_in_trunk_group").page(number=1, size=10)
@@ -62,8 +68,8 @@ if trunks:
     print(f"  Description: {found.description}")
     print(f"  Created at: {found.created_at}")
 
-created_ids = []
-try:
+# The ExitStack deletes every trunk created in it, also when a step or another deletion fails
+with ExitStack() as cleanup:
     # --- Create a SIP trunk ---
     print("\n=== Creating SIP Trunk ===")
     sip = SipConfiguration()
@@ -89,7 +95,7 @@ try:
     trunk.configuration = sip
 
     sip_trunk = client.voice_in_trunks().create(trunk).data
-    created_ids.append(sip_trunk.id)
+    cleanup.callback(delete_trunk, sip_trunk.id)
     print(f"Created SIP trunk: {sip_trunk.id}")
     print(f"  Name: {sip_trunk.name}")
     print(f"  POP: {enum_value(sip_trunk.pop)}")
@@ -107,7 +113,7 @@ try:
     trunk.configuration = pstn
 
     pstn_trunk = client.voice_in_trunks().create(trunk).data
-    created_ids.append(pstn_trunk.id)
+    cleanup.callback(delete_trunk, pstn_trunk.id)
     print(f"Created PSTN trunk: {pstn_trunk.id}")
     print(f"  Name: {pstn_trunk.name}")
     print_configuration(pstn_trunk.configuration)
@@ -135,8 +141,5 @@ try:
     updated = client.voice_in_trunks().update(update).data
     print(f"Name: {updated.name}")
     print_configuration(updated.configuration)
-finally:
-    # --- Delete both trunks ---
-    for trunk_id in created_ids:
-        client.voice_in_trunks().delete(trunk_id)
-        print(f"Deleted trunk {trunk_id}")
+
+    print("\n=== Deleting Trunks ===")
