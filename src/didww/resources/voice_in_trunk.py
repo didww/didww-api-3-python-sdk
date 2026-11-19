@@ -1,4 +1,4 @@
-from didww.enums import CliFormat
+from didww.enums import CliFormat, Pop
 from didww.resources.base import DidwwApiModel, DatetimeAttributeField, SafeAttributeField, EnumAttributeField, RelationField, Repository
 from didww.resources.configuration.base import TrunkConfiguration
 
@@ -8,10 +8,16 @@ import didww.resources.configuration.pstn  # noqa: F401
 
 
 class VoiceInTrunk(DidwwApiModel):
+    """Voice IN trunk resource.
+
+    ``pop`` (Pop) pins the trunk to a point of presence; ``None`` lets DIDWW
+    choose (on update it is sent as null).
+    """
+
     _writable_attrs = {
         "priority", "capacity_limit", "weight", "name", "cli_format",
         "cli_prefix", "description", "ringing_timeout", "configuration",
-        "external_reference_id",
+        "external_reference_id", "pop",
     }
 
     name = SafeAttributeField("name")
@@ -25,7 +31,7 @@ class VoiceInTrunk(DidwwApiModel):
     created_at = DatetimeAttributeField("created_at")
     external_reference_id = SafeAttributeField("external_reference_id")
 
-    pop = RelationField("pop")
+    pop = EnumAttributeField("pop", Pop)
     voice_in_trunk_group = RelationField("voice_in_trunk_group")
 
     class Meta:

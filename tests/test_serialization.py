@@ -8,6 +8,9 @@ PATCH (update) requests must include only fields explicitly changed by user
 code ("dirty fields"). Explicit null assignments must be preserved.
 """
 
+import pytest
+from jsonapi_requests.data import JsonApiResponse
+
 from didww.resources.did import Did
 from didww.resources.order import Order
 from didww.resources.export import Export
@@ -590,3 +593,77 @@ class TestMutableAttributeTracking:
         doc = trunk.to_jsonapi(include_id=True, dirty_only=True)
         assert doc["attributes"]["dst_prefixes"] == ["370", "371"]
 
+
+
+class TestRelationshipAssignment:
+    def test_none_unassigns_a_to_one_relationship(self):
+        did = Did.build("abc")
+        did.identity = None
+        assert did.identity is None
+        assert did.to_jsonapi(include_id=True, dirty_only=True)["relationships"] == {"identity": {"data": None}}
+
+    def test_none_drops_a_loaded_included_object(self):
+        did = Did.from_response_content(JsonApiResponse.from_data({
+            "data": {
+                "id": "abc",
+                "type": "dids",
+                "attributes": {},
+                "relationships": {"voice_in_trunk": {"data": {"type": "voice_in_trunks", "id": "t1"}}},
+            },
+            "included": [{"id": "t1", "type": "voice_in_trunks", "attributes": {"name": "trunk"}}],
+        }))
+        assert did.voice_in_trunk.name == "trunk"
+        did.voice_in_trunk = None
+        assert did.voice_in_trunk is None
+        assert did.to_jsonapi(include_id=True, dirty_only=True)["relationships"] == {"voice_in_trunk": {"data": None}}
+
+    def test_exclusive_none_unassigns_only_itself(self):
+        did = Did.build("abc")
+        did.voice_in_trunk_group = None
+        did.sms_trunk_group = None
+        assert did.to_jsonapi(include_id=True, dirty_only=True)["relationships"] == {
+            "voice_in_trunk_group": {"data": None},
+            "sms_trunk_group": {"data": None},
+        }
+
+    def test_private_null_relationship_reads_back_as_none(self):
+        did = Did.build("abc")
+        did._null_relationship("emergency_calling_service")
+        assert did.emergency_calling_service is None
+
+    def test_to_many_none_sends_an_empty_list(self):
+        from didww.resources.sms_trunk_group import SmsTrunkGroup
+
+        group = SmsTrunkGroup.build("g1")
+        group.sms_trunks = None
+        assert group.sms_trunks == []
+        assert group.to_jsonapi(include_id=True, dirty_only=True)["relationships"] == {"sms_trunks": {"data": []}}
+
+    def test_relationship_without_included_object_reads_as_id_only_resource(self):
+        from didww.resources.sms_trunk import SmsTrunk
+        from didww.resources.sms_trunk_group import SmsTrunkGroup
+
+        group = SmsTrunkGroup.from_jsonapi({
+            "id": "g1",
+            "type": "sms_trunk_groups",
+            "attributes": {},
+            "relationships": {"sms_trunks": {"data": [{"type": "sms_trunks", "id": "t1"}]}},
+        })
+        trunks = group.sms_trunks
+        assert [(type(t), t.id, t.name) for t in trunks] == [(SmsTrunk, "t1", None)]
+        did = Did.from_jsonapi({
+            "id": "abc",
+            "type": "dids",
+            "attributes": {},
+            "relationships": {"did_group": {"data": {"type": "did_groups", "id": "g1"}}},
+        })
+        assert did.did_group.id == "g1"
+        assert did.did_group.prefix is None
+
+    def test_read_only_relationship_cannot_be_assigned(self):
+        from didww.resources.sms_trunk_group import SmsTrunkGroup
+
+        group = SmsTrunkGroup.build("g1")
+        with pytest.raises(AttributeError):
+            group.incoming_dids = []
+        assert group._dirty_rels == set()

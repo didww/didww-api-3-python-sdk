@@ -1,4 +1,4 @@
-from didww.enums import EmergencyCallingServiceStatus
+from didww.enums import EmergencyCallingServiceStatus, NumberType
 from didww.resources.base import DidwwApiModel, DatetimeAttributeField, SafeAttributeField, EnumAttributeField, RelationField, ReadOnlyRepository
 
 
@@ -14,6 +14,7 @@ class EmergencyCallingService(DidwwApiModel):
         canceled_at (datetime): Timestamp when the service was canceled. None when active.
         created_at (datetime): Timestamp when the resource was created.
         renew_date (str): Next renewal date as date-only string (e.g. "2026-05-22"). None when canceled.
+        number_type (NumberType): Number type the service covers.
 
     Resource-level meta: setup_price, monthly_price
     """
@@ -25,9 +26,9 @@ class EmergencyCallingService(DidwwApiModel):
     canceled_at = DatetimeAttributeField("canceled_at")
     created_at = DatetimeAttributeField("created_at")
     renew_date = SafeAttributeField("renew_date")
+    number_type = EnumAttributeField("number_type", NumberType)
 
     country = RelationField("country")
-    did_group_type = RelationField("did_group_type")
     order = RelationField("order")
     address = RelationField("address")
     emergency_requirement = RelationField("emergency_requirement")

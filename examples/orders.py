@@ -24,19 +24,21 @@ for order in orders[:3]:
     if order.external_reference_id:
         print(f"  External reference: {order.external_reference_id}")
 
-# Create an order with DID order items
+# Create an order with DID order items, from a DID group with numbers in stock:
+# the DID group of an available DID
 print("\n=== Creating DID Order ===")
-params = QueryParams().include("stock_keeping_units")
-did_groups = client.did_groups().list(params).data
+params = QueryParams().include("did_group.stock_keeping_units").page(number=1, size=10)
+available_dids = client.available_dids().list(params).data
 
 sku_id = None
-for dg in did_groups:
-    if dg.stock_keeping_units:
-        sku_id = dg.stock_keeping_units[0].id
+for available in available_dids:
+    if available.did_group and available.did_group.stock_keeping_units:
+        sku_id = available.did_group.stock_keeping_units[0].id
+        print(f"DID group: {available.did_group.prefix} {available.did_group.area_name}, SKU {sku_id}")
         break
 
 if not sku_id:
-    print("No DID group with stock_keeping_units found")
+    print("No available DID with stock keeping units found")
     raise SystemExit(1)
 
 item = DidOrderItem()

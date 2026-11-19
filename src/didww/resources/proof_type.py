@@ -2,6 +2,8 @@ from didww.resources.base import DidwwApiModel, SafeAttributeField, ReadOnlyRepo
 
 
 class ProofType(DidwwApiModel):
+    """Proof type resource; ``entity_type`` is ``address``, ``business`` or ``personal``."""
+
     name = SafeAttributeField("name")
     entity_type = SafeAttributeField("entity_type")
 

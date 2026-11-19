@@ -9,4 +9,4 @@ class TestProofType:
         first = response.data[0]
         assert first.id == "ab1fb565-ac55-4c73-bc55-64dc61e70169"
         assert first.name == "Utility Bill"
-        assert first.entity_type == "Address"
+        assert first.entity_type == "address"

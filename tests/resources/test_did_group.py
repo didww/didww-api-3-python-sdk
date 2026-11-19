@@ -1,4 +1,5 @@
-from didww.enums import Feature, IdentityType, AreaLevel
+from didww.enums import Feature, IdentityType, AreaLevel, NumberType
+from didww.resources.did_group import DidGroup
 from tests.conftest import my_vcr
 from didww.query_params import QueryParams
 
@@ -19,7 +20,7 @@ class TestDidGroup:
 
     @my_vcr.use_cassette("did_groups/show.yaml")
     def test_find_did_group(self, client):
-        params = QueryParams().include("country", "region", "city", "did_group_type", "stock_keeping_units")
+        params = QueryParams().include("country", "region", "city", "stock_keeping_units")
         response = client.did_groups().find("2187c36d-28fb-436f-8861-5a0f5b5a3ee1", params)
         dg = response.data
         assert dg.id == "2187c36d-28fb-436f-8861-5a0f5b5a3ee1"
@@ -29,15 +30,14 @@ class TestDidGroup:
         assert dg.area_name == "Aachen"
         assert dg.allow_additional_channels is True
         assert dg.service_restrictions is None
+        assert dg.number_type == NumberType.LOCAL
+        assert dg.is_demo is False
         country = dg.country
         assert country is not None
         assert country.name == "Germany"
         city = dg.city
         assert city is not None
         assert city.name == "Aachen"
-        dgt = dg.did_group_type
-        assert dgt is not None
-        assert dgt.name == "Local"
         assert dg.region is None
         assert len(dg.stock_keeping_units) == 2
 
@@ -55,3 +55,12 @@ class TestDidGroup:
         assert address_requirement.identity_type == IdentityType.ANY
         assert address_requirement.personal_area_level == AreaLevel.WORLDWIDE
         assert address_requirement.service_description_required is False
+
+    def test_unknown_number_type_reads_as_raw_string(self):
+        dg = DidGroup.from_jsonapi({
+            "id": "1",
+            "type": "did_groups",
+            "attributes": {"number_type": "future_type", "is_demo": True},
+        })
+        assert dg.number_type == "future_type"
+        assert dg.is_demo is True

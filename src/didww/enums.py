@@ -42,6 +42,22 @@ class AddressVerificationStatus(str, Enum):
 class ExportType(str, Enum):
     CDR_IN = "cdr_in"
     CDR_OUT = "cdr_out"
+    SMS_IN = "sms_in"
+    SMS_OUT = "sms_out"
+
+
+class ExportTrunkType(str, Enum):
+    """Values of the ``trunk_type`` filter of an ``sms_in`` export."""
+    SMPP_SMSC = "smpp_smsc"
+    SMPP_ESME = "smpp_esme"
+    SMS_TO_EMAIL = "sms_to_email"
+    HTTP_IN = "http_in"
+
+
+class ExportServiceType(str, Enum):
+    """Values of the ``service_type`` filter of an ``sms_out`` export."""
+    A2P = "a2p"
+    P2P = "p2p"
 
 
 class ExportStatus(str, Enum):
@@ -94,6 +110,61 @@ class EmergencyCallingServiceStatus(str, Enum):
     IN_PROCESS = "in_process"
     NEW = "new"
     PENDING_UPDATE = "pending_update"
+
+
+class NumberType(str, Enum):
+    LOCAL = "local"
+    NATIONAL = "national"
+    MOBILE = "mobile"
+    TOLL_FREE = "toll_free"
+    SHARED_COST = "shared_cost"
+    GLOBAL = "global"
+
+
+class Pop(str, Enum):
+    """Point of presence a Voice IN trunk is served from."""
+    NYC = "nyc"
+    FRA = "fra"
+    LAC = "lac"
+    MIA = "mia"
+    SG = "sg"
+    HK = "hk"
+    AMS = "ams"
+
+
+class SenderIdVerificationStatus(str, Enum):
+    ACTIVE = "active"
+    CHANGES_REQUIRED = "changes_required"
+    CLOSED = "closed"
+    CLOSING_IN_PROCESS = "closing_in_process"
+    IN_PROCESS = "in_process"
+    NEW = "new"
+
+
+class SenderType(str, Enum):
+    ALPHANUMERIC = "alphanumeric"
+    CARRIER = "carrier"
+    LONG_CODE = "long_code"
+    SHORT_CODE = "short_code"
+    TOLL_FREE = "toll_free"
+
+
+class SmsHttpMethod(str, Enum):
+    GET = "get"
+    POST = "post"
+    PUT = "put"
+
+
+class SmsBodyType(str, Enum):
+    JSON = "json"
+    HTML_MULTIPART = "html_multipart"
+    HTML_URL_ENCODED = "html_url_encoded"
+    RAW = "raw"
+
+
+class SmsServerLocation(str, Enum):
+    NYC = "nyc"
+    AMS = "ams"
 
 
 class VoiceOutTrunkStatus(str, Enum):
@@ -180,20 +251,58 @@ class SstRefreshMethod(IntEnum):
     UPDATE_FALLBACK_INVITE = 3
 
 
-class Codec(IntEnum):
-    TELEPHONE_EVENT = 6
-    G723 = 7
-    G729 = 8
-    PCMU = 9
-    PCMA = 10
-    SPEEX = 12
-    GSM = 13
-    G726_32 = 14
-    G721 = 15
-    G726_24 = 16
-    G726_40 = 17
-    G726_16 = 18
-    L16 = 19
+class Codec(str, Enum):
+    """Codecs of the SIP configuration of a Voice IN trunk."""
+    TELEPHONE_EVENT = "telephone_event"
+    G723 = "g723"
+    G729 = "g729"
+    PCMU = "pcmu"
+    PCMA = "pcma"
+    SPEEX = "speex"
+    GSM = "gsm"
+    G726_32 = "g726_32"
+    G721 = "g721"
+    G726_24 = "g726_24"
+    G726_40 = "g726_40"
+    G726_16 = "g726_16"
+    L16 = "l16"
+    AMR = "amr"
+    AMR_WB = "amr_wb"
+
+
+class VoiceOutCodec(str, Enum):
+    """Codecs of a Voice OUT trunk; not the same set as ``Codec``."""
+    TELEPHONE_EVENT = "telephone_event"
+    G723 = "g723"
+    G729 = "g729"
+    PCMU = "pcmu"
+    PCMA = "pcma"
+    GSM = "gsm"
+    G722 = "g722"
+    OPUS = "opus"
+    AMR = "amr"
+    AMR_WB = "amr_wb"
+
+
+class IceMode(str, Enum):
+    """ICE (Interactive Connectivity Establishment) of a trunk's calls."""
+    DISABLED = "disabled"
+    ACCEPT = "accept"
+    INITIATE = "initiate"
+
+
+class RtcpMuxMode(str, Enum):
+    """RTP and RTCP multiplexed on one port."""
+    DISABLED = "disabled"
+    ACCEPT = "accept"
+    INITIATE = "initiate"
+
+
+class RtcpFeedbackMode(str, Enum):
+    """RTCP feedback (AVPF)."""
+    DISABLED = "disabled"
+    ACCEPT = "accept"
+    INITIATE = "initiate"
 
 
 class ReroutingDisconnectCode(IntEnum):

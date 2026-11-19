@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ['3.9', '3.10', '3.11', '3.12', '3.13']
+        python-version: ['3.11', '3.12', '3.13', '3.14']
     name: Tests with Python ${{ matrix.python-version }}
 
     steps:
@@ -32,6 +32,9 @@ jobs:
 
       - name: Run tests with coverage
         run: pytest --cov=didww --cov-report=xml --cov-report=term-missing -v
+
+      - name: Compile examples
+        run: python -m compileall -q examples
 
       - name: Upload coverage artifact
         if: matrix.python-version == '3.13'

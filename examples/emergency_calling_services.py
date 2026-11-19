@@ -1,11 +1,12 @@
 """
-Emergency Calling Services: list and delete (2026-04-16).
+Emergency Calling Services: list and delete.
 Emergency calling services are created via the emergency verification flow,
 not directly.
 
 Usage: DIDWW_API_KEY=xxx python examples/emergency_calling_services.py
 """
 from client_factory import create_client
+from didww.enums import enum_value
 from didww.query_params import QueryParams
 
 client = create_client()
@@ -21,4 +22,5 @@ for svc in services[:10]:
     country_name = country.name if country else "N/A"
     setup_price = svc.meta.get('setup_price')
     monthly_price = svc.meta.get('monthly_price')
-    print(f"  {svc.id}  status={svc.status}  country={country_name}  setup_price={setup_price}  monthly_price={monthly_price}")
+    print(f"  {svc.id}  status={enum_value(svc.status)}  country={country_name}"
+          f"  number_type={enum_value(svc.number_type)}  setup_price={setup_price}  monthly_price={monthly_price}")

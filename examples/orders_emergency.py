@@ -7,7 +7,9 @@ is activated or renewed — customers cannot POST them directly.
 Usage: DIDWW_API_KEY=xxx python examples/orders_emergency.py
 """
 from client_factory import create_client
+from didww.enums import enum_value
 from didww.query_params import QueryParams
+from didww.resources.order_item.emergency_order_item import EmergencyOrderItem
 
 client = create_client()
 
@@ -18,18 +20,14 @@ orders = client.orders().list(params).data
 
 emergency_orders = [
     o for o in orders
-    if o.items and any(
-        (getattr(i, "type", None) or i.get("type", None) if isinstance(i, dict) else None)
-        == "emergency_order_items"
-        for i in o.items
-    )
+    if any(isinstance(i, EmergencyOrderItem) for i in o.items or [])
 ]
 print(f"Found {len(emergency_orders)} emergency orders out of {len(orders)} total")
 
 for o in emergency_orders[:5]:
     print(f"\nOrder: {o.id}")
     print(f"  Reference: {o.reference}")
-    print(f"  Status: {o.status}")
+    print(f"  Status: {enum_value(o.status)}")
     print(f"  Amount: {o.amount}")
     print(f"  Created: {o.created_at}")
 
@@ -41,7 +39,7 @@ if services:
     svc = services[0]
     print(f"ECS {svc.id} ({svc.name})")
     if svc.order:
-        print(f"  -> Order {svc.order.id} — status: {svc.order.status}, amount: {svc.order.amount}")
+        print(f"  -> Order {svc.order.id} — status: {enum_value(svc.order.status)}, amount: {svc.order.amount}")
     else:
         print("  -> No order linked yet")
 else:

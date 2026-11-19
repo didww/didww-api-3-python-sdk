@@ -56,7 +56,7 @@ address_proof_type = None
 for pt in proof_types:
     if pt.entity_type == enum_value(IdentityType.PERSONAL) and identity_proof_type is None:
         identity_proof_type = pt
-    elif pt.entity_type == "Address" and address_proof_type is None:
+    elif pt.entity_type == "address" and address_proof_type is None:
         address_proof_type = pt
     if identity_proof_type and address_proof_type:
         break

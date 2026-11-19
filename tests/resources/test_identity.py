@@ -92,3 +92,23 @@ class TestIdentity:
     def test_delete_identity(self, client):
         result = client.identities().delete("e96ae7d1-11d5-42bc-a5c5-211f3c3788ae")
         assert result is None
+
+    @my_vcr.use_cassette("identities/update_company_website.yaml")
+    def test_update_company_website(self, client):
+        identity = Identity.build("e96ae7d1-11d5-42bc-a5c5-211f3c3788ae")
+        identity.company_website = "https://www.example.org"
+        updated = client.identities().update(identity).data
+        assert updated.company_website == "https://www.example.org"
+
+    def test_clear_company_website_sends_null(self):
+        identity = Identity.build("e96ae7d1-11d5-42bc-a5c5-211f3c3788ae")
+        identity.company_website = None
+        assert identity.to_jsonapi(include_id=True, dirty_only=True)["attributes"] == {"company_website": None}
+
+    def test_create_personal_identity_omits_company_website(self):
+        identity = Identity()
+        identity.identity_type = IdentityType.PERSONAL
+        identity.first_name = "John"
+        identity.company_website = None
+        assert "company_website" not in identity.to_jsonapi()["attributes"]
+

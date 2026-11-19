@@ -3,9 +3,12 @@ from didww.enums import (
     Codec,
     DiversionInjectMode,
     DiversionRelayPolicy,
+    IceMode,
     MediaEncryptionMode,
     NetworkProtocolPriority,
     ReroutingDisconnectCode,
+    RtcpFeedbackMode,
+    RtcpMuxMode,
     RxDtmfFormat,
     SstRefreshMethod,
     StirShakenMode,
@@ -127,7 +130,9 @@ class SipConfiguration(TrunkConfiguration):
     incoming_auth_username = property(lambda self: self._attr("incoming_auth_username"))
     incoming_auth_password = property(lambda self: self._attr("incoming_auth_password"))
 
-    codec_ids                     = _enum_list("codec_ids", Codec)
+    # Codec names in priority order, the first is the highest. Assign a whole
+    # list: a change to the list read is not kept.
+    codecs                        = _enum_list("codecs", Codec)
     rerouting_disconnect_code_ids = _enum_list("rerouting_disconnect_code_ids", ReroutingDisconnectCode)
 
     transport_protocol_id      = _enum("transport_protocol_id", TransportProtocol)
@@ -139,6 +144,9 @@ class SipConfiguration(TrunkConfiguration):
     diversion_relay_policy     = _enum("diversion_relay_policy", DiversionRelayPolicy)
     diversion_inject_mode      = _enum("diversion_inject_mode", DiversionInjectMode)
     network_protocol_priority  = _enum("network_protocol_priority", NetworkProtocolPriority)
+    ice_mode                   = _enum("ice_mode", IceMode)
+    rtcp_mux_mode              = _enum("rtcp_mux_mode", RtcpMuxMode)
+    rtcp_feedback_mode         = _enum("rtcp_feedback_mode", RtcpFeedbackMode)
 
 
 TrunkConfiguration.register("sip_configurations", SipConfiguration)

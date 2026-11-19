@@ -1,11 +1,12 @@
 """
-Emergency Requirements: list and inspect emergency requirements (2026-04-16).
+Emergency Requirements: list and inspect emergency requirements per country and number type.
 Read-only resource. Emergency requirements define what documentation is needed
 for emergency calling services in specific countries/regions.
 
 Usage: DIDWW_API_KEY=xxx python examples/emergency_requirements.py
 """
 from client_factory import create_client
+from didww.enums import enum_value
 from didww.query_params import QueryParams
 
 client = create_client()
@@ -21,4 +22,6 @@ for req in requirements[:10]:
     country_name = country.name if country else "N/A"
     setup_price = req.meta.get('setup_price')
     monthly_price = req.meta.get('monthly_price')
-    print(f"  {req.id}  country={country_name}  setup_price={setup_price}  monthly_price={monthly_price}")
+    number_type = enum_value(req.number_type)
+    print(f"  {req.id}  country={country_name}  number_type={number_type}"
+          f"  setup_price={setup_price}  monthly_price={monthly_price}")

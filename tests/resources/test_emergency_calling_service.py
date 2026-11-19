@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 
 from tests.conftest import my_vcr
-from didww.enums import EmergencyCallingServiceStatus
+from didww.enums import EmergencyCallingServiceStatus, NumberType
 from didww.resources.emergency_calling_service import EmergencyCallingService
 
 
@@ -51,6 +51,8 @@ class TestEmergencyCallingService:
         assert ecs.activated_at == datetime(2026, 4, 1, 0, 0, 0, 0, tzinfo=timezone.utc)
         assert ecs.canceled_at is None
         assert ecs.created_at == datetime(2026, 3, 15, 10, 0, 0, 0, tzinfo=timezone.utc)
+        assert ecs.renew_date == "2026-05-01"
+        assert ecs.number_type == NumberType.LOCAL
 
     @my_vcr.use_cassette("emergency_calling_services/show_with_includes.yaml")
     def test_find_emergency_calling_service_with_includes(self, client):
