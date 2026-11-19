@@ -1,5 +1,6 @@
 """
-Capacity Pools: list with included shared capacity groups and qty-based pricings.
+Capacity Pools: list with included shared capacity groups and qty-based
+pricings, then find one pool by ID.
 Usage: DIDWW_API_KEY=xxx python examples/capacity_pools.py
 """
 from client_factory import create_client
@@ -31,3 +32,11 @@ for pool in pools:
         print(f"    qty-based pricings ({len(pricings)}):")
         for p in pricings:
             print(f"      qty={p.qty} setup={p.setup_price} monthly={p.monthly_price}")
+
+# Find one capacity pool by ID
+if pools:
+    print("\n=== Capacity Pool Details ===")
+    pool = client.capacity_pools().find(pools[0].id).data
+    print(f"{pool.name} ({pool.id})")
+    print(f"  setup price: {pool.setup_price}, monthly price: {pool.monthly_price}, metered rate: {pool.metered_rate}")
+    print(f"  minimum limit: {pool.minimum_limit}, minimum qty per order: {pool.minimum_qty_per_order}")
