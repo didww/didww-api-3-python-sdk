@@ -310,13 +310,25 @@ def no_price_plan(error):
 # --- Fixtures of the address and emergency verification checks ---
 
 def delete_if_allowed(repository, resource_id, what):
-    """Deletes a resource unless the API refuses, e.g. while a verification uses it."""
+    """Deletes a resource. The API keeps one that a verification uses (409 Conflict), and 404
+    means it is gone already; any other error is returned, so that the caller can try the
+    remaining deletions before it raises the error."""
     try:
         repository.delete(resource_id)
     except DidwwApiError as e:
-        print(f"    left {what} {resource_id}: the API does not delete it ({e})")
+        if e.status_code == 409:
+            print(f"    left {what} {resource_id}: the API keeps it ({e})")
+        elif e.status_code == 404:
+            print(f"    {what} {resource_id} is gone already")
+        else:
+            print(f"    could not delete {what} {resource_id}: {e}")
+            return e
+    except DidwwError as e:
+        print(f"    could not delete {what} {resource_id}: {e}")
+        return e
     else:
         print(f"    deleted {what} {resource_id}")
+    return None
 
 
 def refusal(validate):
@@ -333,28 +345,38 @@ def refusal(validate):
 _public_keys = []
 
 
-def upload_sample(name):
-    """Encrypts sample.pdf and uploads it; returns the encrypted file ID."""
+def upload_sample(name, created):
+    """Encrypts sample.pdf and uploads it; returns the encrypted file ID. The file is added to
+    ``created`` until ``attached`` takes it out, so that a file left unused is deleted."""
     if not _public_keys:
         _public_keys.extend(pk.key for pk in client.public_keys().list().data)
     with open(SAMPLE_PDF, "rb") as f:
         encrypted = Encrypt.encrypt_with_keys(f.read(), _public_keys)
-    return client.upload_encrypted_file(
+    file_id = client.upload_encrypted_file(
         Encrypt.calculate_fingerprint(_public_keys), encrypted,
         description=f"{name}.pdf", filename=f"{name}.pdf.enc",
     )
+    created.append((client.encrypted_files(), file_id, "encrypted file"))
+    return file_id
 
 
-def add_proofs(entity, proof_types, qty):
+def attached(created, file_id):
+    """Keeps an encrypted file that a proof or a document now holds out of the cleanup."""
+    created[:] = [entry for entry in created if entry[1] != file_id]
+
+
+def add_proofs(entity, proof_types, qty, created):
     """Attaches ``qty`` proofs of the given types to an identity or address, with sample.pdf."""
     if not qty or not proof_types:
         return
     for proof_type in itertools.islice(itertools.cycle(proof_types), qty):
+        file_id = upload_sample(f"proof-{proof_type.entity_type}", created)
         proof = Proof()
         proof.entity = entity
         proof.proof_type = ProofType.build(proof_type.id)
-        proof.files = [EncryptedFile.build(upload_sample(f"proof-{proof_type.entity_type}"))]
+        proof.files = [EncryptedFile.build(file_id)]
         client.proofs().create(proof)
+        attached(created, file_id)
         print(f"    added a {proof_type.name} proof to {entity.type} {entity.id}")
 
 
@@ -453,17 +475,21 @@ def new_identity_and_address_for(requirement, group, country, created):
     print(f"    created a {enum_value(identity.identity_type)} identity {identity_id}")
 
     if business:
-        add_proofs(Identity.build(identity_id), requirement.business_proof_types, requirement.business_proof_qty)
+        add_proofs(Identity.build(identity_id), requirement.business_proof_types, requirement.business_proof_qty,
+                   created)
         template = requirement.business_permanent_document
     else:
-        add_proofs(Identity.build(identity_id), requirement.personal_proof_types, requirement.personal_proof_qty)
+        add_proofs(Identity.build(identity_id), requirement.personal_proof_types, requirement.personal_proof_qty,
+                   created)
         template = requirement.personal_permanent_document
     if template:
+        file_id = upload_sample("permanent-document", created)
         document = PermanentSupportingDocument()
         document.identity = Identity.build(identity_id)
         document.template = SupportingDocumentTemplate.build(template.id)
-        document.files = [EncryptedFile.build(upload_sample("permanent-document"))]
+        document.files = [EncryptedFile.build(file_id)]
         client.permanent_supporting_documents().create(document)
+        attached(created, file_id)
         print(f"    added the permanent document {template.name}")
 
     address = Address()
@@ -475,7 +501,7 @@ def new_identity_and_address_for(requirement, group, country, created):
     address_id = client.addresses().create(address).data.id
     created.append((client.addresses(), address_id, "address"))
     print(f"    created an address {address_id} in {address.city_name}")
-    add_proofs(Address.build(address_id), requirement.address_proof_types, requirement.address_proof_qty)
+    add_proofs(Address.build(address_id), requirement.address_proof_types, requirement.address_proof_qty, created)
     return identity_id, address_id
 
 
@@ -1470,6 +1496,7 @@ def _():
         print("    the requirement lists a one-time document, which AddressVerification has no relationship for")
 
     created_here = []
+    succeeded = False
     try:
         identity_id, new_address_id = new_identity_and_address_for(
             requirement, group, country_by_iso("UA"), created_here)
@@ -1495,10 +1522,16 @@ def _():
         expect(updated.external_reference_id == f"my-ref-{suffix}",
                f"external_reference_id is {updated.external_reference_id}")
         print(f"    {enum_value(updated.status)} for DID {did.number}")
+        succeeded = True
     finally:
-        # A verification cannot be deleted; the API may keep its address and identity too
-        for repository, resource_id, what in reversed(created_here):
-            delete_if_allowed(repository, resource_id, what)
+        # A verification cannot be deleted; the API may keep its address and identity too.
+        # Every deletion is tried; an unexpected error fails the check unless a step failed
+        # before, whose error is the one reported.
+        errors = [delete_if_allowed(repository, resource_id, what)
+                  for repository, resource_id, what in reversed(created_here)]
+        errors = [e for e in errors if e is not None]
+        if errors and succeeded:
+            raise errors[0]
 
 
 @check("Emergency requirements: list and find")
