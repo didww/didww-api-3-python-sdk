@@ -18,7 +18,6 @@ import time
 from client_factory import create_client
 from didww.enums import enum_value
 from didww.query_params import QueryParams
-from didww.resources.available_did import AvailableDid
 from didww.resources.did import Did
 from didww.resources.identity import Identity
 from didww.resources.address import Address

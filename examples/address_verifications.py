@@ -1,13 +1,10 @@
 """
-Address Verifications: create, list, and update (2026-04-16).
+Address Verifications: list with the address and DIDs included (2026-04-16).
 
 Usage: DIDWW_API_KEY=xxx python examples/address_verifications.py
 """
 from client_factory import create_client
 from didww.query_params import QueryParams
-from didww.resources.address_verification import AddressVerification
-from didww.resources.address import Address
-from didww.resources.did import Did
 
 client = create_client()
 
