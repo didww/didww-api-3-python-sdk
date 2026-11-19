@@ -127,7 +127,7 @@ class TestHeaders:
         make_client(scope=Scope.READ, api_version="2027-01-01", logger=logging.getLogger("my.app")).get("balance")
 
         assert stub.hits("POST", "/token")[0].json() == \
-            {"aud": [API], "api_version": "2027-01-01", "scope": "read"}
+            {"aud": [API], "api_version": "2027-01-01", "scope": "read", "expires_in": 3600}
         assert {r.name for r in caplog.records} == {"my.app"}
         assert len(caplog.records) == 2
 

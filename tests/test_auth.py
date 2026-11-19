@@ -93,7 +93,6 @@ class TestMintRequest:
         assert hit.headers["Content-Type"] == "application/json"
         assert hit.headers["Accept"] == "application/json"
         assert "Authorization" not in hit.headers
-        assert "expires_in" not in hit.json()
 
     def test_body_with_scope(self, stub, make_client):
         stub.on("POST", "/token", token_reply(scope="read"))

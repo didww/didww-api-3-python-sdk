@@ -232,6 +232,8 @@ _DEFAULT_STORE = MemoryTokenStore()
 
 CACHE_KEY_PREFIX = "didww:token:v1:"
 MAX_MINT_ATTEMPTS = 4
+# The longest lifetime the token service grants: the fewer mints, the better.
+_REQUESTED_LIFETIME = 3600
 _BACKOFF_BASE = 0.5
 _BACKOFF_CAP = 8.0
 _MINT_TIMEOUT = 10.0
@@ -500,6 +502,7 @@ class _TokenProvider:
         request = {"aud": [audience], "api_version": self._api_version}
         if self._scope is not None:
             request["scope"] = self._scope
+        request["expires_in"] = _REQUESTED_LIFETIME
         payload = _json.dumps(request)
 
         start = self._monotonic()
