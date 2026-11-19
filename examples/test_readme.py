@@ -383,15 +383,18 @@ def did_needing_address():
     """A Ukrainian DID whose group has an address requirement and that has no address
     verification yet, ordered when the account has none. Returns the DID and its group."""
     ukraine = country_by_iso("UA")
-    params = (QueryParams()
-              .filter("country.id", ukraine.id)
-              .filter("needs_registration", "true")
-              .include("address_requirement", "stock_keeping_units", "city")
-              .page(number=1, size=50))
-    groups = [g for g in client.did_groups().list(params).data
-              if g.address_requirement and g.stock_keeping_units]
+
+    def groups_with_requirement(params):
+        # The address requirement is read only with include=address_requirement
+        params.filter("country.id", ukraine.id).include("address_requirement", "stock_keeping_units", "city")
+        return [g for g in client.did_groups().list(params).data
+                if g.address_requirement and g.stock_keeping_units]
+
+    # The Kiev group has an address requirement; other Ukrainian groups are scanned when it has none
+    groups = groups_with_requirement(QueryParams().filter("area_name", "Kiev"))
+    if not groups:
+        groups = groups_with_requirement(QueryParams().page(number=1, size=100))
     expect(groups, "no Ukrainian DID group with an address requirement")
-    groups.sort(key=lambda g: "odes" not in (g.area_name or "").lower())  # Odessa first
     by_id = {g.id: g for g in groups}
 
     params = (QueryParams()
@@ -461,9 +464,9 @@ def new_identity_and_address_for(requirement, group, country, created):
         print(f"    added the permanent document {template.name}")
 
     address = Address()
-    address.city_name = group.city.name if group.city else (group.area_name or "Odesa")
-    address.postal_code = "65000"
-    address.address = "1 Deribasivska St"
+    address.city_name = group.city.name if group.city else (group.area_name or "Kyiv")
+    address.postal_code = "01001"
+    address.address = "1 Khreshchatyk St"
     address.identity = Identity.build(identity_id)
     address.country = Country.build(country.id)
     address_id = client.addresses().create(address).data.id
