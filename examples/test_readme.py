@@ -275,7 +275,8 @@ def sign(secret, url, payload):
     data = f"{parts.scheme}://{parts.hostname}:{port}{parts.path}{query}"
     for key in sorted(payload):
         data += key + payload[key]
-    return hmac.new(secret.encode("utf-8"), data.encode("utf-8"), hashlib.sha1).hexdigest()
+    # HMAC-SHA1 is the algorithm DIDWW signs callbacks with; a stronger hash would not match
+    return hmac.new(secret.encode("utf-8"), data.encode("utf-8"), hashlib.sha1).hexdigest()  # NOSONAR
 
 
 class ListHandler(logging.Handler):
