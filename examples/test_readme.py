@@ -69,7 +69,6 @@ from didww.exceptions import (
 from didww.prices import PriceFileReader, VoiceOutPriceCategory
 from didww.query_params import QueryParams
 from didww.resources.address import Address
-from didww.resources.address_verification import AddressVerification
 from didww.resources.authentication_method import CredentialsAndIpAuthenticationMethod
 from didww.resources.available_did import AvailableDid
 from didww.resources.capacity_pool import CapacityPool
@@ -77,7 +76,6 @@ from didww.resources.configuration.sip import SipConfiguration
 from didww.resources.country import Country
 from didww.resources.did import Did
 from didww.resources.did_reservation import DidReservation
-from didww.resources.emergency_verification import EmergencyVerification
 from didww.resources.export import Export
 from didww.resources.identity import Identity
 from didww.resources.order import Order
@@ -1053,23 +1051,15 @@ def _():
 
 @check("Address verifications: create and update external_reference_id")
 def _():
-    with ExitStack() as cleanup:
-        address = new_address(cleanup, new_identity(cleanup))
-
-        verification = AddressVerification()
-        verification.address = Address.build(address.id)
-        created = client.address_verifications().create(verification).data
-
-        created.external_reference_id = "my-ref-123"
-        client.address_verifications().update(created)
-        print(f"    verification {created.id}: {enum_value(created.status)}")
+    raise Skip("needs a DID that requires an address and an address with its proofs; "
+               "DIDWW reviews the request and it cannot be deleted")
 
 
 @check("Emergency requirements: list and find")
 def _():
     emergency_reqs = client.emergency_requirements().list().data
     for req in emergency_reqs:
-        print(f"    {req.name}: {req.estimate_setup_time}")
+        print(f"    {req.id}: {req.identity_type}, setup {req.estimate_setup_time}")
     if emergency_reqs:
         req = client.emergency_requirements().find(emergency_reqs[0].id).data
         print(f"    found {req.id}")
@@ -1083,16 +1073,8 @@ def _():
 
 @check("Emergency verifications: create and update external_reference_id")
 def _():
-    with ExitStack() as cleanup:
-        address = new_address(cleanup, new_identity(cleanup))
-
-        verification = EmergencyVerification()
-        verification.address = Address.build(address.id)
-        created = client.emergency_verifications().create(verification).data
-
-        created.external_reference_id = "ext-ref-456"
-        client.emergency_verifications().update(created)
-        print(f"    verification {created.id}: {enum_value(created.status)}")
+    raise Skip("needs a DID with emergency calling and an address that meets its requirement; "
+               "DIDWW reviews the request and it cannot be deleted")
 
 
 @check("Emergency calling services: list and find")
@@ -1115,10 +1097,10 @@ def _():
     dids = client.dids().list(QueryParams().page(number=1, size=1)).data
     if not dids:
         raise Skip("the account has no DID")
-    params = QueryParams().filter("did.id", dids[0].id)
+    params = QueryParams().filter("did_number", dids[0].number)
     history = client.did_history().list(params).data
     for record in history:
-        print(f"    DID: {record.number}, Order Date: {record.order_created_at}")
+        print(f"    {record.created_at} {record.did_number}: {record.action} ({record.method})")
     if history:
         record = client.did_history().find(history[0].id).data
         print(f"    found {record.id}")

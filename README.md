@@ -869,13 +869,15 @@ created = client.shared_capacity_groups().create(scg).data
 ```python
 from didww.resources.address_verification import AddressVerification
 from didww.resources.address import Address
+from didww.resources.did import Did
 
 # List address verifications
 verifications = client.address_verifications().list().data
 
-# Create address verification
+# Create address verification for the DIDs that need the address
 verification = AddressVerification()
 verification.address = Address.build("address-uuid")
+verification.dids = [Did.build("did-uuid")]
 created = client.address_verifications().create(verification).data
 
 # Update external_reference_id
@@ -889,7 +891,7 @@ client.address_verifications().update(created)
 # List emergency requirements
 emergency_reqs = client.emergency_requirements().list().data
 for req in emergency_reqs:
-    print(f"{req.name}: {req.estimate_setup_time}")
+    print(f"{req.id}: {req.identity_type}, setup {req.estimate_setup_time}")
 
 # Find a specific emergency requirement
 req = client.emergency_requirements().find("uuid").data
@@ -900,6 +902,7 @@ req = client.emergency_requirements().find("uuid").data
 ```python
 from didww.resources.emergency_verification import EmergencyVerification
 from didww.resources.address import Address
+from didww.resources.did import Did
 
 # List emergency verifications
 verifications = client.emergency_verifications().list().data
@@ -907,6 +910,7 @@ verifications = client.emergency_verifications().list().data
 # Create emergency verification
 verification = EmergencyVerification()
 verification.address = Address.build("address-uuid")
+verification.dids = [Did.build("did-uuid")]
 created = client.emergency_verifications().create(verification).data
 
 # Update external_reference_id
@@ -934,11 +938,11 @@ client.emergency_calling_services().delete("uuid")
 ```python
 from didww.query_params import QueryParams
 
-# List DID history records
-params = QueryParams().filter("did.id", "did-uuid")
+# List the history of one DID number
+params = QueryParams().filter("did_number", "12125551234")
 history = client.did_history().list(params).data
 for record in history:
-    print(f"DID: {record.number}, Order Date: {record.order_created_at}")
+    print(f"{record.created_at} {record.did_number}: {record.action} ({record.method})")
 
 # Find a specific DID history record
 record = client.did_history().find("uuid").data

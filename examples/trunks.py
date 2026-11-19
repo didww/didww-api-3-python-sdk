@@ -118,7 +118,7 @@ try:
     new_codecs.codecs = [Codec.G729, Codec.PCMA]
     update = VoiceInTrunk.build(sip_trunk.id)
     update.description = "Updated description"
-    update.ringing_timeout = 45
+    update.ringing_timeout = 25
     update.configuration = new_codecs
     updated = client.voice_in_trunks().update(update).data
     print(f"Description: {updated.description}")
