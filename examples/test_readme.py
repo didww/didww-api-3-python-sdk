@@ -841,8 +841,13 @@ def _():
         # List by configuration type, with the group
         params = QueryParams().filter("configuration.type", "http_in,sms_to_email").include("sms_trunk_group")
         trunks = client.sms_trunks().list(params).data
-        expect(any(t.id == created.id for t in trunks), "the new trunk is listed")
-        print(f"    {len(trunks)} http_in or sms_to_email trunk(s)")
+        expect(all(t.configuration is not None and t.configuration.type in ("http_in", "sms_to_email")
+                   for t in trunks),
+               "the list holds other configuration types")
+        print(f"    {len(trunks)} http_in or sms_to_email trunk(s) on the first page")
+        # A list call returns one page: narrow it by name to find the new trunk on any account
+        params = QueryParams().filter("configuration.type", "http_in,sms_to_email").filter("name", created.name)
+        expect(any(t.id == created.id for t in client.sms_trunks().list(params).data), "the new trunk is listed")
 
 
 @check("SMS trunks: a configuration is a copy, sent once assigned back")
@@ -1015,7 +1020,12 @@ def _():
 
         # The reservations that expire first
         reservations = client.did_reservations().list(QueryParams().sort("expires_at")).data
-        expect(any(r.id == created.id for r in reservations), "the reservation is listed")
+        expiries = [r.expires_at for r in reservations if r.expires_at is not None]
+        expect(expiries == sorted(expiries), "the reservations are not sorted by expiry")
+        # A list call returns one page, where a new reservation can be missing: read it by ID
+        expect(client.did_reservations().find(created.id).data.id == created.id, "the reservation is found")
+        print(f"    {len(reservations)} reservation(s) on the first page, the first expires at"
+              f" {expiries[0] if expiries else None}")
     finally:
         # Delete reservation
         delete(client.did_reservations(), created.id, "DID reservation")
