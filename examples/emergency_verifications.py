@@ -1,14 +1,10 @@
 """
-Emergency Verifications: create, list, and update (2026-04-16).
+Emergency Verifications: list with the address and DIDs included (2026-04-16).
 
 Usage: DIDWW_API_KEY=xxx python examples/emergency_verifications.py
 """
 from client_factory import create_client
 from didww.query_params import QueryParams
-from didww.resources.emergency_verification import EmergencyVerification
-from didww.resources.address import Address
-from didww.resources.emergency_calling_service import EmergencyCallingService
-from didww.resources.did import Did
 
 client = create_client()
 

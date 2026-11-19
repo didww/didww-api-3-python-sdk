@@ -18,7 +18,6 @@ import time
 from client_factory import create_client
 from didww.enums import enum_value
 from didww.query_params import QueryParams
-from didww.resources.available_did import AvailableDid
 from didww.resources.did import Did
 from didww.resources.identity import Identity
 from didww.resources.address import Address
@@ -71,8 +70,8 @@ response = client.orders().create(order)
 created_order = response.data
 print(f"  Order: {created_order.id} — {enum_value(created_order.status)}")
 
-# Wait for order to complete
-for _ in range(10):
+# Wait up to two minutes for the order to complete
+for _ in range(24):
     if created_order.status == "completed":
         break
     time.sleep(5)
