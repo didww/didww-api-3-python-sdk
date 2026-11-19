@@ -5,8 +5,17 @@ that belong together. A check that fails is reported with its error and the
 run goes on. Each check deletes what it creates and puts back what it changes
 (a DID's description, capacity limit and voice and SMS routing, the SMS trunk
 of a Sender ID verification), also when it fails. Orders and exports cannot be
-deleted: the order check buys DIDs. A snippet that cannot run in the sandbox
-is reported as skipped with the reason.
+deleted: the order checks buy DIDs. Neither can address and emergency
+verifications: their checks print a line starting with "REVIEW" with the ID
+and reference of each, for DIDWW staff to approve or reject it. The emergency
+calling service check cancels a service of the account. Only the production
+client snippets send nothing: those clients are built and not used.
+
+Some snippets need more than the API key; without it their check is skipped:
+  DIDWW_README_REDIS_URL   a Redis server URL, e.g. redis://localhost:6379/0, and
+                           the redis package (pip install redis)
+  DIDWW_README_PROXY_URL   an HTTP(S) forward proxy URL, e.g. http://localhost:3128
+  DIDWW_README_CA_BUNDLE   a CA bundle file, e.g. /etc/ssl/certs/ca-certificates.crt
 
 The shell snippets (installation, development, release) are not run.
 
@@ -24,6 +33,7 @@ import math
 import os
 import sys
 import tempfile
+import time
 import uuid
 from contextlib import ExitStack
 from datetime import datetime, timedelta, timezone
@@ -43,12 +53,14 @@ from didww.enums import (
     CliFormat,
     Codec,
     DefaultDstAction,
+    EmergencyCallingServiceStatus,
     ExportServiceType,
     ExportType,
     IceMode,
     IdentityType,
     NumberType,
     OnCliMismatchAction,
+    OrderStatus,
     Pop,
     SmsBodyType,
     SmsHttpMethod,
@@ -69,6 +81,9 @@ from didww.exceptions import (
 from didww.prices import PriceFileReader, VoiceOutPriceCategory
 from didww.query_params import QueryParams
 from didww.resources.address import Address
+from didww.resources.address_requirement import AddressRequirement
+from didww.resources.address_requirement_validation import AddressRequirementValidation
+from didww.resources.address_verification import AddressVerification
 from didww.resources.authentication_method import CredentialsAndIpAuthenticationMethod
 from didww.resources.available_did import AvailableDid
 from didww.resources.capacity_pool import CapacityPool
@@ -76,6 +91,10 @@ from didww.resources.configuration.sip import SipConfiguration
 from didww.resources.country import Country
 from didww.resources.did import Did
 from didww.resources.did_reservation import DidReservation
+from didww.resources.emergency_requirement import EmergencyRequirement
+from didww.resources.emergency_requirement_validation import EmergencyRequirementValidation
+from didww.resources.emergency_verification import EmergencyVerification
+from didww.resources.encrypted_file import EncryptedFile
 from didww.resources.export import Export
 from didww.resources.identity import Identity
 from didww.resources.order import Order
@@ -83,6 +102,9 @@ from didww.resources.order_item.available_did_order_item import AvailableDidOrde
 from didww.resources.order_item.capacity_order_item import CapacityOrderItem
 from didww.resources.order_item.did_order_item import DidOrderItem
 from didww.resources.order_item.reservation_did_order_item import ReservationDidOrderItem
+from didww.resources.permanent_supporting_document import PermanentSupportingDocument
+from didww.resources.proof import Proof
+from didww.resources.proof_type import ProofType
 from didww.resources.sender_id_verification import SenderIdVerification
 from didww.resources.shared_capacity_group import SharedCapacityGroup
 from didww.resources.sms_trunk import SmsTrunk
@@ -93,6 +115,7 @@ from didww.resources.sms_trunk_configuration import (
 )
 from didww.resources.sms_trunk_group import SmsTrunkGroup
 from didww.resources.sms_trunk_regenerate_credential import SmsTrunkRegenerateCredential
+from didww.resources.supporting_document_template import SupportingDocumentTemplate
 from didww.resources.voice_in_trunk import VoiceInTrunk
 from didww.resources.voice_in_trunk_group import VoiceInTrunkGroup
 from didww.resources.voice_out_trunk import VoiceOutTrunk
@@ -191,13 +214,27 @@ def new_http_out_trunk(cleanup, name):
     return created
 
 
-_us = []
+_countries = {}
+
+
+def country_by_iso(iso):
+    if iso not in _countries:
+        found = client.countries().list(QueryParams().filter("iso", iso)).data
+        expect(found, f"no country {iso}")
+        _countries[iso] = found[0]
+    return _countries[iso]
 
 
 def us_country():
-    if not _us:
-        _us.extend(client.countries().list(QueryParams().filter("iso", "US")).data)
-    return _us[0]
+    return country_by_iso("US")
+
+
+def env_or_skip(name, what):
+    """The value of an environment variable a snippet needs; skips the check when it is not set."""
+    value = os.environ.get(name)
+    if not value:
+        raise Skip(f"set {name} to {what}")
+    return value
 
 
 def new_identity(cleanup, identity_type=IdentityType.PERSONAL):
@@ -267,6 +304,260 @@ def no_price_plan(error):
     return isinstance(error, DidwwPricesError) and error.kind == PricesErrorKind.PRICE_PLAN_NOT_ASSIGNED
 
 
+# --- Fixtures of the address and emergency verification checks ---
+
+def delete_if_allowed(repository, resource_id, what):
+    """Deletes a resource unless the API refuses, e.g. while a verification uses it."""
+    try:
+        repository.delete(resource_id)
+    except DidwwApiError as e:
+        print(f"    left {what} {resource_id}: the API does not delete it ({e})")
+    else:
+        print(f"    deleted {what} {resource_id}")
+
+
+def refusal(validate):
+    """Runs a validation call: None when it passes, else the reasons of the API."""
+    try:
+        validate()
+    except DidwwApiError as e:
+        if e.status_code != 422:
+            raise
+        return str(e)
+    return None
+
+
+_public_keys = []
+
+
+def upload_sample(name):
+    """Encrypts sample.pdf and uploads it; returns the encrypted file ID."""
+    if not _public_keys:
+        _public_keys.extend(pk.key for pk in client.public_keys().list().data)
+    with open(SAMPLE_PDF, "rb") as f:
+        encrypted = Encrypt.encrypt_with_keys(f.read(), _public_keys)
+    return client.upload_encrypted_file(
+        Encrypt.calculate_fingerprint(_public_keys), encrypted,
+        description=f"{name}.pdf", filename=f"{name}.pdf.enc",
+    )
+
+
+def add_proofs(entity, proof_types, qty):
+    """Attaches ``qty`` proofs of the given types to an identity or address, with sample.pdf."""
+    if not qty or not proof_types:
+        return
+    for proof_type in itertools.islice(itertools.cycle(proof_types), qty):
+        proof = Proof()
+        proof.entity = entity
+        proof.proof_type = ProofType.build(proof_type.id)
+        proof.files = [EncryptedFile.build(upload_sample(f"proof-{proof_type.entity_type}"))]
+        client.proofs().create(proof)
+        print(f"    added a {proof_type.name} proof to {entity.type} {entity.id}")
+
+
+def wait_for_did(order):
+    """Waits up to a minute for an order to complete and returns its first DID."""
+    for _ in range(12):
+        if order.status != OrderStatus.PENDING:
+            break
+        time.sleep(5)
+        order = client.orders().find(order.id).data
+    expect(order.status == OrderStatus.COMPLETED, f"order {order.reference} is {enum_value(order.status)}")
+    dids = client.dids().list(QueryParams().filter("order.id", order.id)).data
+    expect(dids, f"order {order.reference} has no DID")
+    return dids[0]
+
+
+def order_available_did(available_did, sku_id):
+    item = AvailableDidOrderItem()
+    item.available_did_id = available_did.id
+    item.sku_id = sku_id
+    order = Order()
+    order.items = [item]
+    created = client.orders().create(order).data
+    print(f"    ordered {available_did.number} (order {created.reference})")
+    return wait_for_did(created)
+
+
+def did_needing_address():
+    """A Ukrainian DID whose group has an address requirement and that has no address
+    verification yet, ordered when the account has none. Returns the DID and its group."""
+    ukraine = country_by_iso("UA")
+    params = (QueryParams()
+              .filter("country.id", ukraine.id)
+              .filter("needs_registration", "true")
+              .include("address_requirement", "stock_keeping_units", "city")
+              .page(number=1, size=50))
+    groups = [g for g in client.did_groups().list(params).data
+              if g.address_requirement and g.stock_keeping_units]
+    expect(groups, "no Ukrainian DID group with an address requirement")
+    groups.sort(key=lambda g: "odes" not in (g.area_name or "").lower())  # Odessa first
+    by_id = {g.id: g for g in groups}
+
+    params = (QueryParams()
+              .filter("country.id", ukraine.id)
+              .filter("terminated", "false")
+              .include("did_group", "address_verification")
+              .page(number=1, size=100))
+    for did in client.dids().list(params).data:
+        if did.did_group and did.did_group.id in by_id and did.address_verification is None:
+            print(f"    reusing DID {did.number}")
+            return did, by_id[did.did_group.id]
+
+    for group in groups:
+        params = QueryParams().filter("did_group.id", group.id).page(number=1, size=1)
+        available = client.available_dids().list(params).data
+        if available:
+            return order_available_did(available[0], group.stock_keeping_units[0].id), group
+    raise AssertionError("no available DID in a Ukrainian DID group with an address requirement")
+
+
+IDENTITY_FIELD_VALUES = {
+    "birth_date": "1980-01-01",
+    "id_number": "AB123456",
+    "personal_tax_id": "1234567890",
+    "contact_email": "john.doe@example.com",
+    "company_reg_number": "12345678",
+}
+
+
+def new_identity_and_address_for(requirement, group, country, created):
+    """Creates an identity and an address with the fields, proofs and documents that
+    ``requirement`` asks for and returns their IDs. Each is added to ``created`` as soon
+    as it exists, so that the caller can delete it also when a later step fails."""
+    business = requirement.identity_type == IdentityType.BUSINESS
+    identity = Identity()
+    identity.identity_type = IdentityType.BUSINESS if business else IdentityType.PERSONAL
+    identity.first_name = "John"
+    identity.last_name = "Doe"
+    identity.phone_number = "380441234567"
+    identity.country = Country.build(country.id)
+    if business:
+        identity.company_name = f"Example LLC {suffix}"
+    else:
+        identity.birth_country = Country.build(country.id)
+    fields = requirement.business_mandatory_fields if business else requirement.personal_mandatory_fields
+    for field in fields:
+        if field == "tax_id":
+            identity.vat_id = "UA1234567890"  # tax_id is the VAT number, Identity.vat_id
+        elif field in IDENTITY_FIELD_VALUES:
+            setattr(identity, field, IDENTITY_FIELD_VALUES[field])
+    identity_id = client.identities().create(identity).data.id
+    created.append((client.identities(), identity_id, "identity"))
+    print(f"    created a {enum_value(identity.identity_type)} identity {identity_id}")
+
+    if business:
+        add_proofs(Identity.build(identity_id), requirement.business_proof_types, requirement.business_proof_qty)
+        template = requirement.business_permanent_document
+    else:
+        add_proofs(Identity.build(identity_id), requirement.personal_proof_types, requirement.personal_proof_qty)
+        template = requirement.personal_permanent_document
+    if template:
+        document = PermanentSupportingDocument()
+        document.identity = Identity.build(identity_id)
+        document.template = SupportingDocumentTemplate.build(template.id)
+        document.files = [EncryptedFile.build(upload_sample("permanent-document"))]
+        client.permanent_supporting_documents().create(document)
+        print(f"    added the permanent document {template.name}")
+
+    address = Address()
+    address.city_name = group.city.name if group.city else (group.area_name or "Odesa")
+    address.postal_code = "65000"
+    address.address = "1 Deribasivska St"
+    address.identity = Identity.build(identity_id)
+    address.country = Country.build(country.id)
+    address_id = client.addresses().create(address).data.id
+    created.append((client.addresses(), address_id, "address"))
+    print(f"    created an address {address_id} in {address.city_name}")
+    add_proofs(Address.build(address_id), requirement.address_proof_types, requirement.address_proof_qty)
+    return identity_id, address_id
+
+
+def address_requirement_refusal(requirement_id, identity_id, address_id):
+    validation = AddressRequirementValidation()
+    validation.address_requirement = AddressRequirement.build(requirement_id)
+    validation.identity = Identity.build(identity_id)
+    validation.address = Address.build(address_id)
+    return refusal(lambda: client.address_requirement_validations().create(validation))
+
+
+def emergency_requirement_refusal(requirement_id, identity_id, address_id):
+    validation = EmergencyRequirementValidation()
+    validation.emergency_requirement = EmergencyRequirement.build(requirement_id)
+    validation.identity = Identity.build(identity_id)
+    validation.address = Address.build(address_id)
+    return refusal(lambda: client.emergency_requirement_validations().create(validation))
+
+
+def emergency_requirement_for(country_id, number_type):
+    params = QueryParams().filter("country.id", country_id)
+    if number_type is not None:
+        params.filter("number_type", enum_value(number_type))
+    requirements = client.emergency_requirements().list(params).data
+    return requirements[0] if requirements else None
+
+
+def accepted_address(country_id, requirement_id, validate):
+    """An address of the account in the country, with its identity, that the requirement accepts."""
+    params = QueryParams().filter("country.id", country_id).include("identity").page(number=1, size=25)
+    for address in client.addresses().list(params).data:
+        if address.identity and validate(requirement_id, address.identity.id, address.id) is None:
+            return address
+    return None
+
+
+def emergency_did_and_address():
+    """A DID with the emergency feature and no emergency service or verification yet, and an
+    address of the account in its country that its emergency requirement accepts, the way
+    examples/emergency_scenario.py finds them; orders such a DID when the account has none."""
+    params = (QueryParams()
+              .filter("did_group.features", "emergency")
+              .filter("emergency_enabled", "false")
+              .filter("terminated", "false")
+              .include("did_group", "did_group.country", "emergency_calling_service", "emergency_verification")
+              .sort("-created_at")
+              .page(number=1, size=10))
+    accepted = {}  # requirement ID -> an address it accepts, or None
+    for did in client.dids().list(params).data:
+        group = did.did_group
+        if did.emergency_calling_service or did.emergency_verification or not group or not group.country:
+            continue
+        requirement = emergency_requirement_for(group.country.id, group.number_type)
+        if requirement is None:
+            continue
+        if requirement.id not in accepted:
+            accepted[requirement.id] = accepted_address(
+                group.country.id, requirement.id, emergency_requirement_refusal)
+        address = accepted[requirement.id]
+        if address is not None:
+            print(f"    reusing DID {did.number}")
+            return did, address
+
+    addresses = client.addresses().list(QueryParams().include("country", "identity").page(number=1, size=25)).data
+    for address in addresses:
+        if not address.country or not address.identity:
+            continue
+        available_params = (QueryParams()
+                            .filter("did_group.features", "emergency")
+                            .filter("country.id", address.country.id)
+                            .include("did_group.stock_keeping_units")
+                            .page(number=1, size=1))
+        available = client.available_dids().list(available_params).data
+        if not available or not available[0].did_group or not available[0].did_group.stock_keeping_units:
+            continue
+        group = available[0].did_group
+        requirement = emergency_requirement_for(address.country.id, group.number_type)
+        if requirement is None or emergency_requirement_refusal(requirement.id, address.identity.id, address.id):
+            continue
+        return order_available_did(available[0], group.stock_keeping_units[0].id), address
+    raise AssertionError("no address of the account meets the emergency requirement of a DID it can order;"
+                         " add one, e.g. in Ukraine, as examples/emergency_scenario.py expects")
+
+
+# Emergency calling services of the verification created in this run, kept for its review
+_reviewed_services = set()
+
+
 def sign(secret, url, payload):
     """Signs a callback the way DIDWW does (see examples/webhook.py)."""
     parts = urlsplit(url)
@@ -322,18 +613,33 @@ def _():
     print(f"    read-only sandbox client, balance: {sandbox.balance().find().data.total_balance}")
 
 
-@check("HTTP session: a requests.Session of your own")
+@check("HTTP session: a proxy and a CA bundle")
 def _():
-    # The README's proxy and CA bundle are placeholders: that client is built only
+    proxy_url = env_or_skip("DIDWW_README_PROXY_URL", "an HTTP(S) forward proxy URL")
+    ca_bundle = env_or_skip("DIDWW_README_CA_BUNDLE", "a CA bundle file")
+
     session = requests.Session()
-    session.proxies = {"https": "http://proxy.example.com:8080"}
-    session.verify = "/etc/ssl/certs/my-ca-bundle.pem"
-    DidwwClient(api_key="YOUR_API_KEY", environment=Environment.PRODUCTION, session=session)
-    # A session without them carries the sandbox calls
-    own = requests.Session()
-    own.verify = True
-    with create_client(session=own) as session_client:
-        print(f"    balance through the session: {session_client.balance().find().data.total_balance}")
+    session.proxies = {
+        "https": proxy_url,
+    }
+    session.verify = ca_bundle
+
+    # The sandbox in place of the README's production; a token store of its own makes
+    # the token service be called through the proxy too
+    with create_client(session=session, token_store=MemoryTokenStore()) as proxied:
+        print(f"    balance through the proxy: {proxied.balance().find().data.total_balance}")
+
+    # The proxy is used: through one that does not answer, the call fails
+    dead = requests.Session()
+    dead.proxies = {"https": "http://127.0.0.1:9"}
+    dead.verify = ca_bundle
+    with create_client(session=dead, token_store=MemoryTokenStore()) as unreachable:
+        try:
+            unreachable.balance().find()
+        except (DidwwAuthError, DidwwClientError) as e:
+            print(f"    through a proxy that does not answer: {type(e).__name__}")
+        else:
+            raise AssertionError("a call through a proxy that does not answer succeeded")
 
 
 # ─── Authentication ────────────────────────────────────────
@@ -385,9 +691,14 @@ def _():
     print(f"    stored {token!r}")
 
 
-@check("Token cache: RedisTokenStore (with an in-memory stand-in for redis.Redis)")
+@check("Token cache: RedisTokenStore shared by two clients")
 def _():
-    # The README's class as written; redis-py and a Redis server are not needed here.
+    redis_url = env_or_skip("DIDWW_README_REDIS_URL", "a Redis server URL")
+    try:
+        import redis
+    except ImportError:
+        raise Skip("install the redis package (pip install redis)") from None
+
     class RedisTokenStore(TokenStore):
         def __init__(self, redis_client):
             self._redis = redis_client
@@ -405,32 +716,66 @@ def _():
         def delete(self, key):
             self._redis.delete(key)
 
-    class FakeRedis:
-        """The three calls of redis.Redis the store makes, kept in a dict."""
+    class RunKeys:
+        """Puts the keys of this run under a prefix, apart from other tokens in the database."""
 
-        def __init__(self):
-            self.values = {}
-            self.expiries = {}
+        def __init__(self, redis_client, prefix):
+            self._redis = redis_client
+            self._prefix = prefix
 
         def get(self, key):
-            return self.values.get(key)
+            return self._redis.get(self._prefix + key)
 
         def set(self, key, value, ex=None):
-            self.values[key] = value.encode("utf-8")
-            self.expiries[key] = ex
+            return self._redis.set(self._prefix + key, value, ex=ex)
 
         def delete(self, key):
-            self.values.pop(key, None)
+            return self._redis.delete(self._prefix + key)
 
-    redis = FakeRedis()
-    store = RedisTokenStore(redis)
-    redis_client = create_client(token_store=store)
-    redis_client.balance().find()
-    redis_client.balance().find()  # the second call reads the token back from the store
-    expect(len(redis.values) == 1, f"{len(redis.values)} tokens stored")
-    expiry = next(iter(redis.expiries.values()))
-    expect(expiry is not None and expiry > 0, f"expiry is {expiry}")
-    print(f"    one token stored for {expiry} s")
+    prefix = f"didww-test-readme:{suffix}:"
+    connections = []
+
+    def connect():
+        connection = redis.Redis.from_url(redis_url, socket_connect_timeout=5, socket_timeout=5)
+        connections.append(connection)
+        return connection
+
+    def mints(store):
+        """Calls the API with a new client over ``store``; returns how many tokens it minted."""
+        logger = logging.getLogger(f"test_readme.redis.{uuid.uuid4().hex[:8]}")
+        captured = ListHandler()
+        logger.addHandler(captured)
+        logger.setLevel(logging.DEBUG)
+        logger.propagate = False
+        try:
+            with create_client(token_store=store, logger=logger) as store_client:
+                store_client.balance().find()
+        finally:
+            logger.removeHandler(captured)
+        return sum(m.startswith("DIDWW token minted") for m in captured.messages)
+
+    database = connect()
+    try:
+        # The first client mints a token and stores it in Redis
+        minted = mints(RedisTokenStore(RunKeys(connect(), prefix)))
+        expect(minted == 1, f"the first client minted {minted} tokens")
+        keys = list(database.scan_iter(match=prefix + "*"))
+        expect(len(keys) == 1, f"{len(keys)} tokens in Redis")
+        stored = AccessToken.from_dict(json.loads(database.get(keys[0])))
+        ttl = database.ttl(keys[0])
+        expect(ttl > 0, f"the token in Redis has a TTL of {ttl}")
+
+        # A second client, with a store and a connection of its own, reads it back
+        minted = mints(RedisTokenStore(RunKeys(connect(), prefix)))
+        expect(minted == 0, f"the second client minted {minted} tokens")
+        again = AccessToken.from_dict(json.loads(database.get(keys[0])))
+        expect(again.access_token == stored.access_token, "the token in Redis changed")
+        print(f"    one token in Redis for {ttl} s, reused by a second client")
+    finally:
+        for key in database.scan_iter(match=prefix + "*"):
+            database.delete(key)
+        for connection in connections:
+            connection.close()
 
 
 @check("Logging: the didww logger at DEBUG")
@@ -1062,8 +1407,46 @@ def _():
 
 @check("Address verifications: create and update external_reference_id")
 def _():
-    raise Skip("needs a DID that requires an address and an address with its proofs; "
-               "DIDWW reviews the request and it cannot be deleted")
+    did, group = did_needing_address()
+    params = QueryParams().include(
+        "personal_proof_types", "business_proof_types", "address_proof_types",
+        "personal_permanent_document", "business_permanent_document",
+        "personal_onetime_document", "business_onetime_document",
+    )
+    requirement = client.address_requirements().find(group.address_requirement.id, params).data
+    if requirement.personal_onetime_document or requirement.business_onetime_document:
+        print("    the requirement lists a one-time document, which AddressVerification has no relationship for")
+
+    created_here = []
+    try:
+        identity_id, new_address_id = new_identity_and_address_for(
+            requirement, group, country_by_iso("UA"), created_here)
+        address_id = new_address_id
+        refused = address_requirement_refusal(requirement.id, identity_id, new_address_id)
+        if refused:
+            print(f"    the requirement refuses the new identity and address: {refused}")
+            accepted = accepted_address(country_by_iso("UA").id, requirement.id, address_requirement_refusal)
+            expect(accepted is not None, f"no identity and address meet the requirement: {refused}")
+            address_id = accepted.id
+            print(f"    using the account's address {address_id} instead")
+
+        # Create address verification for the DIDs that need the address
+        verification = AddressVerification()
+        verification.address = Address.build(address_id)
+        verification.dids = [Did.build(did.id)]
+        created = client.address_verifications().create(verification).data
+        print(f"REVIEW address_verification {created.id} {created.reference}")
+
+        # Update external_reference_id
+        created.external_reference_id = f"my-ref-{suffix}"
+        updated = client.address_verifications().update(created).data
+        expect(updated.external_reference_id == f"my-ref-{suffix}",
+               f"external_reference_id is {updated.external_reference_id}")
+        print(f"    {enum_value(updated.status)} for DID {did.number}")
+    finally:
+        # A verification cannot be deleted; the API may keep its address and identity too
+        for repository, resource_id, what in reversed(created_here):
+            delete_if_allowed(repository, resource_id, what)
 
 
 @check("Emergency requirements: list and find")
@@ -1084,8 +1467,27 @@ def _():
 
 @check("Emergency verifications: create and update external_reference_id")
 def _():
-    raise Skip("needs a DID with emergency calling and an address that meets its requirement; "
-               "DIDWW reviews the request and it cannot be deleted")
+    did, address = emergency_did_and_address()
+
+    # Create emergency verification
+    verification = EmergencyVerification()
+    verification.address = Address.build(address.id)
+    verification.dids = [Did.build(did.id)]
+    created = client.emergency_verifications().create(verification).data
+    print(f"REVIEW emergency_verification {created.id} {created.reference}")
+
+    # Update external_reference_id
+    created.external_reference_id = f"ext-ref-{suffix}"
+    updated = client.emergency_verifications().update(created).data
+    expect(updated.external_reference_id == f"ext-ref-{suffix}",
+           f"external_reference_id is {updated.external_reference_id}")
+    print(f"    {enum_value(updated.status)} for DID {did.number}, address {address.id}")
+
+    fetched = client.emergency_verifications().find(
+        created.id, QueryParams().include("emergency_calling_service")
+    ).data
+    if fetched.emergency_calling_service:
+        _reviewed_services.add(fetched.emergency_calling_service.id)
 
 
 @check("Emergency calling services: list and find")
@@ -1100,7 +1502,30 @@ def _():
 
 @check("Emergency calling services: delete")
 def _():
-    raise Skip("deleting cancels an emergency calling service of the account, which cannot be undone")
+    # Deleting cancels the service. One of another verification than the one just
+    # created for review is taken first.
+    services = []
+    for status in EmergencyCallingServiceStatus:
+        if status != EmergencyCallingServiceStatus.CANCELED:
+            params = QueryParams().filter("status", status.value).page(number=1, size=10)
+            services.extend(client.emergency_calling_services().list(params).data)
+    if not services:
+        raise Skip("the account has no emergency calling service that is not canceled;"
+                   " examples/emergency_scenario.py creates one")
+    services.sort(key=lambda s: s.id in _reviewed_services)
+    service = services[0]
+
+    # Delete an emergency calling service
+    client.emergency_calling_services().delete(service.id)
+
+    try:
+        status = client.emergency_calling_services().find(service.id).data.status
+    except DidwwApiError as e:
+        expect(e.status_code == 404, f"reading the service back failed: {e}")
+        print(f"    deleted {service.name} ({service.id}), it is gone")
+    else:
+        expect(status == EmergencyCallingServiceStatus.CANCELED, f"the service is {enum_value(status)}")
+        print(f"    canceled {service.name} ({service.id}), it was {enum_value(service.status)}")
 
 
 @check("DID history: list for a DID and find")

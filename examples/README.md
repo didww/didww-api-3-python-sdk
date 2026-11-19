@@ -12,6 +12,7 @@ All examples read the API key from the `DIDWW_API_KEY` environment variable and 
 - `DIDWW_API_KEY` (required): your DIDWW API key
 - `FILE_PATH` (optional for `upload_file.py`): file to encrypt and upload. Defaults to `sample.pdf`
 - `XDG_CACHE_HOME` (optional for `prices_download.py`, Linux and other Unix systems): user cache directory, `~/.cache` if not set
+- `DIDWW_README_REDIS_URL`, `DIDWW_README_PROXY_URL`, `DIDWW_README_CA_BUNDLE` (optional for `test_readme.py`): a Redis server URL (with the `redis` package installed), an HTTP(S) forward proxy URL and a CA bundle file for the token cache and proxy snippets; without them those checks are skipped
 
 ## Install
 
@@ -81,7 +82,7 @@ DIDWW_API_KEY=your_api_key python examples/prices_lookup.py 18005550123
 | 38 | [`prices_download.py`](prices_download.py) | Downloads the Voice IN price file, fetches it again with If-Modified-Since (304), reads the first rows. Directory: `didww-prices` in the user cache directory, created for the current user only. |
 | 39 | [`includes.py`](includes.py) | Reads regions with their country, DID groups with SKUs, available DIDs with a nested include and DIDs with their trunk; shows that a relationship not included reads as `None`. |
 | 40 | [`webhook.py`](webhook.py) | Signs a sample callback the way DIDWW does and checks it with `RequestValidator`: `valid: true`, and `valid: false` for a tampered payload. |
-| 41 | [`test_readme.py`](test_readme.py) | Runs the code snippets of the SDK's README against the sandbox, one check per snippet, and cleans up; prints `Results: N passed, M failed` and exits with 1 when a check failed. |
+| 41 | [`test_readme.py`](test_readme.py) | Runs the code snippets of the SDK's README against the sandbox, one check per snippet, and cleans up; prints `Results: N passed, M failed` and exits with 1 when a check failed. Address and emergency verifications it creates are printed on `REVIEW` lines; it cancels an emergency calling service. |
 
 `sender_id_verifications.py`, `did_sms_routing.py`, `did_trunk_assignment.py` and `test_readme.py` change existing account state and restore it at the end; `trunks.py`, `shared_capacity_groups.py`, `voice_in_trunk_groups.py`, `sms_trunks.py`, `sms_trunk_groups.py` and `test_readme.py` delete what they create. Both happen also when a step fails. Orders and exports cannot be deleted.
 
