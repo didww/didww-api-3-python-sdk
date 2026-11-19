@@ -9,31 +9,37 @@ variant in one order.
 
 Usage: DIDWW_API_KEY=xxx python examples/orders_sku.py
 """
+from collections import Counter
+
 from client_factory import create_client
 from didww.enums import enum_value
 from didww.query_params import QueryParams
 from didww.resources.order import Order
 from didww.resources.order_item.did_order_item import DidOrderItem
 
+QTY = 2
+
 client = create_client()
 
-# Find a DID group with its SKUs
+# Find a DID group with at least QTY numbers in stock, from the available DIDs
 print("=== Finding SKU ===")
-params = QueryParams().include("stock_keeping_units").page(number=1, size=10)
-did_groups = client.did_groups().list(params).data
-group = next((g for g in did_groups if g.stock_keeping_units), None)
+params = QueryParams().include("did_group.stock_keeping_units").page(number=1, size=50)
+groups = [a.did_group for a in client.available_dids().list(params).data
+          if a.did_group and a.did_group.stock_keeping_units]
+in_stock = Counter(g.id for g in groups)
+group = next((g for g in groups if in_stock[g.id] >= QTY), None)
 if group is None:
-    raise SystemExit("No DID group with stock keeping units found")
+    raise SystemExit(f"No DID group with {QTY} available DIDs found")
 
 sku = group.stock_keeping_units[0]
 print(f"DID group: {group.id} ({group.area_name}, prefix {group.prefix})")
 print(f"SKU: {sku.id} (monthly {sku.monthly_price}, {sku.channels_included_count} channels included)")
 
-# Order two DIDs of that SKU
+# Order QTY DIDs of that SKU
 print("\n=== Creating Order by SKU ===")
 item = DidOrderItem()
 item.sku_id = sku.id
-item.qty = 2
+item.qty = QTY
 
 order = Order()
 order.items = [item]

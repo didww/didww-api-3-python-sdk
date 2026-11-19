@@ -35,10 +35,10 @@ def first_sku(available_did):
 
 # --- Find two available DIDs with their DID group and SKUs ---
 print("=== Finding Available DIDs ===")
-params = QueryParams().include("did_group.stock_keeping_units")
+params = QueryParams().include("did_group.stock_keeping_units").page(number=1, size=50)
 available_dids = client.available_dids().list(params).data
-if len(available_dids) < 2:
-    raise SystemExit("Need at least 2 available DIDs for this example")
+if len(available_dids) < 3:
+    raise SystemExit("Need at least 3 available DIDs for this example")
 
 ad1 = available_dids[0]
 ad2 = available_dids[1]
@@ -48,12 +48,15 @@ print(f"Available DID 1: {ad1.number} sku={sku1.id} - for AvailableDidOrderItem"
 print(f"Available DID 2: {ad2.number} sku={sku2.id} - for ReservationDidOrderItem")
 
 # --- Find a SKU for the order by quantity ---
+# From the DID group of another available DID, so that the group has numbers in stock;
+# a group other than those of DIDs 1 and 2 keeps DIDWW from picking one of them
 print("\n=== Finding SKU for Quantity Order ===")
-dg_params = QueryParams().include("stock_keeping_units").page(number=1, size=10)
-did_groups = client.did_groups().list(dg_params).data
-group = next((g for g in did_groups if g.stock_keeping_units), None)
-if group is None:
-    raise SystemExit("No DID group with stock keeping units found")
+others = [a for a in available_dids[2:] if a.did_group and a.did_group.stock_keeping_units]
+used_groups = {ad1.did_group.id, ad2.did_group.id}
+source = next((a for a in others if a.did_group.id not in used_groups), others[0] if others else None)
+if source is None:
+    raise SystemExit("No other available DID with stock keeping units found")
+group = source.did_group
 sku_for_qty = group.stock_keeping_units[0]
 print(f"SKU for qty order: {sku_for_qty.id} (group={group.id})")
 

@@ -356,8 +356,8 @@ def add_proofs(entity, proof_types, qty):
 
 
 def wait_for_did(order):
-    """Waits up to a minute for an order to complete and returns its first DID."""
-    for _ in range(12):
+    """Waits up to two minutes for an order to complete and returns its first DID."""
+    for _ in range(24):
         if order.status != OrderStatus.PENDING:
             break
         time.sleep(5)
@@ -1327,10 +1327,12 @@ section("Orders and capacity")
 
 @check("Orders: order by SKU; build the other item types")
 def _():
-    groups = client.did_groups().list(QueryParams().include("stock_keeping_units").page(number=1, size=10)).data
-    group = next((g for g in groups if g.stock_keeping_units), None)
-    if group is None:
-        raise Skip("no DID group with stock keeping units")
+    # A DID group with two numbers in stock, counted among the available DIDs
+    params = QueryParams().include("did_group.stock_keeping_units").page(number=1, size=50)
+    groups = [a.did_group for a in client.available_dids().list(params).data
+              if a.did_group and a.did_group.stock_keeping_units]
+    group = next((g for g in groups if sum(other.id == g.id for other in groups) >= 2), None)
+    expect(group is not None, "no DID group with 2 available DIDs")
 
     # Order by SKU
     order = Order()

@@ -70,8 +70,8 @@ response = client.orders().create(order)
 created_order = response.data
 print(f"  Order: {created_order.id} — {enum_value(created_order.status)}")
 
-# Wait for order to complete
-for _ in range(10):
+# Wait up to two minutes for the order to complete
+for _ in range(24):
     if created_order.status == "completed":
         break
     time.sleep(5)
