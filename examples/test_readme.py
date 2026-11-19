@@ -510,20 +510,25 @@ def accepted_address(country_id, requirement_id, validate):
 
 
 def emergency_did_and_address():
-    """A DID with the emergency feature and no emergency service or verification yet, and an
-    address of the account in its country that its emergency requirement accepts, the way
-    examples/emergency_scenario.py finds them; orders such a DID when the account has none."""
+    """A DID with the emergency feature and no emergency service, verification or identity yet,
+    and an address of the account in its country that its emergency requirement accepts, the way
+    examples/emergency_scenario.py finds them; orders such a DID when the account has none.
+    An emergency verification binds its DIDs to the identity of its address, and such a DID is
+    refused with any other identity, so a DID with an identity is not reused."""
     params = (QueryParams()
               .filter("did_group.features", "emergency")
               .filter("emergency_enabled", "false")
               .filter("terminated", "false")
-              .include("did_group", "did_group.country", "emergency_calling_service", "emergency_verification")
+              .include("did_group", "did_group.country", "emergency_calling_service", "emergency_verification",
+                       "identity")
               .sort("-created_at")
               .page(number=1, size=10))
     accepted = {}  # requirement ID -> an address it accepts, or None
     for did in client.dids().list(params).data:
         group = did.did_group
-        if did.emergency_calling_service or did.emergency_verification or not group or not group.country:
+        if did.emergency_calling_service or did.emergency_verification or did.identity:
+            continue
+        if not group or not group.country:
             continue
         requirement = emergency_requirement_for(group.country.id, group.number_type)
         if requirement is None:
